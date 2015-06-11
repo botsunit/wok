@@ -1,6 +1,6 @@
 
 
-# Module wok_config #
+# Module wok_queue #
 * [Function Index](#index)
 * [Function Details](#functions)
 

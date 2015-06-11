@@ -14,7 +14,6 @@ init([]) ->
   {ok, {
      {one_for_one, 5, 10},
      [
-      ?CHILD(wok_config, worker, 5000),
       ?CHILD(wok_dispatcher, worker, 5000),
       ?CHILD(wok_services_sup, supervisor, infinity),
       ?CHILD(wok_topics_sup, supervisor, infinity)

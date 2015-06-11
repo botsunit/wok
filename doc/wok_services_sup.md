@@ -10,12 +10,19 @@ __Behaviours:__ [`supervisor`](supervisor.md).
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#init-1">init/1</a></td><td></td></tr><tr><td valign="top"><a href="#start_child-1">start_child/1</a></td><td></td></tr><tr><td valign="top"><a href="#start_link-0">start_link/0</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#available_workers-0">available_workers/0</a></td><td></td></tr><tr><td valign="top"><a href="#init-1">init/1</a></td><td></td></tr><tr><td valign="top"><a href="#start_child-1">start_child/1</a></td><td></td></tr><tr><td valign="top"><a href="#start_link-0">start_link/0</a></td><td></td></tr><tr><td valign="top"><a href="#terminate_child-1">terminate_child/1</a></td><td></td></tr><tr><td valign="top"><a href="#workers-0">workers/0</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
 
 ## Function Details ##
+
+<a name="available_workers-0"></a>
+
+### available_workers/0 ###
+
+`available_workers() -> any()`
+
 
 <a name="init-1"></a>
 
@@ -36,5 +43,19 @@ __Behaviours:__ [`supervisor`](supervisor.md).
 ### start_link/0 ###
 
 `start_link() -> any()`
+
+
+<a name="terminate_child-1"></a>
+
+### terminate_child/1 ###
+
+`terminate_child(Child) -> any()`
+
+
+<a name="workers-0"></a>
+
+### workers/0 ###
+
+`workers() -> any()`
 
 

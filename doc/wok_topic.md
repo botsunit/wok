@@ -42,7 +42,7 @@ __Behaviours:__ [`gen_server`](gen_server.md).
 
 ### handle_info/2 ###
 
-`handle_info(Info, State) -> any()`
+`handle_info(Info, Topic) -> any()`
 
 
 <a name="init-1"></a>

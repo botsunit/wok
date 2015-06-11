@@ -1,4 +1,4 @@
--module(wok_config).
+-module(wok_queue).
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).
 

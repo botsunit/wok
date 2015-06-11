@@ -1,0 +1,21 @@
+digraph wok {
+  splines=ortho;
+  node[shape=box];
+
+  wok_app -> wok_sup;
+
+  wok_sup -> wok_dispatcher [style=dotted];
+  wok_sup -> wok_services_sup [style=dotted];
+  wok_sup -> wok_topics_sup [style=dotted];
+
+  wok_dispatcher -> wok_services_sup;
+
+  wok_services_sup -> wok_service [style=dashed, headlabel="*", taillabel="0"];
+
+  wok_topics_sup -> wok_topic [style=dashed, headlabel="*", taillabel="*"];
+
+  wok_service -> wok_dispatcher;
+
+  wok_topic -> wok_dispatcher;
+
+}
