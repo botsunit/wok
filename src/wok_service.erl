@@ -15,6 +15,15 @@ init(Args) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
+handle_cast(serve, State) ->
+  lager:info("Serve message ~p", [State]),
+  % TODO: get provider from message
+  % TODO: run provider for message
+  _ = timer:sleep(10000),
+  Result = ok,
+  % END
+  _ = wok_dispatcher:finish(self(), Result),
+  {noreply, State};
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
