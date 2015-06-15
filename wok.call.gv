@@ -2,11 +2,22 @@ digraph wok {
   splines=ortho;
   node[shape=box];
 
+  wok[shape=oval];
+  wok -> wok_app;
   wok_app -> wok_sup;
 
-  wok_sup -> wok_dispatcher [style=dotted];
-  wok_sup -> wok_services_sup [style=dotted];
-  wok_sup -> wok_topics_sup [style=dotted];
+  cowboy[shape=oval];
+  wok_app -> cowboy [style=dashed];
+  wok_app -> wok_rest_handler;
+  cowboy -> wok_rest_handler [style=dashed];
+  wok_rest_handler -> "<handlers>";
+
+  wok_sup -> wok_messages_sup [style=dotted];
+  wok_sup -> wok_rest_sup [style=dotted];
+
+  wok_messages_sup -> wok_dispatcher [style=dotted];
+  wok_messages_sup -> wok_services_sup [style=dotted];
+  wok_messages_sup -> wok_topics_sup [style=dotted];
 
   wok_dispatcher -> wok_services_sup;
 
