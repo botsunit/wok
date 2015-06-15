@@ -25,7 +25,7 @@ workers() ->
   end.
 
 available_workers() ->
-  case {workers(), application:get_env(wok, max_messages, ?DEFAULT_MAX_MESSAGES)} of
+  case {workers(), wok_config:conf([wok, messages, max], ?DEFAULT_MAX_MESSAGES)} of
     {Workers, Max} when Workers < Max ->
       Max - Workers;
     _ ->

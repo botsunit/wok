@@ -11,12 +11,12 @@ start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-  Childs = case application:get_env(wok, topics) of
-             {ok, Topics} ->
-               build_childs(Topics);
+  Childs = case wok_config:conf([wok, messages, topics]) of
              undefined ->
                lager:info("No topic declared in config!"),
-               []
+               [];
+             Topics ->
+               build_childs(Topics)
            end,
   {ok, {
      {one_for_one, 5, 10},

@@ -10,7 +10,6 @@
                   , compiler
                   , goldrush
                   , lager
-                  , kafe
                  ]},
   {mod, { wok_app, []}},
   {env, []}

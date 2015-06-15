@@ -1,5 +1,6 @@
 %% encoding: UTF-8
 {application,wok}.
 {packages,[]}.
-{modules,[wok,wok_app,wok_dispatcher,wok_service,wok_services_sup,wok_sup,
-          wok_topic,wok_topics_sup]}.
+{modules,[dummy_service_handler,wok,wok_app,wok_config,wok_dispatcher,
+          wok_messages_sup,wok_rest_handler,wok_rest_sup,wok_service,
+          wok_services_sup,wok_sup,wok_topic,wok_topics_sup]}.

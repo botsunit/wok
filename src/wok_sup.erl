@@ -11,13 +11,20 @@ start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
+  Childs = case wok_config:conf([wok, messages]) of
+             undefined ->
+               [];
+             _ ->
+               [?CHILD(wok_messages_sup, supervisor, infinity)]
+           end ++ case wok_config:conf([wok, rest]) of
+                    undefined ->
+                      [];
+                    _ ->
+                      [?CHILD(wok_rest_sup, supervisor, infinity)]
+                  end,
   {ok, {
      {one_for_one, 5, 10},
-     [
-      ?CHILD(wok_dispatcher, worker, 5000),
-      ?CHILD(wok_services_sup, supervisor, infinity),
-      ?CHILD(wok_topics_sup, supervisor, infinity)
-     ]
+     Childs
     }
   }.
 

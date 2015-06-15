@@ -15,16 +15,16 @@
 
 start_link(Name, Options) ->
   lager:info("Start topic ~s", [Name]),
-  case application:get_env(wok, consumer_group) of
-    {ok, ConsumerGroup} ->
+  case wok_config:conf([wok, messages, consumer_group]) of
+    undefined ->
+      lager:error("Missing consumer group in configuration"),
+      {error, missing_consumer_group};
+    ConsumerGroup ->
       gen_server:start_link({local,
                              eutils:to_atom(Name)},
                             ?MODULE,
                             [{consumer_group, ConsumerGroup}, {name, Name}|Options],
-                            []);
-    undefined ->
-      lager:error("Missing consumer group in configuration"),
-      {error, missing_consumer_group}
+                            [])
   end.
 
 %% ------------------------------------------------------------------
