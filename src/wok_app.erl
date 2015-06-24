@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_app).
 
 -behaviour(application).

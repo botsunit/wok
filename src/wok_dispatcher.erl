@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_dispatcher).
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).
@@ -22,6 +23,7 @@ init(_Args) ->
   {ok, queue:new()}.
 
 handle_call({handle, Message}, _From, State) ->
+  % TODO: Queue
   case wok_services_sup:start_child(Message) of
     {ok, Child} ->
       {reply, gen_server:cast(Child, serve), State};

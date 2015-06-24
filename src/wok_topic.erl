@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_topic).
 -behaviour(gen_server).
 -include("../include/wok.hrl").
@@ -46,9 +47,28 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_info(fetch, #topic{fetch_frequency = Frequency, name = Topic} = State) ->
+handle_info(fetch, #topic{fetch_frequency = Frequency, 
+                          name = Topic,
+                          consumer_group = ConsumerGroup,
+                          max_bytes = MaxBytes} = State) ->
   lager:info("Fetch topic ~s", [Topic]),
-  %% TODO wok_dispatcher:handle(Message)
+  _ = case get_offsets(Topic, ConsumerGroup) of
+        Offsets when is_list(Offsets), Offsets =/= [] ->
+          lists:foreach(
+            fun({Partition, Offset}) ->
+                lager:debug("Fetch message #~p on ~p / ~p", [Offset, Topic, Partition]),
+                case kafe:fetch(-1, Topic, #{partition => Partition, offset => Offset, max_bytes => MaxBytes}) of
+                  {ok, [#{partitions := Partitions}]} ->
+                    lists:foreach(fun wok_dispatcher:handle/1,
+                                  [{Key, Value} || 
+                                   #{message := #{key := Key, value := Value}} <- Partitions, Value =/= <<>>]);
+                  _ ->
+                    lager:info("Error fetching message ~p@~p#~p", [Topic, Partition, Offset])
+                end
+            end, Offsets);
+        _ ->
+          lager:debug("No new message on ~p for ~p", [Topic, ConsumerGroup])
+      end,
   erlang:send_after(Frequency, self(), fetch),
   {noreply, State};
 handle_info(_Info, State) ->
@@ -59,4 +79,45 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+% Private
+
+get_offsets(TopicName, ConsumerGroup) ->
+  NoError = kafe_error:code(0),
+  case kafe:offset([TopicName]) of
+    {ok, [#{name := TopicName, partitions := Partitions}]} ->
+      lists:foldl(
+        fun(#{id := PartitionID, offsets := [Offset|_]}, Acc) ->
+            Offset1 = Offset - 1,
+            if  
+              Offset1 >= 0 ->
+                case kafe:offset_fetch(ConsumerGroup, [{TopicName, [PartitionID]}]) of
+                  {ok,[#{name := TopicName,
+                         partitions_offset := [#{offset := CurrentOffset,
+                                                 partition := PartitionID}]}]} ->
+                    if  
+                      CurrentOffset < Offset1 ->
+                        case kafe:offset_commit(ConsumerGroup, 
+                                                [{TopicName, [{PartitionID, Offset1, <<>>}]}]) of
+                          {ok, [#{name := TopicName, 
+                                  partitions := [#{partition := PartitionID, 
+                                                   error_code := ErrorCode}]}]} when ErrorCode =:= NoError ->
+                            [{PartitionID, Offset1}|Acc];
+                          _ ->
+                            Acc 
+                        end;
+                      true ->
+                        Acc 
+                    end;
+                  _ ->  
+                    Acc 
+                end;
+              true ->
+                Acc 
+            end 
+        end, [], Partitions);
+    _ ->  
+      lager:info("Can't retriece offsets for topic ~p", [TopicName]),
+      error
+  end.
 

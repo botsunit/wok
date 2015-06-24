@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_topics_sup).
 
 -behaviour(supervisor).

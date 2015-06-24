@@ -10,7 +10,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#my_service-1">my_service/1</a></td><td></td></tr><tr><td valign="top"><a href="#my_service_get-1">my_service_get/1</a></td><td></td></tr><tr><td valign="top"><a href="#my_service_post-1">my_service_post/1</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#my_service-1">my_service/1</a></td><td></td></tr><tr><td valign="top"><a href="#my_service_get-1">my_service_get/1</a></td><td></td></tr><tr><td valign="top"><a href="#my_service_get2-1">my_service_get2/1</a></td><td></td></tr><tr><td valign="top"><a href="#my_service_post-1">my_service_post/1</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -29,6 +29,13 @@
 ### my_service_get/1 ###
 
 `my_service_get(Req) -> any()`
+
+
+<a name="my_service_get2-1"></a>
+
+### my_service_get2/1 ###
+
+`my_service_get2(Req) -> any()`
 
 
 <a name="my_service_post-1"></a>

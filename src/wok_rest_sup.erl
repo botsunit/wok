@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_rest_sup).
 
 -behaviour(supervisor).

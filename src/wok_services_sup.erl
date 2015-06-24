@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_services_sup).
 -behaviour(supervisor).
 -include("../include/wok.hrl").

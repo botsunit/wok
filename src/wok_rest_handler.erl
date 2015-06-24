@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_rest_handler).
 
 -export([routes/1]).
