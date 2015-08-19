@@ -14,15 +14,15 @@ compile: get-deps
 	@$(REBAR) compile
 
 compile-dev: get-deps-dev
-	@$(REBAR) -c rebar.dev.config compile
+	@$(REBAR) -C rebar.dev.config compile
 
 get-deps:
 	@$(REBAR) get-deps
 	@$(REBAR) check-deps
 
 get-deps-dev:
-	@$(REBAR) -c rebar.dev.config get-deps
-	@$(REBAR) -c rebar.dev.config check-deps
+	@$(REBAR) -C rebar.dev.config get-deps
+	@$(REBAR) -C rebar.dev.config check-deps
 
 clean:
 	@$(REBAR) clean
