@@ -4,7 +4,6 @@
 * [Function Index](#index)
 * [Function Details](#functions)
 
-
 <a name="index"></a>
 
 ## Function Index ##
@@ -23,13 +22,11 @@
 
 `my_service(Message) -> any()`
 
-
 <a name="my_service_get-1"></a>
 
 ### my_service_get/1 ###
 
 `my_service_get(Req) -> any()`
-
 
 <a name="my_service_get2-1"></a>
 
@@ -37,11 +34,9 @@
 
 `my_service_get2(Req) -> any()`
 
-
 <a name="my_service_post-1"></a>
 
 ### my_service_post/1 ###
 
 `my_service_post(Req) -> any()`
-
 

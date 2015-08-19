@@ -4,7 +4,6 @@
 * [Function Index](#index)
 * [Function Details](#functions)
 
-
 <a name="index"></a>
 
 ## Function Index ##
@@ -23,11 +22,9 @@
 
 `conf(Field) -> any()`
 
-
 <a name="conf-2"></a>
 
 ### conf/2 ###
 
 `conf(Field, Default) -> any()`
-
 
