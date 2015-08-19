@@ -81,7 +81,7 @@ code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
 get_service_handlers(State) ->
-  lists:foldl(fun({ServiceName, HandlerModule, HandlerFunction}, State1) ->
-                  maps:put(ServiceName, {HandlerModule, HandlerFunction}, State1)
+  lists:foldl(fun({ServiceName, Handler}, State1) ->
+                  maps:put(ServiceName, Handler, State1)
               end, State, wok_config:conf([wok, messages, services], [])).
 

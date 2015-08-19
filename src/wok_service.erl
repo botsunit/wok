@@ -9,9 +9,9 @@
          terminate/2, code_change/3]).
 
 start_link(Message) ->
-  gen_server:start_link(?MODULE, [Message], []).
+  gen_server:start_link(?MODULE, Message, []).
 
-init(Message) ->
+init({<<>>, Message}) ->
   lager:info("Start service with message ~p", [Message]),
   {ok, Message}.
 
@@ -20,10 +20,14 @@ handle_call(_Request, _From, Message) ->
 
 handle_cast(serve, Message) ->
   lager:info("Serve message ~p", [Message]),
-  #message{to = To} = Message = erlang:apply(wok_config:conf([wok, messages, handler],
-                                                             ?DEFAULT_MESSAGE_HANDLER),
-                                             parse, [Message]),
-  Result = wok_dispatcher:provide(To, Message),
+  Result = case erlang:apply(wok_config:conf([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER), parse, [Message]) of
+             {ok, ParserMessage, _} ->
+               #message{to = To} = ParserMessage,
+               wok_dispatcher:provide(To, ParserMessage);
+             {error, Reason} ->
+               lager:info("Error parsing message: ~p", [Reason]),
+               noreply
+           end,
   _ = wok_dispatcher:finish(self(), Result),
   {noreply, Message};
 handle_cast(_Msg, Message) ->
