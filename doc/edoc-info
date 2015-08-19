@@ -1,3 +1,4 @@
 %% encoding: UTF-8
 {application,wok}.
-{modules,[dummy_service_handler,wok_config]}.
+{modules,[dummy_service_handler,wok_config,wok_http_handler,
+          wok_provider_handler]}.
