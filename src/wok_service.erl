@@ -1,6 +1,7 @@
 % @hidden
 -module(wok_service).
 -behaviour(gen_server).
+-include("../include/wok.hrl").
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
 -export([start_link/1]).
@@ -19,7 +20,9 @@ handle_call(_Request, _From, State) ->
 
 handle_cast(serve, State) ->
   lager:info("Serve message ~p", [State]),
-  #message{to = To} = Message = wok_message:parse(State),
+  #message{to = To} = Message = erlang:apply(wok_config:conf([wok, messages, handler],
+                                                             ?DEFAULT_MESSAGE_HANDLER),
+                                             parse, [State]),
   %lager:info("~p", [Message]),
   % TODO: get provider from message
   % TODO: run provider for message

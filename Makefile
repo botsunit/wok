@@ -29,7 +29,7 @@ clean:
 	$(RM_F) erl_crash.dump
 
 realclean: clean
-	@$(REBAR) delete-deps
+	@$(REBAR) -C rebar.dev.config delete-deps
 	@$(RM_RF) deps
 	@$(RM_RF) ebin
 	@$(RM_RF) log

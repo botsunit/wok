@@ -8,6 +8,7 @@
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
+  _ = check_message_handler(),
   _ = start_rest(),
   _ = start_messages(),
   wok_sup:start_link().
@@ -38,3 +39,14 @@ start_messages() ->
       _ = application:ensure_all_started(kafe),
       ok
   end.
+
+check_message_handler() ->
+  Handler = wok_config:conf([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER),
+  case code:ensure_loaded(Handler) of
+    {module, Handler} ->
+      ok;
+    {error, What} ->
+      lager:info("Can't load handler ~p", [Handler]),
+      exit(What)
+  end.
+

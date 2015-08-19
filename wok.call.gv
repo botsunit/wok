@@ -27,6 +27,8 @@ digraph wok {
 
   wok_service -> wok_dispatcher;
 
+  wok_service -> "<handler>";
+
   wok_topic -> wok_dispatcher;
 
 }
