@@ -8,14 +8,21 @@ RM_RF = rm -rf
 
 .PHONY: compile get-deps test doc
 
-all: compile doc
+all: doc
 
 compile: get-deps
 	@$(REBAR) compile
 
+compile-dev: get-deps-dev
+	@$(REBAR) -c rebar.dev.config compile
+
 get-deps:
 	@$(REBAR) get-deps
 	@$(REBAR) check-deps
+
+get-deps-dev:
+	@$(REBAR) -c rebar.dev.config get-deps
+	@$(REBAR) -c rebar.dev.config check-deps
 
 clean:
 	@$(REBAR) clean
@@ -27,15 +34,15 @@ realclean: clean
 	@$(RM_RF) ebin
 	@$(RM_RF) log
 
-test: compile
+test: compile-dev
 	@ERL_LIBS="../:deps/*/" $(REBAR) skip_deps=true eunit
 
-doc:
+doc: compile
 	@$(RM_F) documentation.md
 	@$(RM_RF) doc
 	@$(REBAR) doc
 
-dev: compile
+dev: compile-dev
 	@ERL_LIBS="../:deps/*/" erl -pa ebin include deps/*/ebin deps/*/include -config config/wok.config
 
 img: $(PNG)

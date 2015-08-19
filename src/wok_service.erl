@@ -1,7 +1,7 @@
 % @hidden
 -module(wok_service).
 -behaviour(gen_server).
--include_lib("wok_message/include/wok_message.hrl").
+-include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
 -export([start_link/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
