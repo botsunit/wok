@@ -4,7 +4,7 @@
 -define(SERVER, ?MODULE).
 
 -export([start_link/0, handle/1]).
--export([finish/2]).
+-export([provide/2, finish/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
@@ -17,10 +17,13 @@ handle(Message) ->
 finish(Child, Result) ->
   gen_server:cast(?SERVER, {terminate, Child, Result}).
 
+provide(To, Message) ->
+  gen_server:call(?SERVER, {provide, To, Message}).
+
 %% ------------------------------------------------------------------
 
 init(_Args) ->
-  {ok, queue:new()}.
+  {ok, get_service_handlers(#{queue => todo})}.
 
 handle_call({handle, Message}, _From, State) ->
   % TODO: Queue
@@ -37,13 +40,28 @@ handle_call({handle, Message}, _From, State) ->
       lager:info("Faild to start service : ~p", [Reason]),
       {reply, error, State}
   end;
+handle_call({provide, To, Message}, _From, State) ->
+  {reply, case  maps:get(eutils:to_binary(To), State, undefined) of
+            undefined ->
+              lager:info("No provider found for ~p : ignore message", [To]),
+              noreply;
+            {Module, Function} ->
+              erlang:apply(Module, Function, [Message])
+          end, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
 handle_cast({terminate, Child, Result}, State) ->
-  % TODO
-  lager:info("RESULT =================> ~p", [Result]),
-  % TODO
+  case Result of
+    noreply -> 
+      ok;
+    {reply, Topic, Message} ->
+      % TODO
+      lager:info("Reply @ ~p =================> ~p", [Topic, Message]);
+    _ ->
+      lager:error("Invalid response : ~p", [Result]),
+      ignore
+  end,
   _ = case wok_services_sup:terminate_child(Child) of
         ok -> ok;
         _ ->
@@ -61,4 +79,9 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+get_service_handlers(State) ->
+  lists:foldl(fun({ServiceName, HandlerModule, HandlerFunction}, State1) ->
+                  maps:put(ServiceName, {HandlerModule, HandlerFunction}, State1)
+              end, State, wok_config:conf([wok, messages, services], [])).
 

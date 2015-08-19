@@ -11,35 +11,30 @@
 start_link(Message) ->
   gen_server:start_link(?MODULE, [Message], []).
 
-init(Args) ->
-  lager:info("Start service with message ~p", [Args]),
-  {ok, Args}.
+init(Message) ->
+  lager:info("Start service with message ~p", [Message]),
+  {ok, Message}.
 
-handle_call(_Request, _From, State) ->
-  {reply, ok, State}.
+handle_call(_Request, _From, Message) ->
+  {reply, ok, Message}.
 
-handle_cast(serve, State) ->
-  lager:info("Serve message ~p", [State]),
+handle_cast(serve, Message) ->
+  lager:info("Serve message ~p", [Message]),
   #message{to = To} = Message = erlang:apply(wok_config:conf([wok, messages, handler],
                                                              ?DEFAULT_MESSAGE_HANDLER),
-                                             parse, [State]),
-  %lager:info("~p", [Message]),
-  % TODO: get provider from message
-  % TODO: run provider for message
-  _ = timer:sleep(10000),
-  Result = ok,
-  % END
+                                             parse, [Message]),
+  Result = wok_dispatcher:provide(To, Message),
   _ = wok_dispatcher:finish(self(), Result),
-  {noreply, State};
-handle_cast(_Msg, State) ->
-  {noreply, State}.
+  {noreply, Message};
+handle_cast(_Msg, Message) ->
+  {noreply, Message}.
 
-handle_info(_Info, State) ->
-  {noreply, State}.
+handle_info(_Info, Message) ->
+  {noreply, Message}.
 
-terminate(_Reason, _State) ->
+terminate(_Reason, _Message) ->
   ok.
 
-code_change(_OldVsn, State, _Extra) ->
-  {ok, State}.
+code_change(_OldVsn, Message, _Extra) ->
+  {ok, Message}.
 
