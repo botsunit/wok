@@ -28,7 +28,12 @@ handle_cast(serve, #{message := Message} = State) ->
                    lager:info("No provider found for ~p : ignore message", [To]),
                    noreply;
                  {Module, Function} ->
-                   erlang:apply(Module, Function, [Message])
+                   case erlang:apply(Module, Function, [Message]) of
+                     {reply, Topic, {Dest, Message}} ->
+                       {reply, Topic, {To, Dest, Message}};
+                     Other ->
+                       Other
+                   end
                end;
              {error, Reason} ->
                lager:info("Error parsing message: ~p", [Reason]),

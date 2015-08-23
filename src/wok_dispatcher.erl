@@ -45,8 +45,7 @@ handle_cast({terminate, Child, Result}, State) ->
     noreply -> 
       ok;
     {reply, Topic, Message} ->
-      % TODO
-      lager:info("Reply @ ~p =================> ~p", [Topic, Message]);
+      wok:provide(Topic, Message);
     _ ->
       lager:error("Invalid response : ~p", [Result]),
       ignore
