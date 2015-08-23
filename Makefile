@@ -5,6 +5,7 @@ PNG = $(GV:.gv=.png)
 RM = rm
 RM_F = rm -f
 RM_RF = rm -rf
+CP = cp
 
 .PHONY: compile get-deps test doc
 
@@ -37,10 +38,11 @@ realclean: clean
 test: compile-dev
 	@ERL_LIBS="../:deps/*/" $(REBAR) skip_deps=true eunit
 
-doc: compile
+doc: compile img
 	@$(RM_F) documentation.md
 	@$(RM_RF) doc
 	@$(REBAR) doc
+	@${CP} *.png doc
 
 dev: compile-dev
 	@ERL_LIBS="../:deps/*/" erl -pa ebin include deps/*/ebin deps/*/include -config config/wok.config

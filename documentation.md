@@ -1,3 +1,0 @@
-
-
-# The wok application #

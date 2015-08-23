@@ -1,0 +1,87 @@
+@author Gregoire Lejeune <gregoire.lejeune@scalezen.com>
+@copyright 2015 Grégoire Lejeune
+@version 0.0.1
+@title Scalezen framework to create bots
+@doc
+<h3>Create a bot with wok</h3>
+
+<h4>Erlang</h4>
+
+<h4>Elixir</h4>
+
+<h4>Ruby</h4>
+
+<h4>Python</h4>
+
+<h4>Javascript</h4>
+
+<h3>Configuration</h3>
+
+<ul>
+<li><tt>messages :: list()</tt> : <a href="#messages_conf">Messages configuration</a></li>
+<li><tt>rest :: list()</tt> : <a href="#rest_conf">REST configuration</a></li>
+</ul>
+
+<a name="messages_conf"></a><h4>Messages configuration</h4>
+
+<ul>
+<li><tt>handler :: atom()</tt> : </li>
+<li><tt>services :: list()</tt> : <a  href="#services_conf">Services configuration</a></li>
+<li><tt>consumer_group :: binary()</tt> : </li>
+<li><tt>local_queue_name :: binary()</tt> : </li>
+<li><tt>local_consumer_group :: binary()</tt> : </li>
+<li><tt>max_services_fork :: integer()</tt> : </li>
+<li><tt>topics :: list()</tt> : <a href="#topic_conf">Topics configuration</a></li>
+</ul>
+
+<a name="rest_conf"></a><h4>REST configuration</h4>
+
+<ul>
+<li><tt>port :: integer()</tt> :</li>
+<li><tt>ip :: list()</tt> :</li>
+<li><tt>max_conn :: integer()</tt> :</li>
+<li><tt>routes :: list()</tt> : <a href="#routes_conf">Routes configuration</a></li>
+</ul>
+
+<a name="services_conf"></a><h4>Services configuration</h4>
+
+<pre>
+{&lt;&lt;"my_service"&gt;&gt;, {my_service_module, my_service_function}}
+</pre>
+
+<a name="topics_conf"></a><h4>Services configuration</h4>
+
+<pre>
+{&lt;&lt;"topic"&gt;&gt;, [{fetch_frequency, 5000}, {max_bytes, 10485760}]}
+</pre>
+
+<a name="routes_conf"></a><h4>Routes configuration</h4>
+
+<pre>
+{'GET', "/path", {route_module, route_function}}
+</pre>
+
+<h3>Dependencies</h3>
+
+![](wok.deps.png)
+
+<h3>Call tree</h3>
+
+![](wok.call.png)
+
+<h3>Licence</h3>
+
+Wok is available for use under the following license, commonly known as the 3-clause (or "modified") BSD license:
+
+Copyright (c) 2015 Grégoire Lejeune
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+<ul>
+<li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+<li>The name of the author may not be used to endorse or promote products derived from this software without specific prior written permission.</li>
+</ul>
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@end
