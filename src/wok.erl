@@ -18,7 +18,7 @@ provide(Topic, From, To, Body, Options) ->
   provide(Topic, Message).
 
 provide(Topic, Message) when is_binary(Message) ->
-  kafe:provide(Topic, Message);
+  kafe:produce(Topic, Message);
 provide(Topic, {From, To, Body}) ->
   provide(Topic, From, To, Body);
 provide(Topic, {From, To, Body, Options}) ->

@@ -12,7 +12,7 @@ start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 start_child(Message) ->
-  case  available_workers() of
+  case available_workers() of
     0 ->
       {queue, Message};
     N when N > 0 ->

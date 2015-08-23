@@ -1,6 +1,9 @@
 % @hidden
 -module(wok_dispatcher).
 -behaviour(gen_server).
+-include("../include/wok.hrl").
+-include_lib("wok_message_handler/include/wok_message_handler.hrl").
+
 -define(SERVER, ?MODULE).
 
 -export([start_link/0, handle/1]).
@@ -20,21 +23,17 @@ finish(Child, Result) ->
 %% ------------------------------------------------------------------
 
 init(_Args) ->
-  {ok, []}.
+  {ok, get_service_handlers(#{})}.
 
-handle_call({handle, Message}, _From, State) ->
-  % TODO: Queue
-  case wok_services_sup:start_child(Message) of
-    {ok, Child} ->
-      {reply, gen_server:cast(Child, serve), State};
-    {ok, Child, _} ->
-      {reply, gen_server:cast(Child, serve), State};
-    {queue, Message} ->
-      % TODO
-      lager:info("Queue message..."),
+handle_call({handle, {<<>>, Message}}, _From, State) ->
+  case erlang:apply(wok_config:conf([wok, messages, handler], 
+                                    ?DEFAULT_MESSAGE_HANDLER), 
+                    parse, [Message]) of
+    {ok, #message{to = To} = ParserMessage, _} ->
+      _ = consume(ParserMessage, get_services(To, State)),
       {reply, ok, State};
     {error, Reason} ->
-      lager:info("Faild to start service : ~p", [Reason]),
+      lager:info("Error parsing message: ~p", [Reason]),
       {reply, error, State}
   end;
 handle_call(_Request, _From, State) ->
@@ -67,4 +66,37 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+get_service_handlers(State) ->
+  State#{services => lists:foldl(fun({ServiceName, Handler}, Services) ->
+                                     maps:put(ServiceName, Handler, Services)
+                                 end, #{}, wok_config:conf([wok, messages, services], []))}.
+
+get_services(<<"*">>, #{services := Services}) ->
+  maps:values(Services);
+get_services(To, #{services := Services}) ->
+  case maps:get(eutils:to_binary(To), Services, maps:get(<<"*">>, Services, undefined)) of
+    undefined ->
+      [];
+    MF ->
+      [MF]
+  end.
+
+consume(ParsedMessage, Services) ->
+  lists:foreach(fun(Service) ->
+                    % TODO: Queue
+                    case wok_services_sup:start_child({ParsedMessage, Service}) of
+                      {ok, Child} ->
+                        gen_server:cast(Child, serve);
+                      {ok, Child, _} ->
+                        gen_server:cast(Child, serve);
+                      {queue, {ParsedMessage, Service}} ->
+                        % TODO
+                        lager:info("Queue message/service..."),
+                        ok;
+                      {error, Reason} ->
+                        lager:info("Faild to start service : ~p", [Reason]),
+                        error
+                    end
+                end, Services).
 

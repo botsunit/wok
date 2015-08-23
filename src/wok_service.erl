@@ -1,7 +1,6 @@
 % @hidden
 -module(wok_service).
 -behaviour(gen_server).
--include("../include/wok.hrl").
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
 -export([start_link/1]).
@@ -11,33 +10,20 @@
 start_link(Message) ->
   gen_server:start_link(?MODULE, Message, []).
 
-init({<<>>, Message}) ->
-  lager:info("Start service with message ~p", [Message]),
-  {ok, get_service_handlers(#{message => Message})}.
+init({Message, Service}) ->
+  lager:info("Start service ~p with message ~p", [Service, Message]),
+  {ok, #{service => Service, message => Message}}.
 
 handle_call(_Request, _From, Message) ->
   {reply, ok, Message}.
 
-handle_cast(serve, #{message := Message} = State) ->
+handle_cast(serve, #{message := #message{to = To} = Message, service := {Module, Function}} = State) ->
   lager:info("Serve message ~p", [Message]),
-  Result = case erlang:apply(wok_config:conf([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER), parse, [Message]) of
-             {ok, ParserMessage, _} ->
-               #message{to = To} = ParserMessage,
-               case maps:get(eutils:to_binary(To), State, undefined) of
-                 undefined ->
-                   lager:info("No provider found for ~p : ignore message", [To]),
-                   noreply;
-                 {Module, Function} ->
-                   case erlang:apply(Module, Function, [Message]) of
-                     {reply, Topic, {Dest, Message}} ->
-                       {reply, Topic, {To, Dest, Message}};
-                     Other ->
-                       Other
-                   end
-               end;
-             {error, Reason} ->
-               lager:info("Error parsing message: ~p", [Reason]),
-               noreply
+  Result = case erlang:apply(Module, Function, [Message]) of
+             {reply, Topic, {Dest, Message}} ->
+               {reply, Topic, {To, Dest, Message}};
+             Other ->
+               Other
            end,
   _ = wok_dispatcher:finish(self(), Result),
   {noreply, State};
@@ -53,7 +39,3 @@ terminate(_Reason, _Message) ->
 code_change(_OldVsn, Message, _Extra) ->
   {ok, Message}.
 
-get_service_handlers(State) ->
-  lists:foldl(fun({ServiceName, Handler}, State1) ->
-                  maps:put(ServiceName, Handler, State1)
-              end, State, wok_config:conf([wok, messages, services], [])).
