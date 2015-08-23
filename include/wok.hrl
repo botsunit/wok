@@ -5,3 +5,4 @@
 -define(DEFAULT_REST_IP, "0.0.0.0").
 -define(DEFAULT_REST_MAX_CONN, 100).
 -define(DEFAULT_MESSAGE_HANDLER, wok_message).
+-define(DEFAULT_LOCAL_QUEUE, <<"local_queue">>).

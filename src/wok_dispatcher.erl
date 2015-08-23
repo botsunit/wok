@@ -23,6 +23,7 @@ finish(Child, Result) ->
 %% ------------------------------------------------------------------
 
 init(_Args) ->
+  erlang:send_after(5, self(), fetch),
   {ok, get_service_handlers(#{})}.
 
 handle_call({handle, {<<>>, Message}}, _From, State) ->
@@ -50,7 +51,24 @@ handle_cast({terminate, Child, Result}, State) ->
       ignore
   end,
   _ = case wok_services_sup:terminate_child(Child) of
-        ok -> ok;
+        ok -> 
+          case wok_config:conf([wok, messages, local_consumer_group],
+                               wok_config:conf([wok, messages, consumer_group], undefined)) of
+            undefined ->
+              lager:info("Missing consumer group in configuration"),
+              exit(config_error);
+            LocalConsumerGroup ->
+              LocalQueue = eutils:to_atom(
+                             wok_config:conf([wok, messages, local_queue_name], 
+                                             ?DEFAULT_LOCAL_QUEUE)),
+              case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
+                {ok, Data} ->
+                  {ParsedMessage, Service} = binary_to_term(Data),
+                  force_consume(ParsedMessage, Service);
+                {error, _} ->
+                  ok
+              end
+          end;
         _ ->
           lager:error("Faild to stop service #~p", [Child])
       end,
@@ -58,6 +76,25 @@ handle_cast({terminate, Child, Result}, State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
+handle_info(fetch, State) ->
+  case wok_config:conf([wok, messages, local_consumer_group],
+                       wok_config:conf([wok, messages, consumer_group], undefined)) of
+    undefined ->
+      lager:info("Missing consumer group in configuration"),
+      exit(config_error);
+    LocalConsumerGroup ->
+      LocalQueue = eutils:to_atom(
+                     wok_config:conf([wok, messages, local_queue_name], 
+                                     ?DEFAULT_LOCAL_QUEUE)),
+      [case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
+         {ok, Data} ->
+           {ParsedMessage, Service} = binary_to_term(Data),
+           force_consume(ParsedMessage, Service);
+         {error, _} ->
+           ok
+       end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_MESSAGES))]
+  end,
+  {noreply, State};
 handle_info(_Info, State) ->
   {noreply, State}.
 
@@ -83,20 +120,56 @@ get_services(To, #{services := Services}) ->
   end.
 
 consume(ParsedMessage, Services) ->
-  lists:foreach(fun(Service) ->
-                    % TODO: Queue
-                    case wok_services_sup:start_child({ParsedMessage, Service}) of
-                      {ok, Child} ->
-                        gen_server:cast(Child, serve);
-                      {ok, Child, _} ->
-                        gen_server:cast(Child, serve);
-                      {queue, {ParsedMessage, Service}} ->
-                        % TODO
-                        lager:info("Queue message/service..."),
-                        ok;
-                      {error, Reason} ->
-                        lager:info("Faild to start service : ~p", [Reason]),
-                        error
-                    end
-                end, Services).
+  case wok_config:conf([wok, messages, local_consumer_group],
+                        wok_config:conf([wok, messages, consumer_group], undefined)) of
+    undefined ->
+      lager:info("Missing consumer group in configuration"),
+      exit(config_error);
+    LocalConsumerGroup ->
+      LocalQueue = eutils:to_atom(
+                     wok_config:conf([wok, messages, local_queue_name], 
+                                     ?DEFAULT_LOCAL_QUEUE)),
+      lists:foreach(fun(Service) ->
+                        LocalConsumerGroupOffset = pipette:offset(LocalQueue, #{consumer => LocalConsumerGroup}),
+                        case pipette:queue(LocalQueue) of
+                          {LocalQueue, LocalConsumerGroupOffset, _, _, _} ->
+                            case wok_services_sup:start_child({ParsedMessage, Service}) of
+                              {ok, Child} ->
+                                gen_server:cast(Child, serve);
+                              {ok, Child, _} ->
+                                gen_server:cast(Child, serve);
+                              {queue, Data} ->
+                                queue(LocalQueue, Data);
+                              {error, Reason} ->
+                                lager:info("Faild to start service : ~p", [Reason]),
+                                error
+                            end;
+                          _ ->
+                            queue(LocalQueue, {ParsedMessage, Service})
+                        end
+                    end, Services)
+  end.
+
+force_consume(ParsedMessage, Service) ->
+  case wok_services_sup:start_child({ParsedMessage, Service}) of
+    {ok, Child} ->
+      gen_server:cast(Child, serve);
+    {ok, Child, _} ->
+      gen_server:cast(Child, serve);
+    {queue, {ParsedMessage, Service}} ->
+      force_consume(ParsedMessage, Service);
+    {error, Reason} ->
+      lager:info("Faild to start service : ~p", [Reason]),
+      error
+  end.
+
+queue(LocalQueue, {ParsedMessage, _Service} = Data) ->
+  case pipette:in(LocalQueue, term_to_binary(Data)) of
+    {ok, LocalOffset} ->
+      lager:info("Message ~p queued with local offset ~p", [ParsedMessage, LocalOffset]),
+      ok;
+    {error, Reason} ->
+      lager:info("Faild to queue message ~p to ~p: ", [ParsedMessage, LocalQueue, Reason]),
+      error
+  end.
 

@@ -9,6 +9,7 @@
 
 start(_StartType, _StartArgs) ->
   _ = check_message_handler(),
+  _ = start_local_queue(),
   _ = start_rest(),
   _ = start_messages(),
   wok_sup:start_link().
@@ -48,5 +49,19 @@ check_message_handler() ->
     {error, What} ->
       lager:info("Can't load handler ~p", [Handler]),
       exit(What)
+  end.
+
+start_local_queue() ->
+  LocalQueue = eutils:to_atom(wok_config:conf([wok, messages, local_queue_name], ?DEFAULT_LOCAL_QUEUE)),
+  case pipette:queue(LocalQueue) of
+    missing_queue ->
+      case pipette:new_queue(LocalQueue) of
+        {ok, _} ->
+          lager:info("Local queue ~p created", [LocalQueue]);
+        {error, Reason} ->
+          lager:info("Faild to create local queue ~p: ~p", [LocalQueue, Reason])
+      end;
+    _ ->
+      ok
   end.
 

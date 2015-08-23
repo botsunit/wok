@@ -31,7 +31,7 @@ workers() ->
   end.
 
 available_workers() ->
-  case {workers(), wok_config:conf([wok, messages, max], ?DEFAULT_MAX_MESSAGES)} of
+  case {workers(), wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_MESSAGES)} of
     {Workers, Max} when Workers < Max ->
       Max - Workers;
     _ ->
