@@ -15,6 +15,26 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@scalezen.com`](mailto:gregoire
 
 #### Erlang ####
 
+1. Add wok in your dependencies :
+
+```
+
+{wok, ".*", {git, "git@gitlab.scalezen.com:msaas/wok.git", {branch, "master"}}}
+
+```
+
+2. Create your services and routes.
+
+3. Reference your services and routes in the `config` file (see [Configuration](https://gitlab.scalezen.com/msaas/wok/tree/master/doc/README.md#conf))
+
+3. Start your service :
+
+```
+
+application:ensure_all_started(wok).
+
+```
+
 
 #### Elixir ####
 
@@ -26,7 +46,7 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@scalezen.com`](mailto:gregoire
 
 
 #### Javascript ####
-
+<a name="conf"></a>
 
 ### Configuration ###
 
@@ -38,17 +58,17 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@scalezen.com`](mailto:gregoire
 
 #### Messages configuration ####
 
-* `handler :: atom()` :
+* `handler :: atom()` : handler used to create and parse messages. See [wok_message_handler](https://gitlab.scalezen.com/msaas/wok_message_handler) for more informations.
 
 * `services :: list()` : [Services configuration](https://gitlab.scalezen.com/msaas/wok/tree/master/doc/README.md#services_conf)
 
-* `consumer_group :: binary()` :
+* `consumer_group :: binary()` : Name of the Kafka' consumer group
 
-* `local_queue_name :: binary()` :
+* `local_queue_name :: binary()` : Name of the pipette' queue
 
-* `local_consumer_group :: binary()` :
+* `local_consumer_group :: binary()` : Name of the pipette' consumer group
 
-* `max_services_fork :: integer()` :
+* `max_services_fork :: integer()` : Maximum number of messages in parallel
 
 * `topics :: list()` : [Topics configuration](https://gitlab.scalezen.com/msaas/wok/tree/master/doc/README.md#topic_conf)
 
@@ -56,11 +76,11 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@scalezen.com`](mailto:gregoire
 
 #### REST configuration ####
 
-* `port :: integer()` :
+* `port :: integer()` : Port to use for the REST API (default: `8080`)
 
-* `ip :: list()` :
+* `ip :: list()` : IP to use for the REST API (default: `0.0.0.0`)
 
-* `max_conn :: integer()` :
+* `max_conn :: integer()` : Max number of  connexions (default: `100`)
 
 * `routes :: list()` : [Routes configuration](https://gitlab.scalezen.com/msaas/wok/tree/master/doc/README.md#routes_conf)
 
