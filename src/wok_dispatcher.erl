@@ -4,7 +4,7 @@
 -define(SERVER, ?MODULE).
 
 -export([start_link/0, handle/1]).
--export([provide/2, finish/2]).
+-export([finish/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
@@ -17,13 +17,10 @@ handle(Message) ->
 finish(Child, Result) ->
   gen_server:cast(?SERVER, {terminate, Child, Result}).
 
-provide(To, Message) ->
-  gen_server:call(?SERVER, {provide, To, Message}).
-
 %% ------------------------------------------------------------------
 
 init(_Args) ->
-  {ok, get_service_handlers(#{queue => todo})}.
+  {ok, []}.
 
 handle_call({handle, Message}, _From, State) ->
   % TODO: Queue
@@ -40,14 +37,6 @@ handle_call({handle, Message}, _From, State) ->
       lager:info("Faild to start service : ~p", [Reason]),
       {reply, error, State}
   end;
-handle_call({provide, To, Message}, _From, State) ->
-  {reply, case  maps:get(eutils:to_binary(To), State, undefined) of
-            undefined ->
-              lager:info("No provider found for ~p : ignore message", [To]),
-              noreply;
-            {Module, Function} ->
-              erlang:apply(Module, Function, [Message])
-          end, State};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
@@ -79,9 +68,4 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
-
-get_service_handlers(State) ->
-  lists:foldl(fun({ServiceName, Handler}, State1) ->
-                  maps:put(ServiceName, Handler, State1)
-              end, State, wok_config:conf([wok, messages, services], [])).
 
