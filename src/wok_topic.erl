@@ -51,7 +51,7 @@ handle_info(fetch, #topic{fetch_frequency = Frequency,
                           name = Topic,
                           consumer_group = ConsumerGroup,
                           max_bytes = MaxBytes} = State) ->
-  lager:info("Fetch topic ~s", [Topic]),
+  lager:debug("Fetch topic ~s", [Topic]),
   _ = case kafe:offsets(Topic, ConsumerGroup) of
         Offsets when is_list(Offsets), Offsets =/= [] ->
           lager:debug("Topic ~s will fetch ~p", [Topic, Offsets]),

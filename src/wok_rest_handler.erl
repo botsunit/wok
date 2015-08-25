@@ -9,7 +9,6 @@ routes(Routes) ->
 
 init(Req, Opts) ->
   Path = cowboy_req:path(Req),
-  lager:info("~p", [Path]),
   {Code, Headers, Body} = case list_to_atom(
                                  string:to_upper(
                                    binary_to_list(

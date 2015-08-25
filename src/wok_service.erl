@@ -18,7 +18,7 @@ handle_call(_Request, _From, Message) ->
   {reply, ok, Message}.
 
 handle_cast(serve, #{message := #message{to = To} = Message, service := {Module, Function}} = State) ->
-  lager:info("Serve message ~p", [Message]),
+  lager:debug("Serve message ~p", [Message]),
   Result = case erlang:apply(Module, Function, [Message]) of
              {reply, Topic, {Dest, Message}} ->
                {reply, Topic, {To, Dest, Message}};

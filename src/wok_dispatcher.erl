@@ -166,7 +166,7 @@ force_consume(ParsedMessage, Service) ->
 queue(LocalQueue, {ParsedMessage, _Service} = Data) ->
   case pipette:in(LocalQueue, term_to_binary(Data)) of
     {ok, LocalOffset} ->
-      lager:info("Message ~p queued with local offset ~p", [ParsedMessage, LocalOffset]),
+      lager:debug("Message ~p queued with local offset ~p", [ParsedMessage, LocalOffset]),
       ok;
     {error, Reason} ->
       lager:info("Faild to queue message ~p to ~p: ", [ParsedMessage, LocalQueue, Reason]),
