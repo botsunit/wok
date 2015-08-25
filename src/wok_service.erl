@@ -10,18 +10,18 @@
 start_link(Message) ->
   gen_server:start_link(?MODULE, Message, []).
 
-init({Message, Service}) ->
+init({Message, Service, Action}) ->
   lager:info("Start service ~p with message ~p", [Service, Message]),
-  {ok, #{service => Service, message => Message}}.
+  {ok, #{service => Service, action => Action, message => Message}}.
 
 handle_call(_Request, _From, Message) ->
   {reply, ok, Message}.
 
-handle_cast(serve, #{message := #message{to = To} = Message, service := {Module, Function}} = State) ->
+handle_cast(serve, #{message := Message, action := {Module, Function}, service := Service} = State) ->
   lager:debug("Serve message ~p", [Message]),
   Result = case erlang:apply(Module, Function, [Message]) of
-             {reply, Topic, {Dest, Message}} ->
-               {reply, Topic, {To, Dest, Message}};
+             {reply, Topic, {Dest, Response}} ->
+               {reply, Topic, {Service, Dest, Response}};
              Other ->
                Other
            end,

@@ -31,7 +31,7 @@ handle_call({handle, {<<>>, Message}}, _From, State) ->
                                     ?DEFAULT_MESSAGE_HANDLER), 
                     parse, [Message]) of
     {ok, #message{to = To} = ParserMessage, _} ->
-      _ = consume(ParserMessage, get_services(To, State)),
+      _ = consume(ParserMessage, get_services(To, State), State),
       {reply, ok, State};
     {error, Reason} ->
       lager:info("Error parsing message: ~p", [Reason]),
@@ -40,7 +40,7 @@ handle_call({handle, {<<>>, Message}}, _From, State) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({terminate, Child, Result}, State) ->
+handle_cast({terminate, Child, Result}, #{services := Services} = State) ->
   case Result of
     noreply -> 
       ok;
@@ -64,7 +64,7 @@ handle_cast({terminate, Child, Result}, State) ->
               case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
                 {ok, Data} ->
                   {ParsedMessage, Service} = binary_to_term(Data),
-                  force_consume(ParsedMessage, Service);
+                  force_consume(ParsedMessage, Service, maps:get(Service, Services));
                 {error, _} ->
                   ok
               end
@@ -76,7 +76,7 @@ handle_cast({terminate, Child, Result}, State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_info(fetch, State) ->
+handle_info(fetch, #{services := Services} = State) ->
   case wok_config:conf([wok, messages, local_consumer_group],
                        wok_config:conf([wok, messages, consumer_group], undefined)) of
     undefined ->
@@ -89,7 +89,7 @@ handle_info(fetch, State) ->
       [case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
          {ok, Data} ->
            {ParsedMessage, Service} = binary_to_term(Data),
-           force_consume(ParsedMessage, Service);
+           force_consume(ParsedMessage, Service, maps:get(Service, Services));
          {error, _} ->
            ok
        end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_MESSAGES))]
@@ -107,19 +107,39 @@ code_change(_OldVsn, State, _Extra) ->
 get_service_handlers(State) ->
   State#{services => lists:foldl(fun({ServiceName, Handler}, Services) ->
                                      maps:put(ServiceName, Handler, Services)
-                                 end, #{}, wok_config:conf([wok, messages, services], []))}.
+                                 end, #{}, wok_config:conf([wok, messages, services], 
+                                                           wok_config:conf([wok, messages, controlers], [])))}.
 
-get_services(<<"*">>, #{services := Services}) ->
-  maps:values(Services);
-get_services(To, #{services := Services}) ->
-  case maps:get(eutils:to_binary(To), Services, maps:get(<<"*">>, Services, undefined)) of
-    undefined ->
-      [];
-    MF ->
-      [MF]
-  end.
+get_services(To, State) when is_binary(To) ->
+  get_services([To],State);
+get_services(Tos, #{services := Services}) when is_list(Tos) ->
+  lists:foldl(fun(To, Acc) ->
+                  lists:umerge(lists:sort(Acc),
+                               lists:sort(
+                                 get_services(
+                                   binary:split(To, <<"/">>, [global]), 
+                                   maps:keys(Services), [])))
+              end, [], Tos).
 
-consume(ParsedMessage, Services) ->
+get_services(_, [], Result) ->
+  Result;
+get_services(To, [Service|Services], Result) ->
+  get_services(To, Services, service_match(To, binary:split(eutils:to_binary(Service), <<"/">>, [global]), Service, Result)).
+
+service_match(_, [], ServiceName, Result) ->
+  [ServiceName|Result];
+service_match([], X, _, Result) when X =/= [] ->
+  Result;
+service_match([X|_], [Y|_], _, Result) when X =/= Y,
+                                            X =/= <<"*">>,
+                                            Y =/= <<"*">> ->
+  Result;
+service_match([X|To], [Y|Service], ServiceName, Result) when X == Y;
+                                                             X == <<"*">>;
+                                                             Y == <<"*">> ->
+  service_match(To, Service, ServiceName, Result).
+
+consume(ParsedMessage, Services, #{services := ServicesActions}) ->
   case wok_config:conf([wok, messages, local_consumer_group],
                         wok_config:conf([wok, messages, consumer_group], undefined)) of
     undefined ->
@@ -133,7 +153,7 @@ consume(ParsedMessage, Services) ->
                         LocalConsumerGroupOffset = pipette:offset(LocalQueue, #{consumer => LocalConsumerGroup}),
                         case pipette:queue(LocalQueue) of
                           {LocalQueue, LocalConsumerGroupOffset, _, _, _} ->
-                            case wok_services_sup:start_child({ParsedMessage, Service}) of
+                            case wok_services_sup:start_child({ParsedMessage, Service, maps:get(Service, ServicesActions)}) of
                               {ok, Child} ->
                                 gen_server:cast(Child, serve);
                               {ok, Child, _} ->
@@ -150,14 +170,14 @@ consume(ParsedMessage, Services) ->
                     end, Services)
   end.
 
-force_consume(ParsedMessage, Service) ->
-  case wok_services_sup:start_child({ParsedMessage, Service}) of
+force_consume(ParsedMessage, Service, Action) ->
+  case wok_services_sup:start_child({ParsedMessage, Service, Action}) of
     {ok, Child} ->
       gen_server:cast(Child, serve);
     {ok, Child, _} ->
       gen_server:cast(Child, serve);
-    {queue, {ParsedMessage, Service}} ->
-      force_consume(ParsedMessage, Service);
+    {queue, {ParsedMessage, Service, Action}} ->
+      force_consume(ParsedMessage, Service, Action);
     {error, Reason} ->
       lager:info("Faild to start service : ~p", [Reason]),
       error
