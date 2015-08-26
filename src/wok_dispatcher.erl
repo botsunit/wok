@@ -27,14 +27,23 @@ init(_Args) ->
   {ok, get_service_handlers(#{})}.
 
 handle_call({handle, {<<>>, Message}}, _From, State) ->
-  case erlang:apply(wok_config:conf([wok, messages, handler], 
-                                    ?DEFAULT_MESSAGE_HANDLER), 
-                    parse, [Message]) of
-    {ok, #message{to = To} = ParserMessage, _} ->
-      _ = consume(ParserMessage, get_services(To, State), State),
-      {reply, ok, State};
-    {error, Reason} ->
-      lager:info("Error parsing message: ~p", [Reason]),
+  try
+    case erlang:apply(wok_config:conf([wok, messages, handler], 
+                                      ?DEFAULT_MESSAGE_HANDLER), 
+                      parse, [Message]) of
+      {ok, #message{to = To} = ParserMessage, _} ->
+        _ = consume(ParserMessage, get_services(To, State), State),
+        {reply, ok, State};
+      {error, Reason} ->
+        lager:info("Error parsing message: ~p", [Reason]),
+        {reply, error, State};
+      _ ->
+        lager:info("Wrong message parser return. See wok_message_handler for more informations"),
+        {reply, error, State}
+    end
+  catch
+    _:E ->
+      lager:info("Parser faild: ~p", [E]),
       {reply, error, State}
   end;
 handle_call(_Request, _From, State) ->
