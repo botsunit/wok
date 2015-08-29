@@ -27,7 +27,10 @@ start_rest() ->
       IP = enet:str_to_ip(wok_config:conf([wok, rest, ip], ?DEFAULT_REST_IP)),
       TransOpts = [{port, Port}, {ip, IP}],
       MaxConn = wok_config:conf([wok, rest, max_conn], ?DEFAULT_REST_MAX_CONN),
-      Dispatch = wok_rest_handler:routes(wok_config:conf([wok, rest, routes], [])),
+      Dispatch = wok_rest_handler:routes(
+                   wok_config:conf([wok, rest, routes], []) ++
+                   wok_middlewares:routes()
+                  ),
       ProtoOpts   = [{env, [{dispatch, Dispatch}]}],
       {ok, _} = cowboy:start_http(http, MaxConn, TransOpts, ProtoOpts)
   end.
