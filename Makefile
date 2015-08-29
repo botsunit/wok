@@ -44,7 +44,7 @@ test: compile-dev
 doc: compile-dev img
 	@$(RM_F) documentation.md
 	@$(RM_RF) doc
-	@$(REBAR) doc
+	@$(REBAR) -C rebar.dev.config doc
 	@${CP} *.png doc
 
 dev: compile-dev

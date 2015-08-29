@@ -42,14 +42,14 @@ handle_call({handle, {<<>>, Message}}, _From, State) ->
         {reply, error, State}
     end
   catch
-    _:E ->
-      lager:info("Parser faild: ~p", [E]),
+    T:E ->
+      lager:info("Parser faild: ~p:~p~n~p", [T, E, erlang:get_stacktrace()]),
       {reply, error, State}
   end;
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({terminate, Child, Result}, #{services := Services} = State) ->
+handle_cast({terminate, Child, Result}, State) ->
   case Result of
     noreply -> 
       ok;
@@ -72,8 +72,8 @@ handle_cast({terminate, Child, Result}, #{services := Services} = State) ->
                                              ?DEFAULT_LOCAL_QUEUE)),
               case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
                 {ok, Data} ->
-                  {ParsedMessage, Service} = binary_to_term(Data),
-                  force_consume(ParsedMessage, Service, maps:get(Service, Services));
+                  {ParsedMessage, Service, Action} = binary_to_term(Data),
+                  force_consume(ParsedMessage, Service, Action);
                 {error, _} ->
                   ok
               end
@@ -85,7 +85,7 @@ handle_cast({terminate, Child, Result}, #{services := Services} = State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_info(fetch, #{services := Services} = State) ->
+handle_info(fetch, State) ->
   case wok_config:conf([wok, messages, local_consumer_group],
                        wok_config:conf([wok, messages, consumer_group], undefined)) of
     undefined ->
@@ -97,8 +97,8 @@ handle_info(fetch, #{services := Services} = State) ->
                                      ?DEFAULT_LOCAL_QUEUE)),
       [case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
          {ok, Data} ->
-           {ParsedMessage, Service} = binary_to_term(Data),
-           force_consume(ParsedMessage, Service, maps:get(Service, Services));
+           {ParsedMessage, Service, Action} = binary_to_term(Data),
+           force_consume(ParsedMessage, Service, Action);
          {error, _} ->
            ok
        end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_MESSAGES))]
@@ -192,7 +192,7 @@ force_consume(ParsedMessage, Service, Action) ->
       error
   end.
 
-queue(LocalQueue, {ParsedMessage, _Service} = Data) ->
+queue(LocalQueue, {ParsedMessage, _Service, _Action} = Data) ->
   case pipette:in(LocalQueue, term_to_binary(Data)) of
     {ok, LocalOffset} ->
       lager:debug("Message ~p queued with local offset ~p", [ParsedMessage, LocalOffset]),

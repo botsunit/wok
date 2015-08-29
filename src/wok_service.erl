@@ -19,12 +19,18 @@ handle_call(_Request, _From, Message) ->
 
 handle_cast(serve, #{message := Message, action := {Module, Function}, service := Service} = State) ->
   lager:debug("Serve message ~p", [Message]),
-  Result = case erlang:apply(Module, Function, [Message]) of
-             {reply, Topic, {Dest, Response}} ->
-               {reply, Topic, {Service, Dest, Response}};
-             Other ->
-               Other
-           end,
+  WokState = wok_state:state(),
+  {Result, WokState1} = case erlang:apply(Module, Function, [Message, WokState]) of
+                          {noreply, RestState} -> 
+                            {noreply, RestState};
+                          {reply, Topic, {Dest, Response}, RestState} ->
+                            {{reply, Topic, {Service, Dest, Response}}, RestState};
+                          {reply, Topic, Response, RestState} ->
+                            {{reply, Topic, Response}, RestState};
+                          _ ->
+                            {noreply, WokState}
+                        end,
+  _ = wok_state:state(WokState1),
   _ = wok_dispatcher:finish(self(), Result),
   {noreply, State};
 handle_cast(_Msg, Message) ->

@@ -9,25 +9,27 @@ routes(Routes) ->
 
 init(Req, Opts) ->
   Path = cowboy_req:path(Req),
-  {Code, Headers, Body} = case list_to_atom(
-                                 string:to_upper(
-                                   binary_to_list(
-                                     cowboy_req:method(Req)))) of
-                            'OPTIONS' ->
-                              {200, [{<<"Allow">>, allow(Path)}], <<>>};
-                            Action ->
-                              try
-                                case lists:keyfind(Action, 1, Opts) of
-                                  {Action, {Module, Function}} ->
-                                    erlang:apply(Module, Function, [Req]);
-                                  false ->
-                                    {404, [], <<>>}
-                                end
-                              catch
-                                _:_ ->
-                                  {500, [], <<>>}
-                              end
-                          end,
+  WokState = wok_state:state(),
+  {Code, Headers, Body, WokState1} = case list_to_atom(
+                                            string:to_upper(
+                                              binary_to_list(
+                                                cowboy_req:method(Req)))) of
+                                       'OPTIONS' ->
+                                         {200, [{<<"Allow">>, allow(Path)}], <<>>};
+                                       Action ->
+                                         try
+                                           case lists:keyfind(Action, 1, Opts) of
+                                             {Action, {Module, Function}} ->
+                                               erlang:apply(Module, Function, [Req, WokState]);
+                                             false ->
+                                               {404, [], <<>>, WokState}
+                                           end
+                                         catch
+                                           _:_ ->
+                                             {500, [], <<>>, WokState}
+                                         end
+                                     end,
+  _ = wok_state:state(WokState1),
   {ok, cowboy_req:reply(Code, Headers, Body, Req), Opts}.
 
 % private

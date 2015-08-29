@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_config).
 
 -export([
@@ -19,7 +20,7 @@ conf(Field, Default) ->
   end.
 
 get_conf(_, undefined) ->
-      undefined;
+  undefined;
 get_conf([], Result) ->
   Result;
 get_conf([Field|Rest], Data) ->
