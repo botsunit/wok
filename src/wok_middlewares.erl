@@ -7,6 +7,7 @@
 
 -export([start_link/0]).
 -export([state/1, state/2]).
+-export([call/1]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
@@ -24,6 +25,9 @@ state(Middleware) ->
 
 state(Middleware, State) ->
   gen_server:cast(?SERVER, {state, Middleware, State}).
+
+call(Message) ->
+  gen_server:call(?SERVER, {call, Message}).
 
 init(_) ->
   {Middlewares, Confs} = lists:foldl(fun({Name, Opts}, {MiddlewaresAcc, ConfsAcc}) ->
@@ -45,6 +49,22 @@ init(_) ->
 
 handle_call({state, Middleware}, _From, #{confs := MStates} = State) ->
   {reply, maps:get(Middleware, MStates, nostate), State};
+handle_call({call, Message}, _From, #{middlewares := Middlewares,
+                                      confs := MStates} = State) ->
+  {Result, MStates2} = lists:foldl(
+                         fun
+                           (Middleware, {{stop, _, _}, _} = Result) ->
+                             lager:debug("Ignore middleware ~p", [Middleware]),
+                             Result;
+                           (Middleware, {{ok, Message1}, MStates1}) ->
+                             case erlang:apply(Middleware, call, [Message1, maps:get(Middleware, MStates1, nostate)]) of
+                               {ok, Message2, MState} ->
+                                 {{ok, Message2}, maps:put(Middleware, MState, MStates1)};
+                               {stop, Reason, MState} ->
+                                 {{stop, Middleware, Reason}, maps:put(Middleware, MState, MStates1)}
+                             end
+                         end, {{ok, Message}, MStates}, Middlewares),
+  {reply, Result, State#{confs => MStates2}};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 

@@ -16,8 +16,8 @@ routes() ->
   ].
 
 call(Message, State) ->
-  lager:info("Middleware ~p was called !!!", [?MODULE]),
-  {ok, Message, State}. % {stop, State}.
+  lager:info("Middleware ~p was called - message: ~p - state: ~p", [?MODULE, Message, State]),
+  {ok, Message, State}. % {stop, Reason, State}.
 
 my_dummy_get(_Req, State) ->
   {current_function, {M, F, A}} = process_info(self(), current_function),

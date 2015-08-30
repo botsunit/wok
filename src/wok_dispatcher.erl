@@ -148,35 +148,42 @@ service_match([X|To], [Y|Service], ServiceName, Result) when X == Y;
                                                              Y == <<"*">> ->
   service_match(To, Service, ServiceName, Result).
 
+consume(_, [], _) ->
+  ok;
 consume(ParsedMessage, Services, #{services := ServicesActions}) ->
-  case wok_config:conf([wok, messages, local_consumer_group],
-                        wok_config:conf([wok, messages, consumer_group], undefined)) of
-    undefined ->
-      lager:info("Missing consumer group in configuration"),
-      exit(config_error);
-    LocalConsumerGroup ->
-      LocalQueue = eutils:to_atom(
-                     wok_config:conf([wok, messages, local_queue_name], 
-                                     ?DEFAULT_LOCAL_QUEUE)),
-      lists:foreach(fun(Service) ->
-                        LocalConsumerGroupOffset = pipette:offset(LocalQueue, #{consumer => LocalConsumerGroup}),
-                        case pipette:queue(LocalQueue) of
-                          {LocalQueue, LocalConsumerGroupOffset, _, _, _} ->
-                            case wok_services_sup:start_child({ParsedMessage, Service, maps:get(Service, ServicesActions)}) of
-                              {ok, Child} ->
-                                gen_server:cast(Child, serve);
-                              {ok, Child, _} ->
-                                gen_server:cast(Child, serve);
-                              {queue, Data} ->
-                                queue(LocalQueue, Data);
-                              {error, Reason} ->
-                                lager:info("Faild to start service : ~p", [Reason]),
-                                error
-                            end;
-                          _ ->
-                            queue(LocalQueue, {ParsedMessage, Service})
-                        end
-                    end, Services)
+  case wok_middlewares:call(ParsedMessage) of
+    {ok, ParsedMessage1} ->
+      case wok_config:conf([wok, messages, local_consumer_group],
+                           wok_config:conf([wok, messages, consumer_group], undefined)) of
+        undefined ->
+          lager:info("Missing consumer group in configuration"),
+          exit(config_error);
+        LocalConsumerGroup ->
+          LocalQueue = eutils:to_atom(
+                         wok_config:conf([wok, messages, local_queue_name], 
+                                         ?DEFAULT_LOCAL_QUEUE)),
+          lists:foreach(fun(Service) ->
+                            LocalConsumerGroupOffset = pipette:offset(LocalQueue, #{consumer => LocalConsumerGroup}),
+                            case pipette:queue(LocalQueue) of
+                              {LocalQueue, LocalConsumerGroupOffset, _, _, _} ->
+                                case wok_services_sup:start_child({ParsedMessage1, Service, maps:get(Service, ServicesActions)}) of
+                                  {ok, Child} ->
+                                    gen_server:cast(Child, serve);
+                                  {ok, Child, _} ->
+                                    gen_server:cast(Child, serve);
+                                  {queue, Data} ->
+                                    queue(LocalQueue, Data);
+                                  {error, Reason} ->
+                                    lager:info("Faild to start service : ~p", [Reason]),
+                                    error
+                                end;
+                              _ ->
+                                queue(LocalQueue, {ParsedMessage1, Service})
+                            end
+                        end, Services)
+      end;
+    {stop, Middleware, Reason} ->
+      lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, ParsedMessage, Reason])
   end.
 
 force_consume(ParsedMessage, Service, Action) ->
