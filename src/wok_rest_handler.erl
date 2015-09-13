@@ -3,6 +3,7 @@
 
 -export([routes/1]).
 -export([init/2]).
+-export([websocket_handle/3, websocket_info/3]).
 
 routes(Routes) ->
   lager:debug("Routes : ~p", [Routes]),
@@ -10,37 +11,89 @@ routes(Routes) ->
 
 init(Req, Opts) ->
   Path = cowboy_req:path(Req),
-  {Code, Headers, Body} = case list_to_atom(
-                                            string:to_upper(
-                                              binary_to_list(
-                                                cowboy_req:method(Req)))) of
-                                       'OPTIONS' ->
-                                         {200, [{<<"Allow">>, allow(Path)}], <<>>};
-                                       Action ->
-                                         try
-                                           case lists:keyfind(Action, 1, Opts) of
-                                             {Action, {Module, Function}} ->
-                                               {C, H, B, WokState} = erlang:apply(Module, 
-                                                                                  Function, 
-                                                                                  [Req, wok_state:state()]),
-                                               _ = wok_state:state(WokState),
-                                               {C, H, B};
-                                             {Action, {Module, Function}, Middleware} ->
-                                               {C, H, B, MidState} = erlang:apply(Module, 
-                                                                                  Function, 
-                                                                                  [Req, 
-                                                                                   wok_middlewares:state(Middleware)]),
-                                               _ = wok_middlewares:state(Middleware, MidState),
-                                               {C, H, B};
-                                             false ->
-                                               {404, [], <<>>}
-                                           end
-                                         catch
-                                           _:_ ->
-                                             {500, [], <<>>}
-                                         end
-                                     end,
-  {ok, cowboy_req:reply(Code, Headers, Body, Req), Opts}.
+  case list_to_atom(
+         string:to_upper(
+           binary_to_list(
+             cowboy_req:method(Req)))) of
+    'OPTIONS' ->
+      {ok, cowboy_req:reply(200, [{<<"Allow">>, allow(Path)}], <<>>, Req), Opts};
+    Action ->
+      try
+        case lists:keyfind(Action, 1, Opts) of
+          {Action, {Module, Function}} ->
+            {C, H, B, WokState} = erlang:apply(Module, 
+                                               Function, 
+                                               [Req, wok_state:state()]),
+            _ = wok_state:state(WokState),
+            {ok, cowboy_req:reply(C, H, B, Req), Opts};
+          {Action, {Module, Function}, Middleware} ->
+            {C, H, B, MidState} = erlang:apply(Module, 
+                                               Function, 
+                                               [Req, 
+                                                wok_middlewares:state(Middleware)]),
+            _ = wok_middlewares:state(Middleware, MidState),
+            {ok, cowboy_req:reply(C, H, B, Req), Opts};
+          false ->
+            case lists:keyfind('WS', 1, Opts) of
+              {'WS', Module} ->
+                {ok, Req2, WokState} = erlang:apply(Module, ws_init, [Req, self(), wok_state:state()]),
+                _ = wok_state:state(WokState),
+                {cowboy_websocket, Req2, Module};
+              {'WS', Module, Middleware} ->
+                {ok, Req2, MidState} = erlang:apply(Module, ws_init, [Req, self(), wok_middlewares:state(Middleware)]),
+                _ = wok_middlewares:state(Middleware, MidState),
+                {cowboy_websocket, Req2, {Module, Middleware}};
+              false ->
+                {ok, cowboy_req:reply(404, [], <<>>, Req), Opts}
+            end
+        end
+      catch
+        _:_ ->
+          {ok, cowboy_req:reply(500, [], <<>>, Req), Opts}
+      end
+  end.
+
+websocket_handle(Data, Req, {Module, Middleware} = Opts) ->
+  case websocket_handle(Module, Data, Req, wok_middlewares:state(Middleware)) of
+    {ok, Req2, State} ->
+      _ = wok_middlewares:state(Middleware, State),
+      {ok, Req2, Opts};
+    {reply, Response, Req2, State} ->
+      _ = wok_middlewares:state(Middleware, State),
+      {reply, Response, Req2, Opts}
+  end;
+websocket_handle(Data, Req, Module) ->
+  case websocket_handle(Module, Data, Req, wok_state:state()) of
+    {ok, Req2, State} ->
+      _ = wok_state:state(State),
+      {ok, Req2, Module};
+    {reply, Response, Req2, State} ->
+      _ = wok_state:state(State),
+      {reply, Response, Req2, Module}
+  end.
+websocket_handle(Module, Data, Req, State) ->
+  erlang:apply(Module, ws_handle, [Data, Req, self(), State]).
+
+websocket_info(Data, Req, {Module, Middleware} = Opts) ->
+  case websocket_info(Module, Data, Req, wok_middlewares:state(Middleware)) of
+    {ok, Req2, State} ->
+      _ = wok_middlewares:state(Middleware, State),
+      {ok, Req2, Opts};
+    {reply, Response, Req2, State} ->
+      _ = wok_middlewares:state(Middleware, State),
+      {reply, Response, Req2, Opts}
+  end;
+websocket_info(Data, Req, Module) ->
+  case websocket_info(Module, Data, Req, wok_state:state()) of
+    {ok, Req2, State} ->
+      _ = wok_state:state(State),
+      {ok, Req2, Module};
+    {reply, Response, Req2, State} ->
+      _ = wok_state:state(State),
+      {reply, Response, Req2, Module}
+  end.
+websocket_info(Module, Data, Req, State) ->
+  erlang:apply(Module, ws_info, [Data, Req, self(), State]).
 
 % private
 
