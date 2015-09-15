@@ -17,8 +17,8 @@ provide(Topic, From, To, Body, Options) ->
                          create, [From, To, Body, Options]),
   provide(Topic, Message).
 
-provide(Topic, Message) when is_binary(Topic), is_binary(Message) ->
-  kafe:produce(Topic, Message);
+provide(Topic, Message) when is_binary(Message) ->
+  kafe:produce(eutils:to_binary(Topic), Message);
 provide(Topic, {From, To, Body}) ->
   provide(Topic, From, To, Body);
 provide(Topic, {From, To, Body, Options}) ->
