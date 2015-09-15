@@ -1,67 +1,37 @@
-REBAR = ./rebar
-DOT = dot
-GV = $(wildcard *.gv) wok.deps.gv
-PNG = $(GV:.gv=.png)
-RM = rm
-RM_F = rm -f
-RM_RF = rm -rf
-MKDIR = mkdir -p
+PROJECT = wok
+
+DEPS = lager wok_message wok_message_handler pipette kafe cowboy eutils
+dep_lager = git https://github.com/basho/lager.git master
+dep_wok_message = git git@gitlab.scalezen.com:msaas/wok_message.git master
+dep_wok_message_handler = git git@gitlab.scalezen.com:msaas/wok_message_handler.git master
+dep_pipette = git git@gitlab.scalezen.com:msaas/pipette.git master
+dep_kafe = git https://github.com/homeswap/kafe.git erlang-mk
+dep_cowboy = git https://github.com/ninenines/cowboy.git master
+dep_eutils = git https://github.com/emedia-project/eutils.git master
+dep_edown = git https://github.com/homeswap/edown.git master
+
+include erlang.mk
+
 CP = cp
-CP_R = cp -r
-DATE = $(shell date +"%F %T")
 
-.PHONY: compile get-deps test doc
+ERLC_OPTS = +debug_info +'{parse_transform, lager_transform}'
 
-all: compile
+EDOC_OPTS = {doclet, edown_doclet} \
+						, {app_default, "http://www.erlang.org/doc/man"} \
+						, {source_path, ["src"]} \
+						, {overview, "overview.edoc"} \
+						, {stylesheet, ""} \
+						, {image, ""} \
+						, {edown_target, gitlab} \
+						, {top_level_readme, {"./README.md", "https://gitlab.scalezen.com/msaas/wok"}} 
 
-compile: get-deps
-	@$(REBAR) compile
-
-compile-dev: get-deps-dev
-	@$(REBAR) -C rebar.dev.config compile
-
-get-deps:
-	@$(REBAR) get-deps
-	@$(REBAR) check-deps
-
-get-deps-dev:
-	@$(REBAR) -C rebar.dev.config get-deps
-	@$(REBAR) -C rebar.dev.config check-deps
-
-clean:
-	@$(REBAR) clean
-	$(RM_F) erl_crash.dump
-
-realclean: clean
-	@$(REBAR) -C rebar.dev.config delete-deps
-	@$(RM_RF) deps
-	@$(RM_RF) ebin
-	@$(RM_RF) log
-
-test: compile-dev
-	@ERL_LIBS="../:deps/*/" $(REBAR) skip_deps=true eunit
-
-doc: compile-dev img
-	@$(RM_F) documentation.md
-	@$(RM_RF) doc
-	@$(REBAR) -C rebar.dev.config doc
+docs::
 	@${CP} *.png doc
 
-dev: compile-dev
-	@ERL_LIBS="../:deps/*/" erl -pa ebin include deps/*/ebin deps/*/include -config config/wok.config
+dev: deps app
+	@erl -pa ebin include deps/*/ebin deps/*/include -config config/wok.config
 
-img: $(PNG)
-
-%.gv :
-	@$(REBAR) graph-deps graph=wok.deps.gv
-
-%.png : %.gv
-	@$(DOT) -Tpng -o$@ $<
-
-clean-img:
-	@$(RM_F) *.png
-
-rel-dev: realclean compile
+rel-dev: deps app
 	@${RM_RF} ../wok-dev
 	git clone git@github.com:scalezen-developer/wok.git ../wok-dev
 	@${CP} rebar.release.config ../wok-dev/rebar.config

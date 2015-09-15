@@ -11,3 +11,5 @@ erl_crash.dump
 .eunit
 .rebar
 queues
+.erlang.mk
+wok.d
