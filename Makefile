@@ -1,9 +1,9 @@
 PROJECT = wok
 
-DEPS = lager wok_message wok_message_handler pipette kafe cowboy eutils
+DEPS = lager wok_message wok_message_handler pipette kafe cowboy eutils edown
 dep_lager = git https://github.com/basho/lager.git master
-dep_wok_message = git git@gitlab.scalezen.com:msaas/wok_message.git master
-dep_wok_message_handler = git git@gitlab.scalezen.com:msaas/wok_message_handler.git master
+dep_wok_message = git git@gitlab.scalezen.com:msaas/wok_message.git erlang-mk
+dep_wok_message_handler = git git@gitlab.scalezen.com:msaas/wok_message_handler.git erlang-mk
 dep_pipette = git git@gitlab.scalezen.com:msaas/pipette.git erlang-mk
 dep_kafe = git https://github.com/homeswap/kafe.git erlang-mk
 dep_cowboy = git https://github.com/ninenines/cowboy.git master
