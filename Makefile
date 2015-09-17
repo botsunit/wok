@@ -13,6 +13,8 @@ dep_edown = git https://github.com/homeswap/edown.git master
 include erlang.mk
 
 CP = cp
+CP_R = cp -r
+RM_RF = rm -rf
 
 ERLC_OPTS = +debug_info +'{parse_transform, lager_transform}'
 
