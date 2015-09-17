@@ -178,7 +178,7 @@ consume(ParsedMessage, Services, #{services := ServicesActions}) ->
                                     error
                                 end;
                               _ ->
-                                queue(LocalQueue, {ParsedMessage1, Service})
+                                queue(LocalQueue, {ParsedMessage1, Service, maps:get(Service, ServicesActions)})
                             end
                         end, Services)
       end;
