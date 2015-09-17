@@ -177,7 +177,8 @@ consume(ParsedMessage, Services, #{services := ServicesActions}) ->
                                     lager:info("Faild to start service : ~p", [Reason]),
                                     error
                                 end;
-                              _ ->
+                              Reason ->
+                                lager:info("WARNING queue ~p error: ~p", [LocalQueue, Reason]),
                                 queue(LocalQueue, {ParsedMessage1, Service, maps:get(Service, ServicesActions)})
                             end
                         end, Services)
