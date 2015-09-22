@@ -26,8 +26,11 @@ EDOC_OPTS = {doclet, edown_doclet} \
 
 include erlang.mk
 
-docs::
+docs:: wok.call.png
 	@${CP} *.png doc
+
+wok.call.png: wok.call.gv
+	@dot -T png -o wok.call.png wok.call.gv
 
 dev: deps app
 	@erl -pa ebin include deps/*/ebin deps/*/include -config config/wok.config

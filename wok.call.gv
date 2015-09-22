@@ -5,42 +5,37 @@ digraph wok {
     splines=ortho
   ] 
 
-  wok[shape=oval];
+  wok[shape=oval, label="wok (*)"];
+  wok_app[label="wok_app (*)"];
+  wok_sup[label="wok_sup (*)"];
+  wok_rest_handler[label="wok_rest_handler (*)"];
+  wok_middlewares[label="wok_middlewares (*)"];
+  wok_dispatcher[label="wok_dispatcher (*)"];
+  wok_services_sup[label="wok_services_sup (*)"];
+  wok_topics_sup[label="wok_topics_sup (*)"];
+  wok_topic[label="wok_topic (*)"];
+  wok_state[label="wok_state (*)"];
   cowboy[shape=oval];
-  wok_config1[shape=point];
-  wok_config2[shape=point];
-  wok_config3[shape=point];
-  wok_config4[shape=point];
-  wok_config5[shape=point];
-  wok_config6[shape=point];
-  wok_config7[shape=point];
-  wok_config8[shape=point];
-  wok_config9[shape=point];
-  wok_configA[shape=point];
-  __wok_config__[shape=point];
+  __wok_config__[shape=circle, label="*"];
   wok_topic[label = "<topic :: wok_topic>"];
 
   wok -> wok_app;
-  wok -> wok_config1;
 
   wok_app -> wok_sup;
   wok_app -> cowboy [style=dashed];
   wok_app -> wok_rest_handler;
-  wok_app -> wok_config2;
   wok_app -> wok_middlewares;
 
   wok_sup -> wok_messages_sup [style=dotted];
   wok_sup -> wok_rest_sup [style=dotted];
-  wok_sup -> wok_config4;
 
   cowboy -> wok_rest_handler [style=dashed];
 
   wok_rest_handler -> "<handler :: wok_http_handler>";
-  wok_rest_handler -> wok_config3;
+  wok_rest_handler -> "<middleware>";
   wok_rest_handler -> wok_middlewares;
   wok_rest_handler -> wok_state;
 
-  wok_middlewares -> wok_config9;
   wok_middlewares -> "<middleware>";
 
   wok_messages_sup -> wok_dispatcher [style=dotted];
@@ -48,16 +43,12 @@ digraph wok {
   wok_messages_sup -> wok_topics_sup [style=dotted];
 
   wok_dispatcher -> wok_services_sup;
-  wok_dispatcher -> wok_config5;
   wok_dispatcher -> wok_middlewares;
 
   wok_services_sup -> wok_service [style=dashed, headlabel="*", taillabel="0"];
-  wok_services_sup -> wok_config6;
 
   wok_topics_sup -> wok_topic [style=dashed, headlabel="*", taillabel="*"];
-  wok_topics_sup -> wok_config7;
 
-  wok_topic -> wok_config8;
   wok_topic -> wok_dispatcher;
 
   wok_service -> wok_dispatcher;
@@ -65,7 +56,6 @@ digraph wok {
   wok_service -> "<handler :: wok_provider_handler>";
   wok_service -> wok_state
 
-  wok_state -> wok_configA;
   
   "<handler :: wok_provider_handler>" -> wok_message_handler;
 
