@@ -13,6 +13,7 @@ dep_edown = git https://github.com/homeswap/edown.git master
 CP = cp
 CP_R = cp -r
 RM_RF = rm -rf
+DATE = $(shell date +"%F %T")
 
 EDOC_OPTS = {doclet, edown_doclet} \
 						, {app_default, "http://www.erlang.org/doc/man"} \
