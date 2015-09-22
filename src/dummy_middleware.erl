@@ -1,8 +1,9 @@
 % @hidden
 -module(dummy_middleware).
+-compile([{parse_transform, lager_transform}]).
 
 -export([init/1, routes/0]).
--export([call/2]).
+-export([ingoing/2, outgoing/2]).
 -export([my_dummy_get/2, my_dummy_post/2]).
 
 init(Args) ->
@@ -15,8 +16,12 @@ routes() ->
    {'POST', "/dummy_post", {?MODULE, my_dummy_post}}
   ].
 
-call(Message, State) ->
-  lager:info("Middleware ~p was called - message: ~p - state: ~p", [?MODULE, Message, State]),
+ingoing(Message, State) ->
+  lager:info("Middleware ingoing ~p was called - message: ~p - state: ~p", [?MODULE, Message, State]),
+  {ok, Message, State}. % {stop, Reason, State}.
+
+outgoing(Message, State) ->
+  lager:info("Middleware outgoing ~p was called - message: ~p - state: ~p", [?MODULE, Message, State]),
   {ok, Message, State}. % {stop, Reason, State}.
 
 my_dummy_get(_Req, State) ->

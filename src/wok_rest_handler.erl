@@ -1,5 +1,6 @@
 % @hidden
 -module(wok_rest_handler).
+-compile([{parse_transform, lager_transform}]).
 
 -export([routes/1]).
 -export([init/2]).

@@ -13,3 +13,4 @@ erl_crash.dump
 queues
 .erlang.mk
 wok.d
+xrefr

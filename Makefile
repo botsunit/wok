@@ -10,13 +10,9 @@ dep_cowboy = git https://github.com/ninenines/cowboy.git master
 dep_eutils = git https://github.com/emedia-project/eutils.git master
 dep_edown = git https://github.com/homeswap/edown.git master
 
-include erlang.mk
-
 CP = cp
 CP_R = cp -r
 RM_RF = rm -rf
-
-ERLC_OPTS = +debug_info +'{parse_transform, lager_transform}'
 
 EDOC_OPTS = {doclet, edown_doclet} \
 						, {app_default, "http://www.erlang.org/doc/man"} \
@@ -26,6 +22,8 @@ EDOC_OPTS = {doclet, edown_doclet} \
 						, {image, ""} \
 						, {edown_target, gitlab} \
 						, {top_level_readme, {"./README.md", "https://gitlab.scalezen.com/msaas/wok"}} 
+
+include erlang.mk
 
 docs::
 	@${CP} *.png doc

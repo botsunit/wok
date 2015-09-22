@@ -1,5 +1,6 @@
 % @hidden
 -module(dummy_service_handler).
+-compile([{parse_transform, lager_transform}]).
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
 -export([my_action/2, my_answer/2]).

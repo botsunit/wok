@@ -1,5 +1,6 @@
 % @hidden
 -module(wok_dispatcher).
+-compile([{parse_transform, lager_transform}]).
 -behaviour(gen_server).
 -include("../include/wok.hrl").
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
@@ -54,7 +55,12 @@ handle_cast({terminate, Child, Result}, State) ->
     noreply -> 
       ok;
     {reply, Topic, Message} ->
-      wok:provide(Topic, Message);
+      case wok_middlewares:outgoing(Message) of
+        {ok, Message1} ->
+          wok:provide(Topic, Message1);
+        {stop, Middleware, Reason} ->
+          lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason])
+      end;
     _ ->
       lager:error("Invalid response : ~p", [Result]),
       ignore
@@ -151,7 +157,7 @@ service_match([X|To], [Y|Service], ServiceName, Result) when X == Y;
 consume(_, [], _) ->
   ok;
 consume(ParsedMessage, Services, #{services := ServicesActions}) ->
-  case wok_middlewares:call(ParsedMessage) of
+  case wok_middlewares:ingoing(ParsedMessage) of
     {ok, ParsedMessage1} ->
       case wok_config:conf([wok, messages, local_consumer_group],
                            wok_config:conf([wok, messages, consumer_group], undefined)) of

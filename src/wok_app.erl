@@ -1,8 +1,7 @@
 % @hidden
 -module(wok_app).
-
+-compile([{parse_transform, lager_transform}]).
 -behaviour(application).
-
 -include("../include/wok.hrl").
 
 -export([start/2, stop/1]).

@@ -1,5 +1,6 @@
 % @hidden
 -module(wok_topic).
+-compile([{parse_transform, lager_transform}]).
 -behaviour(gen_server).
 -include("../include/wok.hrl").
 -define(SERVER, ?MODULE).

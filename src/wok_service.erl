@@ -1,5 +1,6 @@
 % @hidden
 -module(wok_service).
+-compile([{parse_transform, lager_transform}]).
 -behaviour(gen_server).
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
