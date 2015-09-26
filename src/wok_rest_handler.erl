@@ -18,9 +18,9 @@ init(Req, Opts) ->
              cowboy_req:method(Req)))) of
     'OPTIONS' ->
       CorsAllowAll = [
-        {<<"Access-Control-Allow-Methods">>,<<"GET, POST, PUT, DELETE, OPTIONS, PATCH">>},
+        {<<"Access-Control-Allow-Methods">>,allow(Path)},
         {<<"Access-Control-Allow-Origin">>,<<"*">>},
-        {<<"Access-Control-Allow-Headers">>,<<"any">>},
+        {<<"Access-Control-Allow-Headers">>,<<"Access-Control-Allow-Origin, Authorization, Origin, x-requested-with, Content-Type, Content-Range, Content-Disposition, Content-Description">>},
         {<<"Access-Control-Max-Age">>,<<"1728000">>}],
       {ok, cowboy_req:reply(200, CorsAllowAll, <<>>, Req), Opts};
     Action ->
