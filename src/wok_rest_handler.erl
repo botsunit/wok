@@ -17,20 +17,25 @@ init(Req, Opts) ->
            binary_to_list(
              cowboy_req:method(Req)))) of
     'OPTIONS' ->
-      {ok, cowboy_req:reply(200, [{<<"Allow">>, allow(Path)}], <<>>, Req), Opts};
+      CorsAllowAll = [
+        {<<"Access-Control-Allow-Methods">>,<<"GET, POST, PUT, DELETE, OPTIONS, PATCH">>},
+        {<<"Access-Control-Allow-Origin">>,<<"*">>},
+        {<<"Access-Control-Allow-Headers">>,<<"any">>},
+        {<<"Access-Control-Max-Age">>,<<"1728000">>}],
+      {ok, cowboy_req:reply(200, CorsAllowAll, <<>>, Req), Opts};
     Action ->
       try
         case lists:keyfind(Action, 1, Opts) of
           {Action, {Module, Function}} ->
-            {C, H, B, WokState} = erlang:apply(Module, 
-                                               Function, 
+            {C, H, B, WokState} = erlang:apply(Module,
+                                               Function,
                                                [Req, wok_state:state()]),
             _ = wok_state:state(WokState),
             {ok, cowboy_req:reply(C, H, B, Req), Opts};
           {Action, {Module, Function}, Middleware} ->
-            {C, H, B, MidState} = erlang:apply(Module, 
-                                               Function, 
-                                               [Req, 
+            {C, H, B, MidState} = erlang:apply(Module,
+                                               Function,
+                                               [Req,
                                                 wok_middlewares:state(Middleware)]),
             _ = wok_middlewares:state(Middleware, MidState),
             {ok, cowboy_req:reply(C, H, B, Req), Opts};
@@ -134,12 +139,12 @@ allow(Ressource) ->
         fun({Verb, Path, _}, Acc) ->
             case {eutils:to_binary(Ressource),
                   eutils:to_binary(Path)} of
-              {R, P} when R == <<"*">> orelse R == P -> 
+              {R, P} when R == <<"*">> orelse R == P ->
                 case lists:member(atom_to_list(Verb), Path) of
                   true -> Acc;
                   false -> [atom_to_list(Verb)|Acc]
                 end;
-              _ -> 
+              _ ->
                 Acc
             end
         end, ["OPTIONS"], wok_config:conf([wok, rest, routes], [])), ",")).
