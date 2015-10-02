@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_time).
 
 -export([verify/1, next/1, next/2]).
