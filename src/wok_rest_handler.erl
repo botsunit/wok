@@ -17,7 +17,7 @@ init(Req, Opts) ->
            binary_to_list(
              cowboy_req:method(Req)))) of
     'OPTIONS' ->
-      {ok, cowboy_req:reply(200, cors_headers(Path), <<>>, Req), Opts};
+      {ok, cowboy_req:reply(200, add_access_control_allow_origin(cors_headers(Path)), <<>>, Req), Opts};
     Action ->
       try
         case lists:keyfind(Action, 1, Opts) of
@@ -33,7 +33,7 @@ init(Req, Opts) ->
                                                [Req,
                                                 wok_middlewares:state(Middleware)]),
             _ = wok_middlewares:state(Middleware, MidState),
-            {ok, cowboy_req:reply(C, H, B, Req), Opts};
+            {ok, cowboy_req:reply(C, add_access_control_allow_origin(H), B, Req), Opts};
           false ->
             case lists:keyfind('WS', 1, Opts) of
               {'WS', Module} ->
@@ -45,12 +45,12 @@ init(Req, Opts) ->
                 _ = wok_middlewares:state(Middleware, MidState),
                 {cowboy_websocket, Req2, {Module, Middleware}};
               false ->
-                {ok, cowboy_req:reply(404, [], <<>>, Req), Opts}
+                {ok, cowboy_req:reply(404, add_access_control_allow_origin([]), <<>>, Req), Opts}
             end
         end
       catch
         _:_ ->
-          {ok, cowboy_req:reply(500, [], <<>>, Req), Opts}
+          {ok, cowboy_req:reply(500, add_access_control_allow_origin([]), <<>>, Req), Opts}
       end
   end.
 
@@ -148,8 +148,6 @@ cors_headers(Path) ->
   [
    {<<"Access-Control-Allow-Methods">>, 
     ebinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Methods'], allow(Path)), <<", ">>)},
-   {<<"Access-Control-Allow-Origin">>,
-    wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Origin'], <<"*">>)},
    {<<"Access-Control-Max-Age">>,
     eutils:to_binary(wok_config:conf([wok, rest, cors, 'Access-Control-Max-Age'], 1728000))},
    {<<"Access-Control-Allow-Headers">>,
@@ -170,5 +168,14 @@ cors_headers(Path) ->
   case wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Credentials'], undefined) of
     undefined -> [];
     C -> [{<<"Access-Control-Allow-Credentials">>, eutils:to_binary(C)}]
+  end.
+
+add_access_control_allow_origin(Headers) ->
+  case lists:keyfind(<<"Access-Control-Allow-Origin">>, 1, Headers) of
+    false ->
+      [{<<"Access-Control-Allow-Origin">>,
+        wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Origin'], <<"*">>)}|Headers];
+    _ ->
+      Headers
   end.
 
