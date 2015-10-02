@@ -25,6 +25,12 @@ init([]) ->
                [];
              _ ->
                [?CHILD(wok_rest_sup, supervisor, infinity)]
+           end ++
+           case wok_config:conf([wok, plugins]) of
+             undefined ->
+               [];
+             _ ->
+               [?CHILD(wok_plugins_sup, supervisor, infinity)]
            end,
   {ok, {
      {one_for_one, 5, 10},

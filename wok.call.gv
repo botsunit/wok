@@ -28,6 +28,9 @@ digraph wok {
 
   wok_sup -> wok_messages_sup [style=dotted];
   wok_sup -> wok_rest_sup [style=dotted];
+  wok_sup -> wok_plugins_sup [style=dotted];
+
+  wok_plugins_sup -> "<plugin>";
 
   cowboy -> wok_rest_handler [style=dashed];
 
