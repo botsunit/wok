@@ -17,12 +17,7 @@ init(Req, Opts) ->
            binary_to_list(
              cowboy_req:method(Req)))) of
     'OPTIONS' ->
-      CorsAllowAll = [
-        {<<"Access-Control-Allow-Methods">>,allow(Path)},
-        {<<"Access-Control-Allow-Origin">>,<<"*">>},
-        {<<"Access-Control-Allow-Headers">>,<<"Access-Control-Allow-Origin, Authorization, Origin, x-requested-with, Content-Type, Content-Range, Content-Disposition, Content-Description">>},
-        {<<"Access-Control-Max-Age">>,<<"1728000">>}],
-      {ok, cowboy_req:reply(200, CorsAllowAll, <<>>, Req), Opts};
+      {ok, cowboy_req:reply(200, cors_headers(Path), <<>>, Req), Opts};
     Action ->
       try
         case lists:keyfind(Action, 1, Opts) of
@@ -148,4 +143,32 @@ allow(Ressource) ->
                 Acc
             end
         end, ["OPTIONS"], wok_config:conf([wok, rest, routes], [])), ",")).
+
+cors_headers(Path) ->
+  [
+   {<<"Access-Control-Allow-Methods">>, 
+    ebinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Methods'], allow(Path)), <<", ">>)},
+   {<<"Access-Control-Allow-Origin">>,
+    wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Origin'], <<"*">>)},
+   {<<"Access-Control-Max-Age">>,
+    eutils:to_binary(wok_config:conf([wok, rest, cors, 'Access-Control-Max-Age'], 1728000))},
+   {<<"Access-Control-Allow-Headers">>,
+    ebinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Headers'], 
+                                 [<<"Access-Control-Allow-Origin">>, 
+                                  <<"Authorization">>, 
+                                  <<"Origin">>, 
+                                  <<"x-requested-with">>, 
+                                  <<"Content-Type">>, 
+                                  <<"Content-Range">>, 
+                                  <<"Content-Disposition">>, 
+                                  <<"Content-Description">>]))}
+  ] ++ 
+  case wok_config:conf([wok, rest, cors, 'Access-Control-Expose-Headers'], undefined) of
+    undefined -> [];
+    H -> [{<<"Access-Control-Expose-Headers">>, ebinary:join(H)}]
+  end ++
+  case wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Credentials'], undefined) of
+    undefined -> [];
+    C -> [{<<"Access-Control-Allow-Credentials">>, eutils:to_binary(C)}]
+  end.
 
