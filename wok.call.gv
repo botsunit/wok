@@ -28,14 +28,15 @@ digraph wok {
 
   wok_sup -> wok_messages_sup [style=dotted];
   wok_sup -> wok_rest_sup [style=dotted];
-  wok_sup -> wok_plugins_sup [style=dotted];
+  wok_sup -> wok_plugins [style=dotted];
+  wok_sup -> wok_middlewares [style=dotted];
+  wok_sup -> wok_state [style=dotted];
 
-  wok_plugins_sup -> "<plugin>";
+  wok_plugins -> "<plugin>";
 
   cowboy -> wok_rest_handler [style=dashed];
 
   wok_rest_handler -> "<handler :: wok_http_handler>";
-  wok_rest_handler -> "<middleware>";
   wok_rest_handler -> wok_middlewares;
   wok_rest_handler -> wok_state;
 

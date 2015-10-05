@@ -45,7 +45,6 @@ next({_, _, _, _, _, _} = Spec,
                                                        MM <- Minutes,
                                                        SS <- Seconds],
                               MinGap = min_gap(Spec),
-io:format("---> ~p~n", [MinGap]),
                               case lists:foldl(fun(DateTime, Result) ->
                                                        get_date(MinGap, DateTime, FromAsDT, Result) 
                                                    end, 
@@ -209,7 +208,6 @@ get_all_dates([{Year, Month, Day}|_] = Result) ->
 get_date(MinGap, {Date, _} = DateTime, From, Result) ->
   DateTimeToSecond = calendar:datetime_to_gregorian_seconds(DateTime),
   FromToSecond = calendar:datetime_to_gregorian_seconds(From),
-  io:format("~p >= (~p + ~p)~n", [DateTimeToSecond, FromToSecond, MinGap]),
   case calendar:valid_date(Date) of
     false -> Result;
     true ->

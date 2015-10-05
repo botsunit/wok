@@ -13,7 +13,8 @@ start_link() ->
 
 init([]) ->
   Childs = [?CHILD(wok_state, worker, 5000),
-            ?CHILD(wok_middlewares, worker, 5000)] ++
+            ?CHILD(wok_middlewares, worker, 5000),
+            ?CHILD(wok_plugins, worker, 5000)] ++
            case wok_config:conf([wok, messages]) of
              undefined ->
                [];
@@ -25,12 +26,6 @@ init([]) ->
                [];
              _ ->
                [?CHILD(wok_rest_sup, supervisor, infinity)]
-           end ++
-           case wok_config:conf([wok, plugins]) of
-             undefined ->
-               [];
-             _ ->
-               [?CHILD(wok_plugins_sup, supervisor, infinity)]
            end,
   {ok, {
      {one_for_one, 5, 10},
