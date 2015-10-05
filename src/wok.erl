@@ -9,18 +9,11 @@ start() ->
   application:ensure_all_started(?MODULE).
 
 provide(Topic, From, To, Body) ->
-  provide(Topic, From, To, Body, []).
+  wok_producer:provide(Topic, From, To, Body).
 
 provide(Topic, From, To, Body, Options) ->
-  Message = erlang:apply(wok_config:conf([wok, messages, handler], 
-                                         ?DEFAULT_MESSAGE_HANDLER), 
-                         create, [From, To, Body, Options]),
-  provide(Topic, Message).
+  wok_producer:provide(Topic,  From, To, Body, Options).
 
-provide(Topic, Message) when is_binary(Message) ->
-  kafe:produce(eutils:to_binary(Topic), Message);
-provide(Topic, {From, To, Body}) ->
-  provide(Topic, From, To, Body);
-provide(Topic, {From, To, Body, Options}) ->
-  provide(Topic, From, To, Body, Options).
+provide(Topic, Message) ->
+  wok_producer:provide(Topic, Message).
 
