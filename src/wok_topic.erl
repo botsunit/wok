@@ -7,6 +7,7 @@
 -record(topic, {
           fetch_frequency,
           max_bytes,
+          max_messages,
           consumer_group,
           name
          }).
@@ -36,6 +37,7 @@ init(Args) ->
   Topic = #topic{
              fetch_frequency = Frequency,
              max_bytes = elists:keyfind(max_bytes, 1, Args, ?DEFAULT_MESSAGE_MAX_BYTES),
+             max_messages = elists:keyfind(max_messages, 1, Args, ?DEFAULT_MAX_MESSAGES),
              consumer_group = elists:keyfind(consumer_group, 1, Args),
              name = elists:keyfind(name, 1, Args)
             },
@@ -51,9 +53,10 @@ handle_cast(_Msg, State) ->
 handle_info(fetch, #topic{fetch_frequency = Frequency, 
                           name = Topic,
                           consumer_group = ConsumerGroup,
-                          max_bytes = MaxBytes} = State) ->
+                          max_bytes = MaxBytes,
+                          max_messages = MaxMessages} = State) ->
   lager:debug("Fetch topic ~s", [Topic]),
-  _ = case kafe:offsets(Topic, ConsumerGroup) of
+  _ = case kafe:offsets(Topic, ConsumerGroup, MaxMessages) of
         Offsets when is_list(Offsets), Offsets =/= [] ->
           lager:debug("Topic ~s will fetch ~p", [Topic, Offsets]),
           lists:foreach(

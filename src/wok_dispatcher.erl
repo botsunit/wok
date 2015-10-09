@@ -16,7 +16,7 @@ start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 handle(Message) ->
-  gen_server:call(?SERVER, {handle, Message}).
+  gen_server:cast(?SERVER, {handle, Message}).
 
 finish(Child, Result) ->
   gen_server:cast(?SERVER, {terminate, Child, Result}).
@@ -27,29 +27,26 @@ init(_Args) ->
   erlang:send_after(5, self(), fetch),
   {ok, get_service_handlers(#{})}.
 
-handle_call({handle, {<<>>, Message}}, _From, State) ->
+handle_call(_Request, _From, State) ->
+  {reply, ok, State}.
+
+handle_cast({handle, {<<>>, Message}}, State) ->
   try
     case erlang:apply(wok_config:conf([wok, messages, handler], 
                                       ?DEFAULT_MESSAGE_HANDLER), 
                       parse, [Message]) of
       {ok, #message{to = To} = ParserMessage, _} ->
-        _ = consume(ParserMessage, get_services(To, State), State),
-        {reply, ok, State};
+        _ = consume(ParserMessage, get_services(To, State), State);
       {error, Reason} ->
-        lager:info("Error parsing message: ~p", [Reason]),
-        {reply, error, State};
+        lager:info("Error parsing message: ~p", [Reason]);
       _ ->
-        lager:info("Wrong message parser return. See wok_message_handler for more informations"),
-        {reply, error, State}
+        lager:info("Wrong message parser return. See wok_message_handler for more informations")
     end
   catch
     T:E ->
-      lager:info("Parser faild: ~p:~p~n~p", [T, E, erlang:get_stacktrace()]),
-      {reply, error, State}
-  end;
-handle_call(_Request, _From, State) ->
-  {reply, ok, State}.
-
+      lager:info("Parser faild: ~p:~p~n~p", [T, E, erlang:get_stacktrace()])
+  end,
+  {noreply, State};
 handle_cast({terminate, Child, Result}, State) ->
   case Result of
     noreply -> 
@@ -107,7 +104,7 @@ handle_info(fetch, State) ->
            force_consume(ParsedMessage, Service, Action);
          {error, _} ->
            ok
-       end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_MESSAGES))]
+       end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_SERVICES_FORK))]
   end,
   {noreply, State};
 handle_info(_Info, State) ->
