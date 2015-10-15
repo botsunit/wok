@@ -2,10 +2,10 @@ PROJECT = wok
 
 DEPS = lager wok_message wok_message_handler wok_producer pipette kafe cowboy eutils edown
 dep_lager = git https://github.com/basho/lager.git master
-dep_wok_message = git git@gitlab.scalezen.com:msaas/wok_message.git master
-dep_wok_message_handler = git git@gitlab.scalezen.com:msaas/wok_message_handler.git master
-dep_wok_producer = git git@gitlab.scalezen.com:msaas/wok_producer.git master
-dep_pipette = git git@gitlab.scalezen.com:msaas/pipette.git master
+dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git master
+dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
+dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
+dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
 dep_kafe = git https://github.com/homeswap/kafe.git master
 dep_cowboy = git https://github.com/ninenines/cowboy.git master
 dep_eutils = git https://github.com/emedia-project/eutils.git master
@@ -23,7 +23,7 @@ EDOC_OPTS = {doclet, edown_doclet} \
 						, {stylesheet, ""} \
 						, {image, ""} \
 						, {edown_target, gitlab} \
-						, {top_level_readme, {"./README.md", "https://gitlab.scalezen.com/msaas/wok"}} 
+						, {top_level_readme, {"./README.md", "https://gitlab.botsunit.com/msaas/wok"}} 
 
 include erlang.mk
 
