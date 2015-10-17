@@ -20,7 +20,12 @@ start_child(Message) ->
   end.
 
 terminate_child(Child) ->
-  supervisor:terminate_child(?MODULE, Child).
+  case supervisor:terminate_child(?MODULE, Child) of
+    ok ->
+      supervisor:delete_child(?MODULE, Child);
+    E ->
+      E
+  end.
 
 workers() ->
   case lists:keyfind(active, 1, supervisor:count_children(?MODULE)) of
