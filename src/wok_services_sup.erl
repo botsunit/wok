@@ -20,12 +20,7 @@ start_child(Message) ->
   end.
 
 terminate_child(Child) ->
-  case supervisor:terminate_child(?MODULE, Child) of
-    ok ->
-      supervisor:delete_child(?MODULE, Child);
-    E ->
-      E
-  end.
+  supervisor:terminate_child(?MODULE, Child).
 
 workers() ->
   case lists:keyfind(active, 1, supervisor:count_children(?MODULE)) of
@@ -44,5 +39,11 @@ available_workers() ->
   end.
 
 init([]) ->
-  {ok, { {simple_one_for_one, 0, 1}, [?CHILD(wok_service, worker)]} }.
+  SupFlags = #{strategy => simple_one_for_one,
+               intensity => 0,
+               period => 1},
+  ChildSpecs = [#{id => wok_service,
+                  start => {wok_service, start_link, []},
+                  shutdown => brutal_kill}],
+  {ok, {SupFlags, ChildSpecs}}.
 

@@ -81,8 +81,8 @@ handle_cast({terminate, Child, Result}, State) ->
                   ok
               end
           end;
-        _ ->
-          lager:error("Faild to stop service #~p", [Child])
+        E ->
+          lager:error("Faild to stop service #~p : ~p", [Child, E])
       end,
   {noreply, State};
 handle_cast(_Msg, State) ->
