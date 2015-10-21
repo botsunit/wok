@@ -23,7 +23,7 @@ EDOC_OPTS = {doclet, edown_doclet} \
 						, {stylesheet, ""} \
 						, {image, ""} \
 						, {edown_target, gitlab} \
-						, {top_level_readme, {"./README.md", "https://gitlab.botsunit.com/msaas/wok"}} 
+						, {top_level_readme, {"./README.md", "https://gitlab.botsunit.com/msaas/${PROJECT}"}} 
 
 include erlang.mk
 
@@ -34,15 +34,15 @@ wok.call.png: wok.call.gv
 	@dot -T png -o wok.call.png wok.call.gv
 
 dev: deps app
-	@erl -pa ebin include deps/*/ebin deps/*/include -config config/wok.config
+	@erl -pa ebin include deps/*/ebin deps/*/include -config config/${PROJECT}.config
 
 rel-dev: deps app
-	@${RM_RF} ../wok-dev
-	git clone git@github.com:botsunit/wok.git ../wok-dev
-	@${CP} rebar.release.config ../wok-dev/rebar.config
-	@${CP_R} ebin ../wok-dev
-	@${CP_R} config ../wok-dev
-	@${CP_R} include ../wok-dev
-	cd ../wok-dev; git add . 
-	cd ../wok-dev; git commit -m "Update ${DATE}"
+	@${RM_RF} ../${PROJECT}-dev
+	git clone git@github.com:botsunit/${PROJECT}.git ../${PROJECT}-dev
+	@${CP} rebar.release.config ../${PROJECT}-dev/rebar.config
+	@${CP_R} ebin ../${PROJECT}-dev
+	@${CP_R} config ../${PROJECT}-dev
+	@${CP_R} include ../${PROJECT}-dev
+	cd ../${PROJECT}-dev; git add . 
+	cd ../${PROJECT}-dev; git commit -m "Update ${DATE}"
 
