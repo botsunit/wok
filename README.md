@@ -19,7 +19,7 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 
 ```
 
-{wok, ".*", {git, "git@gitlab.scalezen.com:msaas/wok.git", {branch, "master"}}}
+{wok, ".*", {git, "git@gitlab.botsunit.com:msaas/wok.git", {branch, "master"}}}
 
 ```
 
@@ -58,7 +58,7 @@ application:ensure_all_started(wok).
 
 #### Messages configuration ####
 
-* `handler :: atom()` : handler used to create and parse messages. See [wok_message_handler](https://gitlab.scalezen.com/msaas/wok_message_handler) for more informations.
+* `handler :: atom()` : handler used to create and parse messages. See [wok_message_handler](https://gitlab.botsunit.com/msaas/wok_message_handler) for more informations.
 
 * `services :: list()` : [Services configuration](https://gitlab.botsunit.com/msaas/wok/tree/master/doc/README.md#services_conf)
 

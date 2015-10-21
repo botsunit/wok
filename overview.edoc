@@ -11,7 +11,7 @@
 1. Add wok in your dependencies :
 
 <pre>
-{wok, ".*", {git, "git@gitlab.scalezen.com:msaas/wok.git", {branch, "master"}}}
+{wok, ".*", {git, "git@gitlab.botsunit.com:msaas/wok.git", {branch, "master"}}}
 </pre>
 
 2. Create your services and routes.
@@ -42,7 +42,7 @@ application:ensure_all_started(wok).
 <a name="messages_conf"></a><h4>Messages configuration</h4>
 
 <ul>
-<li><tt>handler :: atom()</tt> : handler used to create and parse messages. See <a href="https://gitlab.scalezen.com/msaas/wok_message_handler">wok_message_handler</a> for more informations.</li>
+<li><tt>handler :: atom()</tt> : handler used to create and parse messages. See <a href="https://gitlab.botsunit.com/msaas/wok_message_handler">wok_message_handler</a> for more informations.</li>
 <li><tt>services :: list()</tt> : <a  href="#services_conf">Services configuration</a></li>
 <li><tt>consumer_group :: binary()</tt> : Name of the Kafka' consumer group</li>
 <li><tt>local_queue_name :: binary()</tt> : Name of the pipette' queue</li>

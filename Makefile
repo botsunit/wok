@@ -6,10 +6,10 @@ dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git master
 dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
 dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
 dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
-dep_kafe = git https://github.com/homeswap/kafe.git master
+dep_kafe = git https://github.com/botsunit/kafe.git master
 dep_cowboy = git https://github.com/ninenines/cowboy.git master
 dep_eutils = git https://github.com/emedia-project/eutils.git master
-dep_edown = git https://github.com/homeswap/edown.git master
+dep_edown = git https://github.com/uwiger/edown.git master
 
 CP = cp
 CP_R = cp -r
@@ -38,7 +38,7 @@ dev: deps app
 
 rel-dev: deps app
 	@${RM_RF} ../wok-dev
-	git clone git@github.com:scalezen-developer/wok.git ../wok-dev
+	git clone git@github.com:botsunit/wok.git ../wok-dev
 	@${CP} rebar.release.config ../wok-dev/rebar.config
 	@${CP_R} ebin ../wok-dev
 	@${CP_R} config ../wok-dev
