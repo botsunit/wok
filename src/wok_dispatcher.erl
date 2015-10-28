@@ -82,7 +82,8 @@ handle_cast({terminate, Child, Result}, State) ->
                 {ok, Data} ->
                   {ParsedMessage, Service, Action} = binary_to_term(Data),
                   force_consume(ParsedMessage, Service, Action);
-                {error, _} ->
+                {error, E2} ->
+                  lager:error("Pipette out error: ~p", [E2]),
                   ok
               end
           end;
@@ -103,13 +104,19 @@ handle_info(fetch, State) ->
       LocalQueue = eutils:to_atom(
                      wok_config:conf([wok, messages, local_queue_name], 
                                      ?DEFAULT_LOCAL_QUEUE)),
-      [case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
-         {ok, Data} ->
-           {ParsedMessage, Service, Action} = binary_to_term(Data),
-           force_consume(ParsedMessage, Service, Action);
-         {error, _} ->
-           ok
-       end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_SERVICES_FORK))]
+      case pipette:ready(LocalQueue) of
+        true ->
+          [case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
+             {ok, Data} ->
+               {ParsedMessage, Service, Action} = binary_to_term(Data),
+               force_consume(ParsedMessage, Service, Action);
+             {error, E} ->
+               lager:error("Pipette out error : ~p", [E]),
+               ok
+           end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_SERVICES_FORK))];
+        false ->
+          erlang:send_after(5, self(), fetch)
+      end
   end,
   {noreply, State};
 handle_info(_Info, State) ->

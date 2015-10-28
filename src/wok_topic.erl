@@ -55,26 +55,34 @@ handle_info(fetch, #topic{fetch_frequency = Frequency,
                           consumer_group = ConsumerGroup,
                           max_bytes = MaxBytes,
                           max_messages = MaxMessages} = State) ->
-  lager:debug("Fetch topic ~s", [Topic]),
-  _ = case kafe:offsets(Topic, ConsumerGroup, MaxMessages) of
-        Offsets when is_list(Offsets), Offsets =/= [] ->
-          lager:debug("Topic ~s will fetch ~p", [Topic, Offsets]),
-          lists:foreach(
-            fun({Partition, Offset}) ->
-                lager:debug("Fetch message #~p on ~p / ~p", [Offset, Topic, Partition]),
-                case kafe:fetch(-1, Topic, #{partition => Partition, offset => Offset, max_bytes => MaxBytes}) of
-                  {ok, [#{partitions := Partitions}]} ->
-                    lists:foreach(fun wok_dispatcher:handle/1,
-                                  [{Key, Value} || 
-                                   #{message := #{key := Key, value := Value}} <- Partitions, Value =/= <<>>]);
-                  _ ->
-                    lager:error("Error fetching message ~p@~p#~p", [Topic, Partition, Offset])
-                end
-            end, Offsets);
-        _ ->
-          lager:debug("No new message on ~p for ~p", [Topic, ConsumerGroup])
-      end,
-  erlang:send_after(Frequency, self(), fetch),
+  LocalQueue = eutils:to_atom(
+                 wok_config:conf([wok, messages, local_queue_name], 
+                                 ?DEFAULT_LOCAL_QUEUE)),
+  case pipette:ready(LocalQueue) of
+    true ->
+      lager:debug("Fetch topic ~s", [Topic]),
+      _ = case kafe:offsets(Topic, ConsumerGroup, MaxMessages) of
+            Offsets when is_list(Offsets), Offsets =/= [] ->
+              lager:debug("Topic ~s will fetch ~p", [Topic, Offsets]),
+              lists:foreach(
+                fun({Partition, Offset}) ->
+                    lager:debug("Fetch message #~p on ~p / ~p", [Offset, Topic, Partition]),
+                    case kafe:fetch(-1, Topic, #{partition => Partition, offset => Offset, max_bytes => MaxBytes}) of
+                      {ok, [#{partitions := Partitions}]} ->
+                        lists:foreach(fun wok_dispatcher:handle/1,
+                                      [{Key, Value} || 
+                                       #{message := #{key := Key, value := Value}} <- Partitions, Value =/= <<>>]);
+                      _ ->
+                        lager:error("Error fetching message ~p@~p#~p", [Topic, Partition, Offset])
+                    end
+                end, Offsets);
+            _ ->
+              lager:debug("No new message on ~p for ~p", [Topic, ConsumerGroup])
+          end,
+      erlang:send_after(Frequency, self(), fetch);
+    false ->
+      erlang:send_after(1000, self(), fetch)
+  end,
   {noreply, State};
 handle_info(_Info, State) ->
   {noreply, State}.
