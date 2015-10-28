@@ -17,10 +17,11 @@ init(_) ->
                                    ({Name, Calls, Opts}, {PluginsAcc, ConfAcc}) ->
                                      case erlang:apply(Name, init, [Opts]) of
                                        {ok, Args} ->
+                                         lager:info("Plugin ~p started", [Name]),
                                          {[Name|PluginsAcc],
                                           maps:put(Name, #{state => Args, calls => Calls}, ConfAcc)};
                                        {stop, Reason} ->
-                                         lager:info("Plugin ~p stop: ~p", [Name, Reason]),
+                                         lager:debug("Plugin ~p stop: ~p", [Name, Reason]),
                                          {PluginsAcc, ConfAcc}
                                      end;
                                    ({Name, Calls}, {PluginsAcc, ConfAcc}) ->
@@ -45,7 +46,7 @@ handle_cast(_Msg, State) ->
 
 handle_info({run, Name, {Fun, _} = Call}, State) ->
   PluginState = get_plugin_state(Name, State),
-  lager:info("Run ~p:~p(~p)", [Name, Fun, PluginState]),
+  lager:debug("Run plugin ~p:~p(~p)", [Name, Fun, PluginState]),
   State2 = case erlang:apply(Name, Fun, [PluginState]) of
              {ok, PluginState2} ->
                _ = start_plugin(Name, Call),
@@ -55,7 +56,7 @@ handle_info({run, Name, {Fun, _} = Call}, State) ->
                _ = wok:provide(Topic, Message),
                update_plugin_state(Name, PluginState3, State);
              {stop, Reason} ->
-               lager:info("Plugin ~p:~p stop: ~p", [Name, Fun, Reason]),
+               lager:debug("Plugin ~p:~p stop: ~p", [Name, Fun, Reason]),
                State
            end,
   {noreply, State2};
@@ -86,7 +87,7 @@ start_plugin(Name, {Fun, Freq}) ->
       lager:info("Plugin ~p:~p stopped", [Name, Fun]),
       stop;
     {error, Reason} ->
-      lager:info("Plugin ~p:~p, configuration error: ~p", [Name, Fun, Reason]),
+      lager:error("Plugin ~p:~p, configuration error: ~p", [Name, Fun, Reason]),
       {error, Reason}
   end.
 

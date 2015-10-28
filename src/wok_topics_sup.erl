@@ -14,7 +14,7 @@ start_link() ->
 init([]) ->
   Childs = case wok_config:conf([wok, messages, topics]) of
              undefined ->
-               lager:info("No topic declared in config!"),
+               lager:debug("No topic declared in config!"),
                [];
              Topics ->
                build_childs(Topics)

@@ -8,7 +8,6 @@
 
 start(_StartType, _StartArgs) ->
   _ = check_message_handler(),
-  _ = start_local_queue(),
   _ = start_rest(),
   _ = start_messages(),
   wok_sup:start_link().
@@ -19,7 +18,7 @@ stop(_State) ->
 start_rest() ->
   case wok_config:conf([wok, rest]) of
     undefined ->
-      ok;
+      lager:debug("No REST configuration.");
     _ ->
       _ = application:ensure_all_started(cowboy),
       Port = wok_config:conf([wok, rest, port], ?DEFAULT_REST_PORT),
@@ -31,7 +30,13 @@ start_rest() ->
                    wok_middlewares:routes()
                   ),
       ProtoOpts   = [{env, [{dispatch, Dispatch}]}],
-      {ok, _} = cowboy:start_http(http, MaxConn, TransOpts, ProtoOpts)
+      case cowboy:start_http(http, MaxConn, TransOpts, ProtoOpts) of
+        {ok, _} -> 
+          lager:info("Start HTTP on port ~p", [Port]);
+        _ ->
+          lager:error("Faild to start HTTP server"),
+          exit(http_error)
+      end
   end.
 
 start_messages() ->
@@ -39,6 +44,7 @@ start_messages() ->
     undefined ->
       ok;
     _ ->
+      _ = start_local_queue(),
       _ = application:ensure_all_started(kafe),
       ok
   end.
@@ -47,9 +53,9 @@ check_message_handler() ->
   Handler = wok_config:conf([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER),
   case code:ensure_loaded(Handler) of
     {module, Handler} ->
-      ok;
+      lager:info("Message handler ~p loaded", [Handler]);
     {error, What} ->
-      lager:info("Can't load handler ~p", [Handler]),
+      lager:error("Can't load handler ~p", [Handler]),
       exit(What)
   end.
 
@@ -61,9 +67,10 @@ start_local_queue() ->
         {ok, _} ->
           lager:info("Local queue ~p created", [LocalQueue]);
         {error, Reason} ->
-          lager:info("Faild to create local queue ~p: ~p", [LocalQueue, Reason])
+          lager:error("Faild to create local queue ~p: ~p", [LocalQueue, Reason]),
+          exit(Reason)
       end;
     _ ->
-      ok
+      lager:info("Local queue ~p started", [LocalQueue])
   end.
 

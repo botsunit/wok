@@ -12,7 +12,7 @@ start_link(Message) ->
   gen_server:start_link(?MODULE, Message, []).
 
 init({Message, Service, Action}) ->
-  lager:info("Start service ~p with message ~p", [Service, Message]),
+  lager:debug("Start service ~p with message ~p", [Service, Message]),
   {ok, #{service => Service, action => Action, message => Message}}.
 
 handle_call(_Request, _From, Message) ->

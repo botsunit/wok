@@ -68,7 +68,7 @@ handle_info(fetch, #topic{fetch_frequency = Frequency,
                                   [{Key, Value} || 
                                    #{message := #{key := Key, value := Value}} <- Partitions, Value =/= <<>>]);
                   _ ->
-                    lager:info("Error fetching message ~p@~p#~p", [Topic, Partition, Offset])
+                    lager:error("Error fetching message ~p@~p#~p", [Topic, Partition, Offset])
                 end
             end, Offsets);
         _ ->

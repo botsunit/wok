@@ -42,9 +42,10 @@ init(_) ->
                                                   erlang:apply(Name, init, [Init])
                                               end of
                                            {ok, Args} ->
+                                             lager:debug("Middleware ~p started", [Name]),
                                              {[Name|MiddlewaresAcc], maps:put(Name, Args, ConfsAcc)};
                                            {stop, Reason} ->
-                                             lager:info("Middleware ~p stop: ~p", [Name, Reason]),
+                                             lager:debug("Middleware ~p stop: ~p", [Name, Reason]),
                                              {MiddlewaresAcc, ConfsAcc}
                                          end
                                      end, {[], #{}}, wok_config:conf([wok, middlewares], [])),
