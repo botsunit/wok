@@ -24,7 +24,7 @@ finish(Child, Result) ->
 %% ------------------------------------------------------------------
 
 init(_Args) ->
-  erlang:send_after(5, self(), fetch),
+  erlang:send_after(1000, self(), fetch),
   {ok, get_service_handlers(#{})}.
 
 handle_call(_Request, _From, State) ->
@@ -115,7 +115,7 @@ handle_info(fetch, State) ->
                ok
            end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_SERVICES_FORK))];
         false ->
-          erlang:send_after(5, self(), fetch)
+          erlang:send_after(1000, self(), fetch)
       end
   end,
   {noreply, State};
