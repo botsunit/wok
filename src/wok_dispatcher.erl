@@ -54,7 +54,7 @@ handle_cast({terminate, Child, Result}, State) ->
     {reply, Topic, Message} ->
       case wok_middlewares:outgoing(Message) of
         {ok, Message1} ->
-          wok:provide(Topic, Message1);
+          _ = wok:provide(Topic, Message1);
         {stop, Middleware, Reason} ->
           lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason])
       end;
@@ -180,9 +180,10 @@ consume(ParsedMessage, Services, #{services := ServicesActions}) ->
                                     lager:info("Faild to start service : ~p", [Reason]),
                                     error
                                 end;
-                              Reason ->
-                                lager:info("WARNING queue ~p error: ~p", [LocalQueue, Reason]),
-                                queue(LocalQueue, {ParsedMessage1, Service, maps:get(Service, ServicesActions)})
+                              {LocalQueue, CurrentConsumerGroupOffset, _, _, _} when CurrentConsumerGroupOffset > LocalConsumerGroupOffset ->
+                                queue(LocalQueue, {ParsedMessage1, Service, maps:get(Service, ServicesActions)});
+                              Other ->
+                                lager:info("WARNING queue ~p error: ~p", [LocalQueue, Other])
                             end
                         end, Services)
       end;
