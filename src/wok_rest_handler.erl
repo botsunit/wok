@@ -49,7 +49,8 @@ init(Req, Opts) ->
             end
         end
       catch
-        _:_ ->
+        Class:Error ->
+          lager:error("Internal server error ~p:~p : ~p", [Class, Error, erlang:get_stacktrace()]),
           {ok, cowboy_req:reply(500, add_access_control_allow_origin([]), <<>>, Req), Opts}
       end
   end.
