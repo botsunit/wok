@@ -1,0 +1,13 @@
+PROJECT = wok
+
+DEPS = lager wok_message_handler wok_producer pipette kafe cowboy eutils
+dep_lager = git https://github.com/basho/lager.git master
+dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
+dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
+dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
+dep_kafe = git https://github.com/botsunit/kafe.git master
+dep_cowboy = git https://github.com/ninenines/cowboy.git master
+dep_eutils = git https://github.com/emedia-project/eutils.git master
+
+include erlang.mk
+
