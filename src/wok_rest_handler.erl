@@ -108,6 +108,21 @@ routes([{Verb, Path, Handler}|Rest], Acc) ->
 routes([{Verb, Path, Handler, Middleware}|Rest], Acc) ->
   routes(Rest, add_route(Path, Verb, Handler, Middleware, Acc)).
 
+add_route(Path, static, Filepath, Acc) ->
+  case Filepath of
+    {priv_dir, App} ->
+      [{euri:join(Path, "[...]"), 
+        cowboy_static, 
+        {priv_dir, App, "", [{mimetypes, cow_mimetypes, all}]}}|Acc];
+    {priv_dir, App, Path} ->
+      [{euri:join(Path, "[...]"), 
+        cowboy_static, 
+        {priv_dir, App, Path, [{mimetypes, cow_mimetypes, all}]}}|Acc];
+    {dir, Path} ->
+      [{euri:join(Path, "[...]"), 
+        cowboy_static, 
+        {dir, Path, [{mimetypes, cow_mimetypes, all}]}}|Acc]
+  end;
 add_route(Path, Verb, Handler, Acc) ->
   case lists:keyfind(Path, 1, Acc) of
     {Path, Data} ->
@@ -124,8 +139,11 @@ add_route(Path, Verb, Handler, Middleware, Acc) ->
   end.
 
 compile(Routes) ->
-  lists:map(fun({Path, Opts}) ->
-                {Path, ?MODULE, Opts}
+  lists:map(fun
+              ({Path, Opts}) ->
+                {Path, ?MODULE, Opts};
+              (Other) ->
+                Other
             end, Routes).
 
 allow(Ressource) ->
