@@ -114,11 +114,11 @@ add_route(Path, static, Filepath, Acc) ->
     {priv_dir, App} ->
       [{euri:join(Path, "[...]"), 
         cowboy_static, 
-        {priv_dir, App, "", [{mimetypes, cow_mimetypes, all}]}}|Acc];
+        {dir, ecode:priv_dir(App), [{mimetypes, cow_mimetypes, all}]}}|Acc];
     {priv_dir, App, Extra} ->
       [{euri:join(Path, "[...]"), 
         cowboy_static, 
-        {priv_dir, App, Extra, [{mimetypes, cow_mimetypes, all}]}}|Acc];
+        {dir, filename:join(ecode:priv_dir(App), Extra), [{mimetypes, cow_mimetypes, all}]}}|Acc];
     {dir, Dir} ->
       [{euri:join(Path, "[...]"), 
         cowboy_static, 
