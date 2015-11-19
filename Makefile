@@ -9,7 +9,7 @@ dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
 dep_kafe = git https://github.com/botsunit/kafe.git master
 dep_cowboy = git https://github.com/ninenines/cowboy.git master
 dep_eutils = git https://github.com/emedia-project/eutils.git master
-dep_edown = git https://github.com/uwiger/edown.git master
+dep_edown = git https://github.com/botsunit/edown.git master
 
 CP = cp
 CP_R = cp -r
