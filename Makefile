@@ -39,9 +39,10 @@ dev: deps app
 rel-dev: deps app
 	@${RM_RF} ../${PROJECT}-dev
 	git clone git@github.com:botsunit/${PROJECT}.git ../${PROJECT}-dev
-	@${CP} rebar.release.config ../${PROJECT}-dev/rebar.config
+	@${CP} rebar.config.release ../${PROJECT}-dev/rebar.config
 	@${CP} Makefile.release ../${PROJECT}-dev/Makefile
 	@${CP} erlang.mk ../${PROJECT}-dev/erlang.mk
+	@${CP} README.md.release ../${PROJECT}-dev/README.md
 	@${CP_R} ebin ../${PROJECT}-dev
 	@${CP_R} config ../${PROJECT}-dev
 	@${CP_R} include ../${PROJECT}-dev
