@@ -100,6 +100,7 @@ websocket_info(Module, Data, Req, State) ->
 % private
 
 routes([], Routes) ->
+  lager:debug("routes => ~p", [Routes]),
   compile(lists:reverse(Routes));
 routes([{Path, Handler}|Rest], Acc) ->
   routes(Rest, add_route(Path, 'GET', Handler, Acc));
@@ -109,7 +110,6 @@ routes([{Verb, Path, Handler, Middleware}|Rest], Acc) ->
   routes(Rest, add_route(Path, Verb, Handler, Middleware, Acc)).
 
 add_route(Path, static, Filepath, Acc) ->
-  lager:info("=================> ~p", [Filepath]),
   case Filepath of
     {priv_dir, App} ->
       [{euri:join(Path, "[...]"), 
