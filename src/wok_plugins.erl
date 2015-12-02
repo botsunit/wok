@@ -80,7 +80,7 @@ update_plugin_state(Name, PluginState, #{confs := Confs} = State) ->
   State#{confs => maps:put(Name, PluginInfo#{state => PluginState}, Confs)}.
 
 start_plugin(Name, {Fun, Freq}) ->
-  case wok_time:next(Freq) of
+  case buctimer:next(Freq) of
     {ok, _, Sec} ->
       {ok, erlang:send_after(Sec * 1000, self(), {run, Name, {Fun, Freq}})};
     stop ->

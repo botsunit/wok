@@ -24,4 +24,4 @@ get_conf(_, undefined) ->
 get_conf([], Result) ->
   Result;
 get_conf([Field|Rest], Data) ->
-  get_conf(Rest, elists:keyfind(Field, 1, Data, undefined)).
+  get_conf(Rest, buclists:keyfind(Field, 1, Data, undefined)).

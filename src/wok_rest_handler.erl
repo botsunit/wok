@@ -112,15 +112,15 @@ routes([{Verb, Path, Handler, Middleware}|Rest], Acc) ->
 add_route(Path, static, Filepath, Acc) ->
   case Filepath of
     {priv_dir, App} ->
-      [{euri:join(Path, "[...]"), 
+      [{bucuri:join(Path, "[...]"), 
         cowboy_static, 
-        {dir, ecode:priv_dir(App), [{mimetypes, cow_mimetypes, all}]}}|Acc];
+        {dir, buccode:priv_dir(App), [{mimetypes, cow_mimetypes, all}]}}|Acc];
     {priv_dir, App, Extra} ->
-      [{euri:join(Path, "[...]"), 
+      [{bucuri:join(Path, "[...]"), 
         cowboy_static, 
-        {dir, filename:join(ecode:priv_dir(App), Extra), [{mimetypes, cow_mimetypes, all}]}}|Acc];
+        {dir, filename:join(buccode:priv_dir(App), Extra), [{mimetypes, cow_mimetypes, all}]}}|Acc];
     {dir, Dir} ->
-      [{euri:join(Path, "[...]"), 
+      [{bucuri:join(Path, "[...]"), 
         cowboy_static, 
         {dir, Dir, [{mimetypes, cow_mimetypes, all}]}}|Acc]
   end;
@@ -152,8 +152,8 @@ allow(Ressource) ->
     string:join(
       lists:foldl(
         fun({Verb, Path, _}, Acc) ->
-            case {eutils:to_binary(Ressource),
-                  eutils:to_binary(Path)} of
+            case {bucs:to_binary(Ressource),
+                  bucs:to_binary(Path)} of
               {R, P} when R == <<"*">> orelse R == P ->
                 case lists:member(atom_to_list(Verb), Path) of
                   true -> Acc;
@@ -167,27 +167,27 @@ allow(Ressource) ->
 cors_headers(Path) ->
   [
    {<<"Access-Control-Allow-Methods">>,
-    ebinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Methods'], allow(Path)), <<", ">>)},
+    bucbinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Methods'], allow(Path)), <<", ">>)},
    {<<"Access-Control-Max-Age">>,
-    eutils:to_binary(wok_config:conf([wok, rest, cors, 'Access-Control-Max-Age'], 1728000))},
+    bucs:to_binary(wok_config:conf([wok, rest, cors, 'Access-Control-Max-Age'], 1728000))},
    {<<"Access-Control-Allow-Headers">>,
-    ebinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Headers'],
-                                 [<<"Access-Control-Allow-Origin">>,
-                                  <<"Authorization">>,
-                                  <<"Origin">>,
-                                  <<"x-requested-with">>,
-                                  <<"Content-Type">>,
-                                  <<"Content-Range">>,
-                                  <<"Content-Disposition">>,
-                                  <<"Content-Description">>]),<<", ">>)}
+    bucbinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Headers'],
+                                   [<<"Access-Control-Allow-Origin">>,
+                                    <<"Authorization">>,
+                                    <<"Origin">>,
+                                    <<"x-requested-with">>,
+                                    <<"Content-Type">>,
+                                    <<"Content-Range">>,
+                                    <<"Content-Disposition">>,
+                                    <<"Content-Description">>]),<<", ">>)}
   ] ++
   case wok_config:conf([wok, rest, cors, 'Access-Control-Expose-Headers'], undefined) of
     undefined -> [];
-    H -> [{<<"Access-Control-Expose-Headers">>, ebinary:join(H)}]
+    H -> [{<<"Access-Control-Expose-Headers">>, bucbinary:join(H)}]
   end ++
   case wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Credentials'], undefined) of
     undefined -> [];
-    C -> [{<<"Access-Control-Allow-Credentials">>, eutils:to_binary(C)}]
+    C -> [{<<"Access-Control-Allow-Credentials">>, bucs:to_binary(C)}]
   end.
 
 add_access_control_allow_origin(Headers) ->

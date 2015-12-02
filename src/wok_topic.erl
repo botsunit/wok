@@ -24,7 +24,7 @@ start_link(Name, Options) ->
       {error, missing_consumer_group};
     ConsumerGroup ->
       gen_server:start_link({local,
-                             eutils:to_atom(Name)},
+                             bucs:to_atom(Name)},
                             ?MODULE,
                             [{consumer_group, ConsumerGroup}, {name, Name}|Options],
                             [])
@@ -33,13 +33,13 @@ start_link(Name, Options) ->
 %% ------------------------------------------------------------------
 
 init(Args) ->
-  Frequency = elists:keyfind(fetch_frequency, 1, Args, ?DEFAULT_FETCH_FREQUENCY),
+  Frequency = buclists:keyfind(fetch_frequency, 1, Args, ?DEFAULT_FETCH_FREQUENCY),
   Topic = #topic{
              fetch_frequency = Frequency,
-             max_bytes = elists:keyfind(max_bytes, 1, Args, ?DEFAULT_MESSAGE_MAX_BYTES),
-             max_messages = elists:keyfind(max_messages, 1, Args, ?DEFAULT_MAX_MESSAGES),
-             consumer_group = elists:keyfind(consumer_group, 1, Args),
-             name = elists:keyfind(name, 1, Args)
+             max_bytes = buclists:keyfind(max_bytes, 1, Args, ?DEFAULT_MESSAGE_MAX_BYTES),
+             max_messages = buclists:keyfind(max_messages, 1, Args, ?DEFAULT_MAX_MESSAGES),
+             consumer_group = buclists:keyfind(consumer_group, 1, Args),
+             name = buclists:keyfind(name, 1, Args)
             },
   erlang:send_after(Frequency, self(), fetch),
   {ok, Topic}.
@@ -55,7 +55,7 @@ handle_info(fetch, #topic{fetch_frequency = Frequency,
                           consumer_group = ConsumerGroup,
                           max_bytes = MaxBytes,
                           max_messages = MaxMessages} = State) ->
-  LocalQueue = eutils:to_atom(
+  LocalQueue = bucs:to_atom(
                  wok_config:conf([wok, messages, local_queue_name], 
                                  ?DEFAULT_LOCAL_QUEUE)),
   case pipette:ready(LocalQueue) of

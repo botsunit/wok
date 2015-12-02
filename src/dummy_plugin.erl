@@ -13,7 +13,7 @@ foo(State) ->
   {ok, State}.
 
 bar([Topic, Data]) ->
-  {send, Topic, {<<"dummy_plugin/bar">>, <<"service/controler/action">>, <<"Message body: ", (eutils:to_binary(Data))/binary>>}, [Topic, Data + 1]}.
+  {send, Topic, {<<"dummy_plugin/bar">>, <<"service/controler/action">>, <<"Message body: ", (bucs:to_binary(Data))/binary>>}, [Topic, Data + 1]}.
 
 baz(State) ->
   {stop, State}.

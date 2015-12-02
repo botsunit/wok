@@ -75,7 +75,7 @@ handle_cast({terminate, Child, Result}, State) ->
               lager:error("Missing consumer group in configuration"),
               exit(config_error);
             LocalConsumerGroup ->
-              LocalQueue = eutils:to_atom(
+              LocalQueue = bucs:to_atom(
                              wok_config:conf([wok, messages, local_queue_name], 
                                              ?DEFAULT_LOCAL_QUEUE)),
               case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
@@ -101,7 +101,7 @@ handle_info(fetch, State) ->
       lager:error("Missing consumer group in configuration"),
       exit(config_error);
     LocalConsumerGroup ->
-      LocalQueue = eutils:to_atom(
+      LocalQueue = bucs:to_atom(
                      wok_config:conf([wok, messages, local_queue_name], 
                                      ?DEFAULT_LOCAL_QUEUE)),
       case pipette:ready(LocalQueue) of
@@ -148,7 +148,7 @@ get_services(Tos, #{services := Services}) when is_list(Tos) ->
 get_services(_, [], Result) ->
   Result;
 get_services(To, [Service|Services], Result) ->
-  get_services(To, Services, service_match(To, binary:split(eutils:to_binary(Service), <<"/">>, [global]), Service, Result)).
+  get_services(To, Services, service_match(To, binary:split(bucs:to_binary(Service), <<"/">>, [global]), Service, Result)).
 
 service_match(_, [], ServiceName, Result) ->
   [ServiceName|Result];
@@ -174,7 +174,7 @@ consume(ParsedMessage, Services, #{services := ServicesActions}) ->
           lager:info("Missing consumer group in configuration"),
           exit(config_error);
         LocalConsumerGroup ->
-          LocalQueue = eutils:to_atom(
+          LocalQueue = bucs:to_atom(
                          wok_config:conf([wok, messages, local_queue_name], 
                                          ?DEFAULT_LOCAL_QUEUE)),
           lists:foreach(fun(Service) ->

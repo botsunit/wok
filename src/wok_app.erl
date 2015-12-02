@@ -22,7 +22,7 @@ start_rest() ->
     _ ->
       _ = application:ensure_all_started(cowboy),
       Port = wok_config:conf([wok, rest, port], ?DEFAULT_REST_PORT),
-      IP = enet:str_to_ip(wok_config:conf([wok, rest, ip], ?DEFAULT_REST_IP)),
+      IP = bucinet:to_ip(wok_config:conf([wok, rest, ip], ?DEFAULT_REST_IP)),
       TransOpts = [{port, Port}, {ip, IP}],
       MaxConn = wok_config:conf([wok, rest, max_conn], ?DEFAULT_REST_MAX_CONN),
       Dispatch = wok_rest_handler:routes(
@@ -60,7 +60,7 @@ check_message_handler() ->
   end.
 
 start_local_queue() ->
-  LocalQueue = eutils:to_atom(wok_config:conf([wok, messages, local_queue_name], ?DEFAULT_LOCAL_QUEUE)),
+  LocalQueue = bucs:to_atom(wok_config:conf([wok, messages, local_queue_name], ?DEFAULT_LOCAL_QUEUE)),
   case pipette:queue(LocalQueue) of
     missing_queue ->
       case pipette:new_queue(LocalQueue) of

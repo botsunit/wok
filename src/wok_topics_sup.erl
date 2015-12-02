@@ -32,6 +32,6 @@ build_childs([], Childs) ->
   Childs;
 build_childs([{Name, Options}|Rest], Childs) ->
   build_childs(Rest,
-               [?CHILD(eutils:to_atom(Name), wok_topic, worker, [Name, Options])|
+               [?CHILD(bucs:to_atom(Name), wok_topic, worker, [Name, Options])|
                 Childs]).
 

@@ -1,6 +1,6 @@
 PROJECT = wok
 
-DEPS = lager wok_message wok_message_handler wok_producer pipette kafe cowboy eutils
+DEPS = lager wok_message wok_message_handler wok_producer pipette kafe cowboy bucs doteki
 
 dep_lager = git https://github.com/basho/lager.git master
 dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git master
@@ -9,7 +9,8 @@ dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
 dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
 dep_kafe = git https://github.com/botsunit/kafe.git master
 dep_cowboy = git https://github.com/ninenines/cowboy.git master
-dep_eutils = git https://github.com/emedia-project/eutils.git master
+dep_bucs = git https://github.com/botsunit/bucs.git master
+dep_doteki = git https://github.com/botsunit/doteki.git master
 
 DOC_DEPS = edown
 
