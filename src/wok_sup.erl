@@ -15,13 +15,13 @@ init([]) ->
   Childs = [?CHILD(wok_state, worker, 5000),
             ?CHILD(wok_middlewares, worker, 5000),
             ?CHILD(wok_plugins, worker, 5000)] ++
-           case wok_config:conf([wok, messages]) of
+           case doteki:get_env([wok, messages]) of
              undefined ->
                [];
              _ ->
                [?CHILD(wok_messages_sup, supervisor, infinity)]
-           end ++ 
-           case wok_config:conf([wok, rest]) of
+           end ++
+           case doteki:get_env([wok, rest]) of
              undefined ->
                [];
              _ ->

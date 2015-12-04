@@ -27,7 +27,7 @@ init(_) ->
                                    ({Name, Calls}, {PluginsAcc, ConfAcc}) ->
                                      {[Name|PluginsAcc],
                                       maps:put(Name, #{state => undefined, calls => Calls}, ConfAcc)}
-                                 end, {[], #{}}, wok_config:conf([wok, plugins], [])),
+                                 end, {[], #{}}, doteki:get_env([wok, plugins], [])),
   State = #{plugins => lists:reverse(Plugins),
             confs => Confs},
   lists:foreach(fun(Plugin) ->
@@ -76,7 +76,7 @@ get_plugin_state(Plugin, #{confs := Confs}) ->
   maps:get(state, maps:get(Plugin, Confs)).
 
 update_plugin_state(Name, PluginState, #{confs := Confs} = State) ->
-  PluginInfo = maps:get(Name, Confs), 
+  PluginInfo = maps:get(Name, Confs),
   State#{confs => maps:put(Name, PluginInfo#{state => PluginState}, Confs)}.
 
 start_plugin(Name, {Fun, Freq}) ->

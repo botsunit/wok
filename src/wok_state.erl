@@ -18,7 +18,7 @@ state(State) ->
   gen_server:cast(?SERVER, {state, State}).
 
 init(_) ->
-  case wok_config:conf([wok, initializer]) of
+  case doteki:get_env([wok, initializer]) of
     [{Module, Args}] ->
       erlang:apply(Module, init, [Args]);
     _ ->

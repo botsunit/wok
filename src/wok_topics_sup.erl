@@ -12,7 +12,7 @@ start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-  Childs = case wok_config:conf([wok, messages, topics]) of
+  Childs = case doteki:get_env([wok, messages, topics]) of
              undefined ->
                lager:debug("No topic declared in config!"),
                [];

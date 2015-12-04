@@ -1,15 +1,12 @@
-{erl_opts, [
-  debug_info,
-  {parse_transform, lager_transform}
-]}.
-
 {deps, [
-  {lager, ".*", {git, "https://github.com/basho/lager.git", {branch, "master"}}},
-  {wok_message_handler, ".*", {git, "https://github.com/botsunit/wok_message_handler.git", {branch, "master"}}},
-  {wok_producer, ".*", {git, "https://github.com/botsunit/wok_producer.git", {branch, "master"}}},
-  {pipette, ".*", {git, "https://github.com/botsunit/pipette.git", {branch, "master"}}},
-  {kafe, ".*", {git, "https://github.com/botsunit/kafe.git", {branch, "master"}}},
-  {cowboy, ".*", {git, "https://github.com/ninenines/cowboy.git", {branch, "master"}}},
-  {eutils, ".*", {git, "https://github.com/emedia-project/eutils.git", {branch, "master"}}}
+  {lager,".*",{git,"https://github.com/basho/lager.git",{branch,"master"}}},
+  {wok_message,".*",{git,"https://github.com/botsunit/wok_message.git",{branch,"master"}}},
+  {wok_message_handler,".*",{git,"https://github.com/botsunit/wok_message_handler.git",{branch,"master"}}},
+  {wok_producer,".*",{git,"https://github.com/botsunit/wok_producer.git",{branch,"master"}}},
+  {pipette,".*",{git,"https://github.com/botsunit/pipette.git",{branch,"master"}}},
+  {kafe,".*",{git,"https://github.com/botsunit/kafe.git",{branch,"master"}}},
+  {cowboy,".*",{git,"https://github.com/ninenines/cowboy.git",{branch,"master"}}},
+  {bucs,".*",{git,"https://github.com/botsunit/bucs.git",{branch,"master"}}},
+  {doteki,".*",{git,"https://github.com/botsunit/doteki.git",{branch,"master"}}}
 ]}.
-
+{erl_opts, [debug_info,warn_export_vars,warn_shadow_vars,warn_obsolete_guard]}.

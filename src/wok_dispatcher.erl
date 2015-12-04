@@ -32,8 +32,8 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({handle, {<<>>, Message}}, State) ->
   try
-    case erlang:apply(wok_config:conf([wok, messages, handler], 
-                                      ?DEFAULT_MESSAGE_HANDLER), 
+    case erlang:apply(doteki:get_env([wok, messages, handler],
+                                      ?DEFAULT_MESSAGE_HANDLER),
                       parse, [Message]) of
       {ok, #message{to = To} = ParserMessage, _} ->
         _ = consume(ParserMessage, get_services(To, State), State);
@@ -49,7 +49,7 @@ handle_cast({handle, {<<>>, Message}}, State) ->
   {noreply, State};
 handle_cast({terminate, Child, Result}, State) ->
   case Result of
-    noreply -> 
+    noreply ->
       ok;
     {reply, Topic, Message} ->
       case wok_middlewares:outgoing(Message) of
@@ -68,15 +68,15 @@ handle_cast({terminate, Child, Result}, State) ->
       ignore
   end,
   _ = case wok_services_sup:terminate_child(Child) of
-        ok -> 
-          case wok_config:conf([wok, messages, local_consumer_group],
-                               wok_config:conf([wok, messages, consumer_group], undefined)) of
+        ok ->
+          case doteki:get_env([wok, messages, local_consumer_group],
+                               doteki:get_env([wok, messages, consumer_group], undefined)) of
             undefined ->
               lager:error("Missing consumer group in configuration"),
               exit(config_error);
             LocalConsumerGroup ->
               LocalQueue = bucs:to_atom(
-                             wok_config:conf([wok, messages, local_queue_name], 
+                             doteki:get_env([wok, messages, local_queue_name],
                                              ?DEFAULT_LOCAL_QUEUE)),
               case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
                 {ok, Data} ->
@@ -95,14 +95,14 @@ handle_cast(_Msg, State) ->
   {noreply, State}.
 
 handle_info(fetch, State) ->
-  case wok_config:conf([wok, messages, local_consumer_group],
-                       wok_config:conf([wok, messages, consumer_group], undefined)) of
+  case doteki:get_env([wok, messages, local_consumer_group],
+                       doteki:get_env([wok, messages, consumer_group], undefined)) of
     undefined ->
       lager:error("Missing consumer group in configuration"),
       exit(config_error);
     LocalConsumerGroup ->
       LocalQueue = bucs:to_atom(
-                     wok_config:conf([wok, messages, local_queue_name], 
+                     doteki:get_env([wok, messages, local_queue_name],
                                      ?DEFAULT_LOCAL_QUEUE)),
       case pipette:ready(LocalQueue) of
         true ->
@@ -113,7 +113,7 @@ handle_info(fetch, State) ->
              {error, E} ->
                lager:error("Pipette out error : ~p", [E]),
                ok
-           end || _ <- lists:seq(1, wok_config:conf([wok, messages, max_services_fork], ?DEFAULT_MAX_SERVICES_FORK))];
+           end || _ <- lists:seq(1, doteki:get_env([wok, messages, max_services_fork], ?DEFAULT_MAX_SERVICES_FORK))];
         false ->
           erlang:send_after(1000, self(), fetch)
       end
@@ -131,8 +131,8 @@ code_change(_OldVsn, State, _Extra) ->
 get_service_handlers(State) ->
   State#{services => lists:foldl(fun({ServiceName, Handler}, Services) ->
                                      maps:put(ServiceName, Handler, Services)
-                                 end, #{}, wok_config:conf([wok, messages, services], 
-                                                           wok_config:conf([wok, messages, controlers], [])))}.
+                                 end, #{}, doteki:get_env([wok, messages, services],
+                                                           doteki:get_env([wok, messages, controlers], [])))}.
 
 get_services(To, State) when is_binary(To) ->
   get_services([To],State);
@@ -141,7 +141,7 @@ get_services(Tos, #{services := Services}) when is_list(Tos) ->
                   lists:umerge(lists:sort(Acc),
                                lists:sort(
                                  get_services(
-                                   binary:split(To, <<"/">>, [global]), 
+                                   binary:split(To, <<"/">>, [global]),
                                    maps:keys(Services), [])))
               end, [], Tos).
 
@@ -168,14 +168,14 @@ consume(_, [], _) ->
 consume(ParsedMessage, Services, #{services := ServicesActions}) ->
   case wok_middlewares:ingoing(ParsedMessage) of
     {ok, ParsedMessage1} ->
-      case wok_config:conf([wok, messages, local_consumer_group],
-                           wok_config:conf([wok, messages, consumer_group], undefined)) of
+      case doteki:get_env([wok, messages, local_consumer_group],
+                           doteki:get_env([wok, messages, consumer_group], undefined)) of
         undefined ->
           lager:info("Missing consumer group in configuration"),
           exit(config_error);
         LocalConsumerGroup ->
           LocalQueue = bucs:to_atom(
-                         wok_config:conf([wok, messages, local_queue_name], 
+                         doteki:get_env([wok, messages, local_queue_name],
                                          ?DEFAULT_LOCAL_QUEUE)),
           lists:foreach(fun(Service) ->
                             LocalConsumerGroupOffset = pipette:offset(LocalQueue, #{consumer => LocalConsumerGroup}),

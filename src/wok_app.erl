@@ -16,22 +16,22 @@ stop(_State) ->
   ok.
 
 start_rest() ->
-  case wok_config:conf([wok, rest]) of
+  case doteki:get_env([wok, rest]) of
     undefined ->
       lager:debug("No REST configuration.");
     _ ->
       _ = application:ensure_all_started(cowboy),
-      Port = wok_config:conf([wok, rest, port], ?DEFAULT_REST_PORT),
-      IP = bucinet:to_ip(wok_config:conf([wok, rest, ip], ?DEFAULT_REST_IP)),
+      Port = doteki:get_env([wok, rest, port], ?DEFAULT_REST_PORT),
+      IP = bucinet:to_ip(doteki:get_env([wok, rest, ip], ?DEFAULT_REST_IP)),
       TransOpts = [{port, Port}, {ip, IP}],
-      MaxConn = wok_config:conf([wok, rest, max_conn], ?DEFAULT_REST_MAX_CONN),
+      MaxConn = doteki:get_env([wok, rest, max_conn], ?DEFAULT_REST_MAX_CONN),
       Dispatch = wok_rest_handler:routes(
-                   wok_config:conf([wok, rest, routes], []) ++
+                   doteki:get_env([wok, rest, routes], []) ++
                    wok_middlewares:routes()
                   ),
       ProtoOpts   = [{env, [{dispatch, Dispatch}]}],
       case cowboy:start_http(http, MaxConn, TransOpts, ProtoOpts) of
-        {ok, _} -> 
+        {ok, _} ->
           lager:info("Start HTTP on port ~p", [Port]);
         _ ->
           lager:error("Faild to start HTTP server"),
@@ -40,7 +40,7 @@ start_rest() ->
   end.
 
 start_messages() ->
-  case wok_config:conf([wok, messages]) of
+  case doteki:get_env([wok, messages]) of
     undefined ->
       ok;
     _ ->
@@ -50,7 +50,7 @@ start_messages() ->
   end.
 
 check_message_handler() ->
-  Handler = wok_config:conf([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER),
+  Handler = doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER),
   case code:ensure_loaded(Handler) of
     {module, Handler} ->
       lager:info("Message handler ~p loaded", [Handler]);
@@ -60,7 +60,7 @@ check_message_handler() ->
   end.
 
 start_local_queue() ->
-  LocalQueue = bucs:to_atom(wok_config:conf([wok, messages, local_queue_name], ?DEFAULT_LOCAL_QUEUE)),
+  LocalQueue = bucs:to_atom(doteki:get_env([wok, messages, local_queue_name], ?DEFAULT_LOCAL_QUEUE)),
   case pipette:queue(LocalQueue) of
     missing_queue ->
       case pipette:new_queue(LocalQueue) of

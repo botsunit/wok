@@ -112,16 +112,16 @@ routes([{Verb, Path, Handler, Middleware}|Rest], Acc) ->
 add_route(Path, static, Filepath, Acc) ->
   case Filepath of
     {priv_dir, App} ->
-      [{bucuri:join(Path, "[...]"), 
-        cowboy_static, 
+      [{bucuri:join(Path, "[...]"),
+        cowboy_static,
         {dir, buccode:priv_dir(App), [{mimetypes, cow_mimetypes, all}]}}|Acc];
     {priv_dir, App, Extra} ->
-      [{bucuri:join(Path, "[...]"), 
-        cowboy_static, 
+      [{bucuri:join(Path, "[...]"),
+        cowboy_static,
         {dir, filename:join(buccode:priv_dir(App), Extra), [{mimetypes, cow_mimetypes, all}]}}|Acc];
     {dir, Dir} ->
-      [{bucuri:join(Path, "[...]"), 
-        cowboy_static, 
+      [{bucuri:join(Path, "[...]"),
+        cowboy_static,
         {dir, Dir, [{mimetypes, cow_mimetypes, all}]}}|Acc]
   end;
 add_route(Path, Verb, Handler, Acc) ->
@@ -162,16 +162,16 @@ allow(Ressource) ->
               _ ->
                 Acc
             end
-        end, ["OPTIONS"], wok_config:conf([wok, rest, routes], [])), ",")).
+        end, ["OPTIONS"], doteki:get_env([wok, rest, routes], [])), ",")).
 
 cors_headers(Path) ->
   [
    {<<"Access-Control-Allow-Methods">>,
-    bucbinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Methods'], allow(Path)), <<", ">>)},
+    bucbinary:join(doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Methods'], allow(Path)), <<", ">>)},
    {<<"Access-Control-Max-Age">>,
-    bucs:to_binary(wok_config:conf([wok, rest, cors, 'Access-Control-Max-Age'], 1728000))},
+    bucs:to_binary(doteki:get_env([wok, rest, cors, 'Access-Control-Max-Age'], 1728000))},
    {<<"Access-Control-Allow-Headers">>,
-    bucbinary:join(wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Headers'],
+    bucbinary:join(doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Headers'],
                                    [<<"Access-Control-Allow-Origin">>,
                                     <<"Authorization">>,
                                     <<"Origin">>,
@@ -181,11 +181,11 @@ cors_headers(Path) ->
                                     <<"Content-Disposition">>,
                                     <<"Content-Description">>]),<<", ">>)}
   ] ++
-  case wok_config:conf([wok, rest, cors, 'Access-Control-Expose-Headers'], undefined) of
+  case doteki:get_env([wok, rest, cors, 'Access-Control-Expose-Headers'], undefined) of
     undefined -> [];
     H -> [{<<"Access-Control-Expose-Headers">>, bucbinary:join(H)}]
   end ++
-  case wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Credentials'], undefined) of
+  case doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Credentials'], undefined) of
     undefined -> [];
     C -> [{<<"Access-Control-Allow-Credentials">>, bucs:to_binary(C)}]
   end.
@@ -194,7 +194,7 @@ add_access_control_allow_origin(Headers) ->
   case lists:keyfind(<<"Access-Control-Allow-Origin">>, 1, Headers) of
     false ->
       [{<<"Access-Control-Allow-Origin">>,
-        wok_config:conf([wok, rest, cors, 'Access-Control-Allow-Origin'], <<"*">>)}|Headers];
+        doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Origin'], <<"*">>)}|Headers];
     _ ->
       Headers
   end.

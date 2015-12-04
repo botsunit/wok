@@ -16,7 +16,7 @@
 routes() ->
   lists:foldl(fun({Name, Opts}, Acc) ->
                 Acc ++ update_routes(erlang:apply(Name, routes, []), Opts, Name, [])
-            end, [], wok_config:conf([wok, middlewares], [])).
+            end, [], doteki:get_env([wok, middlewares], [])).
 
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -48,7 +48,7 @@ init(_) ->
                                              lager:debug("Middleware ~p stop: ~p", [Name, Reason]),
                                              {MiddlewaresAcc, ConfsAcc}
                                          end
-                                     end, {[], #{}}, wok_config:conf([wok, middlewares], [])),
+                                     end, {[], #{}}, doteki:get_env([wok, middlewares], [])),
   {ok, #{middlewares => lists:reverse(Middlewares),
          confs => Confs}}.
 
@@ -87,9 +87,9 @@ update_routes([{Verb, Route, Action}|Rest], Opts, Name, Result) ->
                RoutePrefix;
              _ ->
                case lists:member(no_route_prefix, Opts) of
-                 true -> 
+                 true ->
                    "";
-                 false -> 
+                 false ->
                    io_lib:format("/~p", [Name])
                end
            end,

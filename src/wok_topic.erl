@@ -18,7 +18,7 @@
 
 start_link(Name, Options) ->
   lager:info("Start topic ~s", [Name]),
-  case wok_config:conf([wok, messages, consumer_group]) of
+  case doteki:get_env([wok, messages, consumer_group]) of
     undefined ->
       lager:error("Missing consumer group in configuration"),
       {error, missing_consumer_group};
@@ -50,13 +50,13 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_info(fetch, #topic{fetch_frequency = Frequency, 
+handle_info(fetch, #topic{fetch_frequency = Frequency,
                           name = Topic,
                           consumer_group = ConsumerGroup,
                           max_bytes = MaxBytes,
                           max_messages = MaxMessages} = State) ->
   LocalQueue = bucs:to_atom(
-                 wok_config:conf([wok, messages, local_queue_name], 
+                 doteki:get_env([wok, messages, local_queue_name],
                                  ?DEFAULT_LOCAL_QUEUE)),
   case pipette:ready(LocalQueue) of
     true ->
@@ -70,7 +70,7 @@ handle_info(fetch, #topic{fetch_frequency = Frequency,
                     case kafe:fetch(-1, Topic, #{partition => Partition, offset => Offset, max_bytes => MaxBytes}) of
                       {ok, [#{partitions := Partitions}]} ->
                         lists:foreach(fun wok_dispatcher:handle/1,
-                                      [{Key, Value} || 
+                                      [{Key, Value} ||
                                        #{message := #{key := Key, value := Value}} <- Partitions, Value =/= <<>>]);
                       _ ->
                         lager:error("Error fetching message ~p@~p#~p", [Topic, Partition, Offset])
