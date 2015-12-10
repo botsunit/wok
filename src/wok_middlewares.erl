@@ -8,15 +8,16 @@
 
 -export([start_link/0]).
 -export([state/1, state/2]).
--export([ingoing/1, outgoing/1]).
+-export([incoming_message/1, outgoing_message/1]).
+-export([incoming_http/1, outgoing_http/1]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
 routes() ->
   lists:foldl(fun({Name, Opts}, Acc) ->
-                Acc ++ update_routes(erlang:apply(Name, routes, []), Opts, Name, [])
-            end, [], doteki:get_env([wok, middlewares], [])).
+                  Acc ++ update_routes(erlang:apply(Name, routes, []), Opts, Name, [])
+              end, [], doteki:get_env([wok, middlewares], [])).
 
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -27,11 +28,17 @@ state(Middleware) ->
 state(Middleware, State) ->
   gen_server:cast(?SERVER, {state, Middleware, State}).
 
-ingoing(Message) ->
-  gen_server:call(?SERVER, {ingoing, Message}).
+incoming_message(Message) ->
+  gen_server:call(?SERVER, {incoming_message, Message}).
 
-outgoing(Message) ->
-  gen_server:call(?SERVER, {outgoing, Message}).
+outgoing_message(Message) ->
+  gen_server:call(?SERVER, {outgoing_message, Message}).
+
+incoming_http(Req) ->
+  gen_server:call(?SERVER, {incoming_http, Req}).
+
+outgoing_http(Resp) ->
+  gen_server:call(?SERVER, {outgoing_http, Resp}).
 
 init(_) ->
   {Middlewares, Confs} = lists:foldl(fun({Name, Opts}, {MiddlewaresAcc, ConfsAcc}) ->
@@ -54,13 +61,21 @@ init(_) ->
 
 handle_call({state, Middleware}, _From, #{confs := MStates} = State) ->
   {reply, maps:get(Middleware, MStates, nostate), State};
-handle_call({ingoing, Message}, _From, #{middlewares := Middlewares,
-                                      confs := MStates} = State) ->
-  {Result, MStates2} = middleware_call(ingoing, Middlewares, MStates, Message),
+handle_call({incoming_message, Message}, _From, #{middlewares := Middlewares,
+                                                  confs := MStates} = State) ->
+  {Result, MStates2} = middlewares_message(incoming_message, Middlewares, MStates, Message),
   {reply, Result, State#{confs => MStates2}};
-handle_call({outgoing, Message}, _From, #{middlewares := Middlewares,
-                                      confs := MStates} = State) ->
-  {Result, MStates2} = middleware_call(outgoing, lists:reverse(Middlewares), MStates, Message),
+handle_call({outgoing_message, Message}, _From, #{middlewares := Middlewares,
+                                                  confs := MStates} = State) ->
+  {Result, MStates2} = middlewares_message(outgoing_message, lists:reverse(Middlewares), MStates, Message),
+  {reply, Result, State#{confs => MStates2}};
+handle_call({incoming_http, Req}, _From, #{middlewares := Middlewares,
+                                                  confs := Mstates} = State) ->
+  {Result, MStates2} = middlewares_incoming_http(Middlewares, Mstates, Req),
+  {reply, Result, State#{confs => MStates2}};
+handle_call({outgoing_http, Resp}, _From, #{middlewares := Middlewares,
+                                                  confs := Mstates} = State) ->
+  {Result, MStates2} = middlewares_outgoing_http(lists:reverse(Middlewares), Mstates, Resp),
   {reply, Result, State#{confs => MStates2}};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
@@ -106,18 +121,35 @@ get_route([{route, Route, NewRoute}|_], Route) ->
 get_route([_|Rest], Route) ->
   get_route(Rest, Route).
 
-middleware_call(Direction, Middlewares, MStates, Message) ->
-  lists:foldl(
-    fun
-      (Middleware, {{stop, _, _}, _} = Result) ->
-        lager:debug("Ignore middleware ~p", [Middleware]),
-        Result;
-      (Middleware, {{ok, Message1}, MStates1}) ->
-        case erlang:apply(Middleware, Direction, [Message1, maps:get(Middleware, MStates1, nostate)]) of
-          {ok, Message2, MState} ->
-            {{ok, Message2}, maps:put(Middleware, MState, MStates1)};
-          {stop, Reason, MState} ->
-            {{stop, Middleware, Reason}, maps:put(Middleware, MState, MStates1)}
-        end
-    end, {{ok, Message}, MStates}, Middlewares).
+middlewares_message(Direction, Middlewares, MStates, Message) ->
+  middlewares_message(Direction, Middlewares, {{ok, Message}, MStates}).
+
+middlewares_message(Direction, [Middleware|Middlewares], {{ok, Message}, MStates}) ->
+  case erlang:apply(Middleware, Direction, [Message, maps:get(Middleware, MStates, nostate)]) of
+    {ok, Message1, MState} ->
+      middlewares_message(Direction, Middlewares, {{ok, Message1}, maps:put(Middleware, MState, MStates)});
+    {stop, Reason, MState} ->
+      {{stop, Middleware, Reason}, maps:put(Middleware, MState, MStates)}
+  end;
+middlewares_message(_, _, Result) ->
+  Result.
+
+middlewares_incoming_http(Middlewares, MStates, Req) ->
+  middlewares_incoming_http2(Middlewares, Req, {{continue, Req}, MStates}).
+
+middlewares_incoming_http2([Middleware|Middlewares], Req, {{continue, Req}, MStates}) ->
+  case erlang:apply(Middleware, incoming_http, [Req, maps:get(Middleware, MStates, nostate)]) of
+    {continue, Req2, MState} ->
+      middlewares_incoming_http2(Middlewares, Req2, {{continue, Req2}, maps:put(Middleware, MState, MStates)});
+    {C, H, B, MState} ->
+      {{C, H, B}, maps:put(Middleware, MState, MStates)}
+  end;
+middlewares_incoming_http2(_, _, Result) ->
+  Result.
+
+middlewares_outgoing_http([], MStates, Result) ->
+  {Result, MStates};
+middlewares_outgoing_http([Middleware|Middlewares], MStates, Resp) ->
+  {C, H, B, MState} = erlang:apply(Middleware, outgoing_http, [Resp, maps:get(Middleware, MStates, nostate)]),
+  middlewares_outgoing_http(Middlewares, maps:put(Middleware, MState, MStates), {C, H, B}).
 

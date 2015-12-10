@@ -22,10 +22,13 @@ init(Req, Opts) ->
       try
         case lists:keyfind(Action, 1, Opts) of
           {Action, {Module, Function}} ->
-            {C, H, B, WokState} = erlang:apply(Module,
-                                               Function,
-                                               [Req, wok_state:state()]),
-            _ = wok_state:state(WokState),
+            {C, H, B} = case wok_middlewares:incoming_http(Req) of
+                          {continue, Req2} ->
+                            {C1, H1, B1, WokState} = erlang:apply(Module, Function, [Req2, wok_state:state()]),
+                            _ = wok_state:state(WokState),
+                            wok_middlewares:outgoing_http({C1, H1, B1});
+                          HttpResponse -> HttpResponse
+                        end,
             {ok, cowboy_req:reply(C, H, B, Req), Opts};
           {Action, {Module, Function}, Middleware} ->
             {C, H, B, MidState} = erlang:apply(Module,

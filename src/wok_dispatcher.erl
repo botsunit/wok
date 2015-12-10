@@ -52,7 +52,7 @@ handle_cast({terminate, Child, Result}, State) ->
     noreply ->
       ok;
     {reply, Topic, Message} ->
-      case wok_middlewares:outgoing(Message) of
+      case wok_middlewares:outgoing_message(Message) of
         {ok, Message1} ->
           case wok:provide(Topic, Message1) of
             {ok, _} ->
@@ -166,7 +166,7 @@ service_match([X|To], [Y|Service], ServiceName, Result) when X == Y;
 consume(_, [], _) ->
   ok;
 consume(ParsedMessage, Services, #{services := ServicesActions}) ->
-  case wok_middlewares:ingoing(ParsedMessage) of
+  case wok_middlewares:incoming_message(ParsedMessage) of
     {ok, ParsedMessage1} ->
       case doteki:get_env([wok, messages, local_consumer_group],
                            doteki:get_env([wok, messages, consumer_group], undefined)) of
