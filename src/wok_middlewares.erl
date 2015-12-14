@@ -6,7 +6,7 @@
 
 -export([routes/0]).
 
--export([start_link/0]).
+-export([start_link/0, stop/0]).
 -export([state/1, state/2]).
 -export([incoming_message/1, outgoing_message/1]).
 -export([incoming_http/1, outgoing_http/1]).
@@ -21,6 +21,9 @@ routes() ->
 
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+
+stop() ->
+  gen_server:call(?SERVER, stop).
 
 state(Middleware) ->
   gen_server:call(?SERVER, {state, Middleware}).
@@ -55,10 +58,12 @@ init(_) ->
                                              lager:debug("Middleware ~p stop: ~p", [Name, Reason]),
                                              {MiddlewaresAcc, ConfsAcc}
                                          end
-                                     end, {[], #{}}, doteki:get_env([wok, middlewares], [])),
+                                    end, {[], #{}}, doteki:get_env([wok, middlewares], [])),
   {ok, #{middlewares => lists:reverse(Middlewares),
          confs => Confs}}.
 
+handle_call(stop, _From, State) ->
+  {stop, normal, ok, State};
 handle_call({state, Middleware}, _From, #{confs := MStates} = State) ->
   {reply, maps:get(Middleware, MStates, nostate), State};
 handle_call({incoming_message, Message}, _From, #{middlewares := Middlewares,
@@ -105,7 +110,7 @@ update_routes([{Verb, Route, Action}|Rest], Opts, Name, Result) ->
                  true ->
                    "";
                  false ->
-                   io_lib:format("/~p", [Name])
+                   lists:flatten(io_lib:format("/~w", [Name]))
                end
            end,
   Route1 = case get_route(Opts, Route) of
