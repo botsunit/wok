@@ -82,6 +82,8 @@ handle_cast({terminate, Child, Result}, State) ->
                 {ok, Data} ->
                   {ParsedMessage, Service, Action} = binary_to_term(Data),
                   force_consume(ParsedMessage, Service, Action);
+                {error,no_data} ->
+                  ok;
                 {error, E2} ->
                   lager:error("Pipette out error: ~p", [E2]),
                   ok
@@ -110,6 +112,8 @@ handle_info(fetch, State) ->
              {ok, Data} ->
                {ParsedMessage, Service, Action} = binary_to_term(Data),
                force_consume(ParsedMessage, Service, Action);
+             {error,no_data} ->
+               ok;
              {error, E} ->
                lager:error("Pipette out error : ~p", [E]),
                ok
