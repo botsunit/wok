@@ -1,38 +1,47 @@
 -module(wok_middlewares_tests).
--export([routes/0, init/1]).
 
 -include_lib("eunit/include/eunit.hrl").
 
-% Fake middelware
-routes() ->
-  [
-   {'GET', "/dummy_get", {?MODULE, my_dummy_get}},
-   {'POST', "/dummy_post", {?MODULE, my_dummy_post}}
-  ].
+meck_middleware() ->
+  meck:new(fake_middleware, [non_strict]),
+  meck:expect(fake_middleware, routes,
+              fun() ->
+                  [
+                   {'GET', "/dummy_get", {fake_middleware, my_dummy_get}},
+                   {'POST', "/dummy_post", {fake_middleware, my_dummy_post}}
+                  ]
+              end),
+  meck:expect(fake_middleware, init,
+              fun(X) ->
+                  {ok, X}
+              end).
 
-init(X) ->
-  {ok, X}.
+unmeck_middleware() ->
+  meck:unload(fake_middleware).
 
 % Tests
 wok_routes_no_ops_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config(
               [{wok,
                 [{middlewares,
-                  [{?MODULE,
+                  [{fake_middleware,
                     []
                    }]
                  }]
                }])
    end,
-   fun(_) -> ok end,
+   fun(_) ->
+       unmeck_middleware()
+   end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/wok_middlewares_tests/dummy_post",
-                       {wok_middlewares_tests,my_dummy_post}, wok_middlewares_tests},
-                      {'GET',"/wok_middlewares_tests/dummy_get",
-                       {wok_middlewares_tests,my_dummy_get}, wok_middlewares_tests}],
+        ?assertMatch([{'POST',"/fake_middleware/dummy_post",
+                       {fake_middleware,my_dummy_post}, fake_middleware},
+                      {'GET',"/fake_middleware/dummy_get",
+                       {fake_middleware,my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -40,22 +49,25 @@ wok_routes_no_ops_test_() ->
 wok_routes_no_route_prefix_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config(
               [{wok,
                 [{middlewares,
-                  [{?MODULE,
+                  [{fake_middleware,
                     [no_route_prefix]
                    }]
                  }]
                }])
    end,
-   fun(_) -> ok end,
+   fun(_) ->
+       unmeck_middleware()
+   end,
    [
     fun() ->
         ?assertMatch([{'POST',"/dummy_post",
-                       {wok_middlewares_tests,my_dummy_post}, wok_middlewares_tests},
+                       {fake_middleware,my_dummy_post}, fake_middleware},
                       {'GET',"/dummy_get",
-                       {wok_middlewares_tests,my_dummy_get}, wok_middlewares_tests}],
+                       {fake_middleware,my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -63,22 +75,25 @@ wok_routes_no_route_prefix_test_() ->
 wok_routes_route_prefix_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config(
               [{wok,
                 [{middlewares,
-                  [{?MODULE,
+                  [{fake_middleware,
                     [{route_prefix, "/custom"}]
                    }]
                  }]
                }])
    end,
-   fun(_) -> ok end,
+   fun(_) ->
+       unmeck_middleware()
+   end,
    [
     fun() ->
         ?assertMatch([{'POST',"/custom/dummy_post",
-                       {wok_middlewares_tests,my_dummy_post}, wok_middlewares_tests},
+                       {fake_middleware,my_dummy_post}, fake_middleware},
                       {'GET',"/custom/dummy_get",
-                       {wok_middlewares_tests,my_dummy_get}, wok_middlewares_tests}],
+                       {fake_middleware,my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -86,22 +101,25 @@ wok_routes_route_prefix_test_() ->
 wok_routes_route_change_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config(
               [{wok,
                 [{middlewares,
-                  [{?MODULE,
+                  [{fake_middleware,
                     [{route, "/dummy_get", "/get_dummy"}]
                    }]
                  }]
                }])
    end,
-   fun(_) -> ok end,
+   fun(_) ->
+       unmeck_middleware()
+   end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/wok_middlewares_tests/dummy_post",
-                       {wok_middlewares_tests,my_dummy_post}, wok_middlewares_tests},
-                      {'GET',"/wok_middlewares_tests/get_dummy",
-                       {wok_middlewares_tests,my_dummy_get}, wok_middlewares_tests}],
+        ?assertMatch([{'POST',"/fake_middleware/dummy_post",
+                       {fake_middleware,my_dummy_post}, fake_middleware},
+                      {'GET',"/fake_middleware/get_dummy",
+                       {fake_middleware,my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -109,10 +127,11 @@ wok_routes_route_change_test_() ->
 wok_routes_route_change_all_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config(
               [{wok,
                 [{middlewares,
-                  [{?MODULE,
+                  [{fake_middleware,
                     [
                      {route, "/dummy_get", "/get_dummy"},
                      {route, "/dummy_post", "/post_dummy"}
@@ -121,13 +140,15 @@ wok_routes_route_change_all_test_() ->
                  }]
                }])
    end,
-   fun(_) -> ok end,
+   fun(_) ->
+       unmeck_middleware()
+   end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/wok_middlewares_tests/post_dummy",
-                       {wok_middlewares_tests,my_dummy_post}, wok_middlewares_tests},
-                      {'GET',"/wok_middlewares_tests/get_dummy",
-                       {wok_middlewares_tests,my_dummy_get}, wok_middlewares_tests}],
+        ?assertMatch([{'POST',"/fake_middleware/post_dummy",
+                       {fake_middleware,my_dummy_post}, fake_middleware},
+                      {'GET',"/fake_middleware/get_dummy",
+                       {fake_middleware,my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -135,10 +156,11 @@ wok_routes_route_change_all_test_() ->
 wok_routes_route_change_with_custom_prefix_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config(
               [{wok,
                 [{middlewares,
-                  [{?MODULE,
+                  [{fake_middleware,
                     [
                      {route_prefix, "/custom"},
                      {route, "/dummy_get", "/get_dummy"}
@@ -147,13 +169,15 @@ wok_routes_route_change_with_custom_prefix_test_() ->
                  }]
                }])
    end,
-   fun(_) -> ok end,
+   fun(_) ->
+       unmeck_middleware()
+   end,
    [
     fun() ->
         ?assertMatch([{'POST',"/custom/dummy_post",
-                       {wok_middlewares_tests,my_dummy_post}, wok_middlewares_tests},
+                       {fake_middleware,my_dummy_post}, fake_middleware},
                       {'GET',"/custom/get_dummy",
-                       {wok_middlewares_tests,my_dummy_get}, wok_middlewares_tests}],
+                       {fake_middleware,my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -161,10 +185,11 @@ wok_routes_route_change_with_custom_prefix_test_() ->
 wok_routes_route_change_with_no_prefix_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config(
               [{wok,
                 [{middlewares,
-                  [{?MODULE,
+                  [{fake_middleware,
                     [
                      no_route_prefix,
                      {route, "/dummy_get", "/get_dummy"}
@@ -173,13 +198,15 @@ wok_routes_route_change_with_no_prefix_test_() ->
                  }]
                }])
    end,
-   fun(_) -> ok end,
+   fun(_) ->
+       unmeck_middleware()
+   end,
    [
     fun() ->
         ?assertMatch([{'POST',"/dummy_post",
-                       {wok_middlewares_tests,my_dummy_post}, wok_middlewares_tests},
+                       {fake_middleware,my_dummy_post}, fake_middleware},
                       {'GET',"/get_dummy",
-                       {wok_middlewares_tests,my_dummy_get}, wok_middlewares_tests}],
+                       {fake_middleware,my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -187,19 +214,21 @@ wok_routes_route_change_with_no_prefix_test_() ->
 wok_middelware_no_middleware_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config([{wok, [{middlewares, []}]}]),
        wok_middlewares:start_link()
    end,
    fun
      ({ok, _}) ->
-       wok_middlewares:stop();
+       wok_middlewares:stop(),
+       unmeck_middleware();
      (_) ->
-       ok
+       unmeck_middleware()
    end,
    fun(R) ->
        {with, R,
         [fun(X) -> ?assertMatch({ok, _}, X) end,
-         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(?MODULE)) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware)) end,
          fun(_) -> ?assertMatch({ok, message}, wok_middlewares:incoming_message(message)) end,
          fun(_) -> ?assertMatch({ok, message}, wok_middlewares:outgoing_message(message)) end]
        }
@@ -208,32 +237,35 @@ wok_middelware_no_middleware_test_() ->
 wok_middelware_without_state_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config([{wok,
                                          [{middlewares,
-                                           [{?MODULE, []}]
+                                           [{fake_middleware, []}]
                                           }]
                                         }]),
        wok_middlewares:start_link()
    end,
    fun
      ({ok, _}) ->
-       wok_middlewares:stop();
+       wok_middlewares:stop(),
+       unmeck_middleware();
      (_) ->
-       ok
+       unmeck_middleware()
    end,
    fun(R) ->
        {with, R,
         [fun(X) -> ?assertMatch({ok, _}, X) end,
-         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(?MODULE)) end]
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware)) end]
        }
    end}.
 
 wok_middelware_with_state_test_() ->
   {setup,
    fun() ->
+       meck_middleware(),
        ok = doteki:set_env_from_config([{wok,
                                          [{middlewares,
-                                           [{?MODULE,
+                                           [{fake_middleware,
                                              [
                                               {init, [init, parameters]}
                                              ]
@@ -244,16 +276,17 @@ wok_middelware_with_state_test_() ->
    end,
    fun
      ({ok, _}) ->
-       wok_middlewares:stop();
+       wok_middlewares:stop(),
+       unmeck_middleware();
      (_) ->
-       ok
+       unmeck_middleware()
    end,
    fun(R) ->
        {with, R,
         [fun(X) -> ?assertMatch({ok, _}, X) end,
-         fun(_) -> ?assertMatch([init,parameters], wok_middlewares:state(?MODULE)) end,
-         fun(_) -> ?assertMatch(ok, wok_middlewares:state(?MODULE, [init,new_parameters])) end,
-         fun(_) -> ?assertMatch([init,new_parameters], wok_middlewares:state(?MODULE)) end]
+         fun(_) -> ?assertMatch([init,parameters], wok_middlewares:state(fake_middleware)) end,
+         fun(_) -> ?assertMatch(ok, wok_middlewares:state(fake_middleware, [init,new_parameters])) end,
+         fun(_) -> ?assertMatch([init,new_parameters], wok_middlewares:state(fake_middleware)) end]
        }
    end}.
 
