@@ -211,29 +211,6 @@ wok_routes_route_change_with_no_prefix_test_() ->
     end
    ]}.
 
-wok_middelware_no_middleware_test_() ->
-  {setup,
-   fun() ->
-       meck_middleware(),
-       ok = doteki:set_env_from_config([{wok, [{middlewares, []}]}]),
-       wok_middlewares:start_link()
-   end,
-   fun
-     ({ok, _}) ->
-       wok_middlewares:stop(),
-       unmeck_middleware();
-     (_) ->
-       unmeck_middleware()
-   end,
-   fun(R) ->
-       {with, R,
-        [fun(X) -> ?assertMatch({ok, _}, X) end,
-         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware)) end,
-         fun(_) -> ?assertMatch({ok, message}, wok_middlewares:incoming_message(message)) end,
-         fun(_) -> ?assertMatch({ok, message}, wok_middlewares:outgoing_message(message)) end]
-       }
-   end}.
-
 wok_middelware_without_state_test_() ->
   {setup,
    fun() ->
