@@ -26,7 +26,7 @@ init(Req, Opts) ->
                           {continue, Req2} ->
                             {C1, H1, B1, WokState} = erlang:apply(Module, Function, [Req2, wok_state:state()]),
                             _ = wok_state:state(WokState),
-                            wok_middlewares:outgoing_http({C1, H1, B1});
+                            wok_middlewares:outgoing_http({C1, H1, B1}, Req2);
                           HttpResponse -> HttpResponse
                         end,
             {ok, cowboy_req:reply(C, H, B, Req), Opts};

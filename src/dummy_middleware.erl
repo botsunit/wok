@@ -26,7 +26,7 @@ outgoing_message(Message, State) ->
   {ok, Message, State}. % {stop, Reason, State}.
 
 incoming_http(Req, State) ->
-  {continue, Req, State}.
+  {continue, Req, State}. % {Code, Headers, Body, State}
 
 outgoing_http({C, H, B}, State) ->
   {C, H, B, State}.

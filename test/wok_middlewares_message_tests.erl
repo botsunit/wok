@@ -38,6 +38,24 @@ meck_middleware_two() ->
 unmeck_middleware_two() ->
   meck:unload(fake_middleware_two).
 
+meck_middleware_three() ->
+  meck:new(fake_middleware_three, [non_strict]),
+  meck:expect(fake_middleware_three, init,
+              fun(X) ->
+                  {ok, X}
+              end),
+  meck:expect(fake_middleware_three, incoming_message,
+              fun(_, S) ->
+                  {stop, test, S}
+              end),
+  meck:expect(fake_middleware_three, outgoing_message,
+              fun(_, S) ->
+                  {stop, test, S}
+              end).
+
+unmeck_middleware_three() ->
+  meck:unload(fake_middleware_three).
+
 %% Tests
 
 wok_middelware_no_middleware_test_() ->
@@ -123,6 +141,40 @@ wok_middelware_inout_one_and_two_test_() ->
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_two)) end,
          fun(_) -> ?assertMatch({ok, 4}, wok_middlewares:incoming_message(1)) end,
          fun(_) -> ?assertMatch({ok, 5}, wok_middlewares:outgoing_message(1)) end]
+       }
+   end}.
+
+wok_middelware_inout_stop_test_() ->
+  {setup,
+   fun() ->
+       meck_middleware_one(),
+       meck_middleware_three(),
+       ok = doteki:set_env_from_config([{wok,
+                                         [{middlewares,
+                                           [
+                                            {fake_middleware_three, []},
+                                            {fake_middleware_one, []}
+                                           ]
+                                          }]
+                                        }]),
+       wok_middlewares:start_link()
+   end,
+   fun
+     ({ok, _}) ->
+       wok_middlewares:stop(),
+       unmeck_middleware_one(),
+       unmeck_middleware_three();
+     (_) ->
+       unmeck_middleware_one(),
+       unmeck_middleware_three()
+   end,
+   fun(R) ->
+       {with, R,
+        [fun(X) -> ?assertMatch({ok, _}, X) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_three)) end,
+         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:incoming_message(1)) end,
+         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:outgoing_message(1)) end]
        }
    end}.
 
