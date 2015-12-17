@@ -5,6 +5,8 @@
 -export([routes/1]).
 -export([init/2]).
 -export([websocket_handle/3, websocket_info/3]).
+-export([add_access_control_allow_origin/1, cors_headers/1]).
+-define(ALLOWED_METHODS, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH']).
 
 routes(Routes) ->
   lager:debug("Routes : ~p", [Routes]),
@@ -157,15 +159,15 @@ allow(Ressource) ->
         fun({Verb, Path, _}, Acc) ->
             case {bucs:to_binary(Ressource),
                   bucs:to_binary(Path)} of
-              {R, P} when R == <<"*">> orelse R == P ->
-                case lists:member(atom_to_list(Verb), Path) of
-                  true -> Acc;
-                  false -> [atom_to_list(Verb)|Acc]
+              {R, P} when R =:= <<"*">> orelse R =:= P ->
+                case lists:member(Verb, ?ALLOWED_METHODS) of
+                  true -> [atom_to_list(Verb)|Acc];
+                  false -> Acc
                 end;
               _ ->
                 Acc
             end
-        end, ["OPTIONS"], doteki:get_env([wok, rest, routes], [])), ",")).
+        end, ["OPTIONS"], doteki:get_env([wok, rest, routes], [])), ", ")).
 
 cors_headers(Path) ->
   [
@@ -186,7 +188,7 @@ cors_headers(Path) ->
   ] ++
   case doteki:get_env([wok, rest, cors, 'Access-Control-Expose-Headers'], undefined) of
     undefined -> [];
-    H -> [{<<"Access-Control-Expose-Headers">>, bucbinary:join(H)}]
+    H -> [{<<"Access-Control-Expose-Headers">>, bucbinary:join(H, <<", ">>)}]
   end ++
   case doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Credentials'], undefined) of
     undefined -> [];
