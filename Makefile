@@ -34,6 +34,8 @@ EDOC_OPTS = {doclet, edown_doclet} \
 						, {edown_target, gitlab} \
 						, {top_level_readme, {"./README.md", "https://gitlab.botsunit.com/msaas/${PROJECT}"}}
 
+EUNIT_OPTS = verbose, {report, {eunit_surefire, [{dir, "test"}]}}
+
 include erlang.mk
 
 docs:: wok.call.png

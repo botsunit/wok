@@ -14,3 +14,4 @@ queues
 .erlang.mk
 wok.d
 xrefr
+test/TEST-*.xml
