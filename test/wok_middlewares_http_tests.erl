@@ -359,3 +359,167 @@ wok_middelware_one_and_two_with_except_one_test_() ->
        }
    end}.
 
+wok_middelware_one_and_two_with_except_one_with_get_test_() ->
+  {setup,
+   fun() ->
+       meck_middleware_one(),
+       meck_middleware_two(),
+       ok = doteki:set_env_from_config([{wok,
+                                         [{middlewares,
+                                           [
+                                            {fake_middleware_one,
+                                             [
+                                              {http,
+                                               [
+                                                {except, [{"/*/path", ['GET']}]}
+                                               ]}
+                                             ]},
+                                            {fake_middleware_two,
+                                             [
+                                             ]}
+                                           ]
+                                          }]
+                                        }]),
+       {wok_middlewares:start_link(), cowboy_r()}
+   end,
+   fun
+     ({{ok, _},_}) ->
+       wok_middlewares:stop(),
+       unmeck_middleware_one(),
+       unmeck_middleware_two();
+     (_) ->
+       unmeck_middleware_one(),
+       unmeck_middleware_two()
+   end,
+   fun(R) ->
+       {with, R,
+        [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
+         fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) -> ?assertMatch({200, [{<<"Content-Type">>, <<"text/html">>}], <<"ok">>},
+                                       wok_middlewares:outgoing_http({200, [], <<"ok">>}, Req)) end]
+       }
+   end}.
+
+wok_middelware_one_and_two_with_except_one_with_post_test_() ->
+  {setup,
+   fun() ->
+       meck_middleware_one(),
+       meck_middleware_two(),
+       ok = doteki:set_env_from_config([{wok,
+                                         [{middlewares,
+                                           [
+                                            {fake_middleware_one,
+                                             [
+                                              {http,
+                                               [
+                                                {except, [{"/*/path", ['POST']}]}
+                                               ]}
+                                             ]},
+                                            {fake_middleware_two, []}
+                                           ]
+                                          }]
+                                        }]),
+       {wok_middlewares:start_link(), cowboy_r()}
+   end,
+   fun
+     ({{ok, _},_}) ->
+       wok_middlewares:stop(),
+       unmeck_middleware_one(),
+       unmeck_middleware_two();
+     (_) ->
+       unmeck_middleware_one(),
+       unmeck_middleware_two()
+   end,
+   fun(R) ->
+       {with, R,
+        [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
+         fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) -> ?assertMatch({200, [{<<"Content-Type">>, <<"text/plain">>}], <<"ok">>},
+                                       wok_middlewares:outgoing_http({200, [], <<"ok">>}, Req)) end]
+       }
+   end}.
+
+wok_middelware_one_and_two_with_only_one_with_get_test_() ->
+  {setup,
+   fun() ->
+       meck_middleware_one(),
+       meck_middleware_two(),
+       ok = doteki:set_env_from_config([{wok,
+                                         [{middlewares,
+                                           [
+                                            {fake_middleware_one,
+                                             [
+                                              {http,
+                                               [
+                                                {only, [{"/*/path", ['GET']}]}
+                                               ]}
+                                             ]},
+                                            {fake_middleware_two,
+                                             [
+                                             ]}
+                                           ]
+                                          }]
+                                        }]),
+       {wok_middlewares:start_link(), cowboy_r()}
+   end,
+   fun
+     ({{ok, _},_}) ->
+       wok_middlewares:stop(),
+       unmeck_middleware_one(),
+       unmeck_middleware_two();
+     (_) ->
+       unmeck_middleware_one(),
+       unmeck_middleware_two()
+   end,
+   fun(R) ->
+       {with, R,
+        [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
+         fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) -> ?assertMatch({200, [{<<"Content-Type">>, <<"text/plain">>}], <<"ok">>},
+                                       wok_middlewares:outgoing_http({200, [], <<"ok">>}, Req)) end]
+       }
+   end}.
+
+wok_middelware_one_and_two_with_only_one_with_post_test_() ->
+  {setup,
+   fun() ->
+       meck_middleware_one(),
+       meck_middleware_two(),
+       ok = doteki:set_env_from_config([{wok,
+                                         [{middlewares,
+                                           [
+                                            {fake_middleware_one,
+                                             [
+                                              {http,
+                                               [
+                                                {only, [{"/*/path", ['POST']}]}
+                                               ]}
+                                             ]},
+                                            {fake_middleware_two, []}
+                                           ]
+                                          }]
+                                        }]),
+       {wok_middlewares:start_link(), cowboy_r()}
+   end,
+   fun
+     ({{ok, _},_}) ->
+       wok_middlewares:stop(),
+       unmeck_middleware_one(),
+       unmeck_middleware_two();
+     (_) ->
+       unmeck_middleware_one(),
+       unmeck_middleware_two()
+   end,
+   fun(R) ->
+       {with, R,
+        [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
+         fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) -> ?assertMatch({200, [{<<"Content-Type">>, <<"text/html">>}], <<"ok">>},
+                                       wok_middlewares:outgoing_http({200, [], <<"ok">>}, Req)) end]
+       }
+   end}.
+

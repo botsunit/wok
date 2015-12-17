@@ -196,6 +196,13 @@ check_http_rules(Rules, Route, Verb) ->
 
 check_only([], _, _) ->
   false;
+check_only([{Rule, Verbs}|Rules], Route, Verb) ->
+  case lists:member(Verb, Verbs) of
+    true ->
+      check_only([Rule|Rules], Route, Verb);
+    false ->
+      check_only(Rules, Rules, Verb)
+  end;
 check_only(Rules, Route, Verb) ->
   check_rule(Rules, Route, Verb, true, fun check_only/3).
 
