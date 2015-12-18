@@ -138,11 +138,16 @@ middlewares_message(Direction, Middlewares, MStates, Message) ->
   middlewares_message(Direction, Middlewares, {{ok, Message}, MStates}).
 
 middlewares_message(Direction, [Middleware|Middlewares], {{ok, Message}, MStates}) ->
-  case erlang:apply(Middleware, Direction, [Message, maps:get(Middleware, MStates, nostate)]) of
-    {ok, Message1, MState} ->
-      middlewares_message(Direction, Middlewares, {{ok, Message1}, maps:put(Middleware, MState, MStates)});
-    {stop, Reason, MState} ->
-      {{stop, Middleware, Reason}, maps:put(Middleware, MState, MStates)}
+  case bucs:function_exist(Middleware, Direction, 2) of
+    true ->
+      case erlang:apply(Middleware, Direction, [Message, maps:get(Middleware, MStates, nostate)]) of
+        {ok, Message1, MState} ->
+          middlewares_message(Direction, Middlewares, {{ok, Message1}, maps:put(Middleware, MState, MStates)});
+        {stop, Reason, MState} ->
+          {{stop, Middleware, Reason}, maps:put(Middleware, MState, MStates)}
+      end;
+    false ->
+      middlewares_message(Direction, Middlewares, {{ok, Message}, MStates})
   end;
 middlewares_message(_, _, Result) ->
   Result.
@@ -154,11 +159,16 @@ middlewares_incoming_http([Middleware|Middlewares], {{continue, Req}, MStates}, 
   {Path, Method} = path_and_method(Req),
   case check_http_rules(maps:get(Middleware, Rules, []), Path, Method) of
     true ->
-      case erlang:apply(Middleware, incoming_http, [Req, maps:get(Middleware, MStates, nostate)]) of
-        {continue, Req2, MState} ->
-          middlewares_incoming_http(Middlewares, {{continue, Req2}, maps:put(Middleware, MState, MStates)}, Rules);
-        {C, H, B, MState} ->
-          {{C, H, B}, maps:put(Middleware, MState, MStates)}
+      case bucs:function_exist(Middleware, incoming_http, 2) of
+        true ->
+          case erlang:apply(Middleware, incoming_http, [Req, maps:get(Middleware, MStates, nostate)]) of
+            {continue, Req2, MState} ->
+              middlewares_incoming_http(Middlewares, {{continue, Req2}, maps:put(Middleware, MState, MStates)}, Rules);
+            {C, H, B, MState} ->
+              {{C, H, B}, maps:put(Middleware, MState, MStates)}
+          end;
+        false ->
+          middlewares_incoming_http(Middlewares, {{continue, Req}, MStates}, Rules)
       end;
     false ->
       middlewares_incoming_http(Middlewares, {{continue, Req}, MStates}, Rules)
@@ -172,8 +182,13 @@ middlewares_outgoing_http([Middleware|Middlewares], MStates, Resp, Req, Rules) -
   {Path, Method} = path_and_method(Req),
   case check_http_rules(maps:get(Middleware, Rules, []), Path, Method) of
     true ->
-      {C, H, B, MState} = erlang:apply(Middleware, outgoing_http, [Resp, maps:get(Middleware, MStates, nostate)]),
-      middlewares_outgoing_http(Middlewares, maps:put(Middleware, MState, MStates), {C, H, B}, Req, Rules);
+      case bucs:function_exist(Middleware, outgoing_http, 2) of
+        true ->
+          {C, H, B, MState} = erlang:apply(Middleware, outgoing_http, [Resp, maps:get(Middleware, MStates, nostate)]),
+          middlewares_outgoing_http(Middlewares, maps:put(Middleware, MState, MStates), {C, H, B}, Req, Rules);
+        false ->
+          middlewares_outgoing_http(Middlewares, MStates, Resp, Req, Rules)
+      end;
     false ->
       middlewares_outgoing_http(Middlewares, MStates, Resp, Req, Rules)
   end.
