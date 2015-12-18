@@ -56,6 +56,12 @@ meck_middleware_three() ->
 unmeck_middleware_three() ->
   meck:unload(fake_middleware_three).
 
+meck_middleware_four() ->
+  meck:new(fake_middleware_four, [non_strict]).
+
+unmeck_middleware_four() ->
+  meck:unload(fake_middleware_four).
+
 %% Tests
 
 wok_middelware_no_middleware_test_() ->
@@ -175,6 +181,35 @@ wok_middelware_inout_stop_test_() ->
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_three)) end,
          fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:incoming_message(1)) end,
          fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:outgoing_message(1)) end]
+       }
+   end}.
+
+wok_middelware_with_missing_methods_test_() ->
+  {setup,
+   fun() ->
+       meck_middleware_four(),
+       ok = doteki:set_env_from_config([{wok,
+                                         [{middlewares,
+                                           [
+                                            {fake_middleware_four, []}
+                                           ]
+                                          }]
+                                        }]),
+       wok_middlewares:start_link()
+   end,
+   fun
+     ({ok, _}) ->
+       wok_middlewares:stop(),
+       unmeck_middleware_four();
+     (_) ->
+       unmeck_middleware_four()
+   end,
+   fun(R) ->
+       {with, R,
+        [fun(X) -> ?assertMatch({ok, _}, X) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_four)) end,
+         fun(_) -> ?assertMatch({ok, 1}, wok_middlewares:incoming_message(1)) end,
+         fun(_) -> ?assertMatch({ok, 1}, wok_middlewares:outgoing_message(1)) end]
        }
    end}.
 

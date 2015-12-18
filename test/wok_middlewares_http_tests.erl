@@ -56,6 +56,12 @@ meck_middleware_three() ->
 unmeck_middleware_three() ->
   meck:unload(fake_middleware_three).
 
+meck_middleware_four() ->
+  meck:new(fake_middleware_four, [non_strict]).
+
+unmeck_middleware_four() ->
+  meck:unload(fake_middleware_four).
+
 cowboy_r() ->
   cowboy_req:new(
     undefined, % Socket
@@ -519,6 +525,36 @@ wok_middelware_one_and_two_with_only_one_with_post_test_() ->
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
          fun({_, Req}) -> ?assertMatch({200, [{<<"Content-Type">>, <<"text/html">>}], <<"ok">>},
+                                       wok_middlewares:outgoing_http({200, [], <<"ok">>}, Req)) end]
+       }
+   end}.
+
+wok_middelware_with_missing_methods_test_() ->
+  {setup,
+   fun() ->
+       meck_middleware_four(),
+       ok = doteki:set_env_from_config([{wok,
+                                         [{middlewares,
+                                           [
+                                            {fake_middleware_four, []}
+                                           ]
+                                          }]
+                                        }]),
+       {wok_middlewares:start_link(), cowboy_r()}
+   end,
+   fun
+     ({{ok, _},_}) ->
+       wok_middlewares:stop(),
+       unmeck_middleware_four();
+     (_) ->
+       unmeck_middleware_four()
+   end,
+   fun(R) ->
+       {with, R,
+        [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
+         fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_four)) end,
+         fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) -> ?assertMatch({200, [], <<"ok">>},
                                        wok_middlewares:outgoing_http({200, [], <<"ok">>}, Req)) end]
        }
    end}.
