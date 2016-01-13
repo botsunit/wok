@@ -1,9 +1,8 @@
 PROJECT = wok
 
-DEPS = lager wok_message wok_message_handler wok_producer pipette kafe cowboy bucs doteki
+DEPS = lager wok_message_handler wok_producer pipette kafe cowboy bucs doteki
 
 dep_lager = git https://github.com/basho/lager.git master
-dep_wok_message = git https://github.com/botsunit/wok_message.git master
 dep_wok_message_handler = git https://github.com/botsunit/wok_message_handler.git master
 dep_wok_producer = git https://github.com/botsunit/wok_producer.git master
 dep_pipette = git https://github.com/botsunit/pipette.git master
