@@ -119,15 +119,18 @@ add_route(Path, static, Filepath, Acc) ->
     {priv_dir, App} ->
       [{bucuri:join(Path, "[...]"),
         cowboy_static,
-        {dir, buccode:priv_dir(App), [{mimetypes, cow_mimetypes, all}]}}|Acc];
+        {dir, buccode:priv_dir(App), [{mimetypes, cow_mimetypes, all},
+                                      {default_file, "index.html"}]}}|Acc];
     {priv_dir, App, Extra} ->
       [{bucuri:join(Path, "[...]"),
         cowboy_static,
-        {dir, filename:join(buccode:priv_dir(App), Extra), [{mimetypes, cow_mimetypes, all}]}}|Acc];
+        {dir, filename:join(buccode:priv_dir(App), Extra), [{mimetypes, cow_mimetypes, all},
+                                                            {default_file, "index.html"}]}}|Acc];
     {dir, Dir} ->
       [{bucuri:join(Path, "[...]"),
         cowboy_static,
-        {dir, Dir, [{mimetypes, cow_mimetypes, all}]}}|Acc]
+        {dir, Dir, [{mimetypes, cow_mimetypes, all},
+                    {default_file, "index.html"}]}}|Acc]
   end;
 add_route(Path, Verb, Handler, Acc) ->
   case lists:keyfind(Path, 1, Acc) of
