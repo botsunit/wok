@@ -30,7 +30,7 @@ start_rest() ->
                    wok_middlewares:routes()
                   ),
       ProtoOpts   = [{env, [{dispatch, Dispatch}]},
-                     {middlewares, [cowboy_router, wok_static_converter, cowboy_handler]}],
+                     {middlewares, [cowboy_router, cowboy_default_static_file, cowboy_handler]}],
       case cowboy:start_http(http, MaxConn, TransOpts, ProtoOpts) of
         {ok, _} ->
           lager:info("Start HTTP on port ~p", [Port]);
