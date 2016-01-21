@@ -5,7 +5,7 @@
   {wok_producer,".*",{git,"https://github.com/botsunit/wok_producer.git",{branch,"master"}}},
   {pipette,".*",{git,"https://github.com/botsunit/pipette.git",{branch,"master"}}},
   {kafe,".*",{git,"https://github.com/botsunit/kafe.git",{branch,"master"}}},
-  {cowboy_default_static_file,".*",{git,"https://github.com/botsunit/cowboy_default_static_file.git",{branch,"master"}},
+  {cowboy_default_static_file,".*",{git,"https://github.com/botsunit/cowboy_default_static_file.git",{branch,"master"}}},
   {cowboy,".*",{git,"https://github.com/ninenines/cowboy.git",{branch,"master"}}},
   {bucs,".*",{git,"https://github.com/botsunit/bucs.git",{branch,"master"}}},
   {doteki,".*",{git,"https://github.com/botsunit/doteki.git",{branch,"master"}}}
