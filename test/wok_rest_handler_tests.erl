@@ -42,7 +42,7 @@ wok_rest_handler_routes_test_() ->
                [<<"priv">>, <<"public">>, '...'],
                [],
                cowboy_static,
-               {dir, "/tmp", [{mimetypes,cow_mimetypes,all}]}
+               {dir, "/tmp", [{mimetypes,cow_mimetypes,all}, {default_file, "index.html"}]}
               }]}],
            wok_rest_handler:routes([{static, "/priv/public", {dir, "/tmp"}}]))
     end]}.
