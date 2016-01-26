@@ -7,3 +7,16 @@
 -define(DEFAULT_REST_MAX_CONN, 100).
 -define(DEFAULT_MESSAGE_HANDLER, wok_message).
 -define(DEFAULT_LOCAL_QUEUE, <<"local_queue">>).
+
+-record(message_transfert, {
+          key,
+          message,
+          result,
+          partition,
+          topic,
+          service,
+          action,
+          local_queue,
+          consume_method
+         }).
+

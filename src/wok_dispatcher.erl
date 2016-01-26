@@ -15,11 +15,11 @@
 start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
-handle(Message) ->
-  gen_server:cast(?SERVER, {handle, Message}).
+handle(MessageTransfert) ->
+  gen_server:cast(?SERVER, {handle, MessageTransfert}).
 
-finish(Child, Result) ->
-  gen_server:cast(?SERVER, {terminate, Child, Result}).
+finish(Child, MessageTransfert) ->
+  gen_server:cast(?SERVER, {terminate, Child, MessageTransfert}).
 
 %% ------------------------------------------------------------------
 
@@ -30,13 +30,15 @@ init(_Args) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({handle, {<<>>, Message}}, State) ->
+handle_cast({handle, #message_transfert{message = Message} = MessageTransfert}, State) ->
   try
     case erlang:apply(doteki:get_env([wok, messages, handler],
                                      ?DEFAULT_MESSAGE_HANDLER),
                       parse, [Message]) of
-      {ok, #message{to = To} = ParserMessage, _} ->
-        _ = consume(ParserMessage, get_services(To, State), State);
+      {ok, #message{to = To} = ParsedMessage, _} ->
+        _ = consume(MessageTransfert#message_transfert{message = ParsedMessage},
+                    get_services(To, State),
+                    State);
       {error, Reason} ->
         lager:error("Error parsing message: ~p", [Reason]);
       _ ->
@@ -47,7 +49,8 @@ handle_cast({handle, {<<>>, Message}}, State) ->
       lager:error("Parser faild: ~p:~p~n~p", [Class, Reason1, erlang:get_stacktrace()])
   end,
   {noreply, State};
-handle_cast({terminate, Child, Result}, State) ->
+handle_cast({terminate, Child, #message_transfert{result = Result,
+                                                  local_queue = LocalQueue}}, State) ->
   case Result of
     noreply ->
       ok;
@@ -75,13 +78,9 @@ handle_cast({terminate, Child, Result}, State) ->
               lager:error("Missing consumer group in configuration"),
               exit(config_error);
             LocalConsumerGroup ->
-              LocalQueue = bucs:to_atom(
-                             doteki:get_env([wok, messages, local_queue_name],
-                                            ?DEFAULT_LOCAL_QUEUE)),
               case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
                 {ok, Data} ->
-                  {ParsedMessage, Service, Action} = binary_to_term(Data),
-                  force_consume(ParsedMessage, Service, Action);
+                  force_consume(Data);
                 {error, no_data} ->
                   ok;
                 {error, E2} ->
@@ -110,8 +109,7 @@ handle_info(fetch, State) ->
         true ->
           [case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
              {ok, Data} ->
-               {ParsedMessage, Service, Action} = binary_to_term(Data),
-               force_consume(ParsedMessage, Service, Action);
+               force_consume(Data);
              {error, no_data} ->
                ok;
              {error, E} ->
@@ -169,7 +167,8 @@ service_match([X|To], [Y|Service], ServiceName, Result) when X == Y;
 
 consume(_, [], _) ->
   ok;
-consume(ParsedMessage, Services, #{services := ServicesActions}) ->
+consume(#message_transfert{message = ParsedMessage, local_queue = LocalQueue} = MessageTransfert,
+        Services, #{services := ServicesActions}) ->
   case wok_middlewares:incoming_message(ParsedMessage) of
     {ok, ParsedMessage1} ->
       case doteki:get_env([wok, messages, local_consumer_group],
@@ -178,26 +177,27 @@ consume(ParsedMessage, Services, #{services := ServicesActions}) ->
           lager:info("Missing consumer group in configuration"),
           exit(config_error);
         LocalConsumerGroup ->
-          LocalQueue = bucs:to_atom(
-                         doteki:get_env([wok, messages, local_queue_name],
-                                        ?DEFAULT_LOCAL_QUEUE)),
           lists:foreach(fun(Service) ->
                             LocalConsumerGroupOffset = pipette:offset(LocalQueue, #{consumer => LocalConsumerGroup}),
+                            MessageTransfert1 = MessageTransfert#message_transfert{
+                                                  message = ParsedMessage1,
+                                                  service = Service,
+                                                  action = maps:get(Service, ServicesActions)},
                             case pipette:queue(LocalQueue) of
                               {LocalQueue, LocalConsumerGroupOffset, _, _, _} ->
-                                case wok_services_sup:start_child({ParsedMessage1, Service, maps:get(Service, ServicesActions)}) of
+                                case wok_services_sup:start_child(MessageTransfert1) of
                                   {ok, Child} ->
                                     gen_server:cast(Child, serve);
                                   {ok, Child, _} ->
                                     gen_server:cast(Child, serve);
                                   {queue, Data} ->
-                                    queue(LocalQueue, Data);
+                                    queue(Data);
                                   {error, Reason} ->
                                     lager:error("Faild to start service : ~p", [Reason]),
                                     error
                                 end;
                               {LocalQueue, CurrentConsumerGroupOffset, _, _, _} when CurrentConsumerGroupOffset > LocalConsumerGroupOffset ->
-                                queue(LocalQueue, {ParsedMessage1, Service, maps:get(Service, ServicesActions)});
+                                queue(MessageTransfert1);
                               Other ->
                                 lager:error("Queue ~p error: ~p", [LocalQueue, Other])
                             end
@@ -207,22 +207,24 @@ consume(ParsedMessage, Services, #{services := ServicesActions}) ->
       lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, ParsedMessage, Reason])
   end.
 
-force_consume(ParsedMessage, Service, Action) ->
+force_consume(#message_transfert{message = ParsedMessage,
+                                 service = Service,
+                                 action = Action} = MessageTransfert) ->
   lager:debug("Force consume message ~p:~p(~p)", [Service, Action, ParsedMessage]),
-  case wok_services_sup:start_child({ParsedMessage, Service, Action}) of
+  case wok_services_sup:start_child(MessageTransfert) of
     {ok, Child} ->
       gen_server:cast(Child, serve);
     {ok, Child, _} ->
       gen_server:cast(Child, serve);
-    {queue, {ParsedMessage, Service, Action}} ->
-      force_consume(ParsedMessage, Service, Action);
+    {queue, Data} ->
+      force_consume(Data);
     {error, Reason} ->
       lager:error("Faild to start service : ~p", [Reason]),
       error
   end.
 
-queue(LocalQueue, {ParsedMessage, _Service, _Action} = Data) ->
-  case pipette:in(LocalQueue, term_to_binary(Data)) of
+queue(#message_transfert{local_queue = LocalQueue, message = ParsedMessage} = Data) ->
+  case pipette:in(LocalQueue, Data) of
     {ok, LocalOffset} ->
       lager:debug("Message ~p queued with local offset ~p", [ParsedMessage, LocalOffset]),
       ok;

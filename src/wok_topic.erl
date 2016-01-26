@@ -9,7 +9,10 @@
           max_bytes,
           max_messages,
           consumer_group,
-          name
+          name,
+          partition,
+          local_queue,
+          consume
          }).
 
 -export([start_link/2]).
@@ -23,10 +26,21 @@ start_link(Name, Options) ->
       lager:error("Missing consumer group in configuration"),
       {error, missing_consumer_group};
     ConsumerGroup ->
-      gen_server:start_link({local,
-                             bucs:to_atom(Name)},
+      {LocalName,
+       LocalQueue} = case lists:keyfind(partition, 1, Options) of
+                       {partition, P} ->
+                         {bucs:to_atom(<<Name/binary, "_", (bucs:to_binary(P))/binary>>),
+                          bucs:to_atom(<<Name/binary, "_", (bucs:to_binary(P))/binary>>)};
+                       _ -> {bucs:to_atom(Name),
+                             bucs:to_atom(
+                               doteki:get_env([wok, messages, local_queue_name],
+                                              ?DEFAULT_LOCAL_QUEUE))}
+                     end,
+      gen_server:start_link({local, LocalName},
                             ?MODULE,
-                            [{consumer_group, ConsumerGroup}, {name, Name}|Options],
+                            [{consumer_group, ConsumerGroup},
+                             {name, Name},
+                             {local_queue, LocalQueue}|Options],
                             [])
   end.
 
@@ -39,7 +53,10 @@ init(Args) ->
              max_bytes = buclists:keyfind(max_bytes, 1, Args, ?DEFAULT_MESSAGE_MAX_BYTES),
              max_messages = buclists:keyfind(max_messages, 1, Args, ?DEFAULT_MAX_MESSAGES),
              consumer_group = buclists:keyfind(consumer_group, 1, Args),
-             name = buclists:keyfind(name, 1, Args)
+             name = buclists:keyfind(name, 1, Args),
+             partition = buclists:keyfind(partition, 1, Args, all),
+             local_queue = buclists:keyfind(local_queue, 1, Args),
+             consume = buclists:keyfind(consume, 1, Args)
             },
   erlang:send_after(Frequency, self(), fetch),
   {ok, Topic}.
@@ -54,26 +71,37 @@ handle_info(fetch, #topic{fetch_frequency = Frequency,
                           name = Topic,
                           consumer_group = ConsumerGroup,
                           max_bytes = MaxBytes,
-                          max_messages = MaxMessages} = State) ->
-  LocalQueue = bucs:to_atom(
-                 doteki:get_env([wok, messages, local_queue_name],
-                                 ?DEFAULT_LOCAL_QUEUE)),
+                          max_messages = MaxMessages,
+                          partition = Partition,
+                          local_queue = LocalQueue,
+                          consume = Consume} = State) ->
   case pipette:ready(LocalQueue) of
     true ->
-      lager:debug("Fetch topic ~s", [Topic]),
-      _ = case kafe:offsets(Topic, ConsumerGroup, MaxMessages) of
+      Topic1 = if
+                 Partition =:= all -> Topic;
+                 true -> {Topic, [Partition]}
+               end,
+      lager:debug("Fetch topic ~p", [Topic1]),
+      _ = case kafe:offsets(Topic1, ConsumerGroup, MaxMessages) of
             Offsets when is_list(Offsets), Offsets =/= [] ->
               lager:debug("Topic ~s will fetch ~p", [Topic, Offsets]),
               lists:foreach(
-                fun({Partition, Offset}) ->
-                    lager:debug("Fetch message #~p on ~p / ~p", [Offset, Topic, Partition]),
-                    case kafe:fetch(-1, Topic, #{partition => Partition, offset => Offset, max_bytes => MaxBytes}) of
-                      {ok, [#{partitions := Partitions}]} ->
+                fun({CurrentPartition, Offset}) ->
+                    lager:debug("Fetch message #~p on ~p (partition ~p)", [Offset, Topic, CurrentPartition]),
+                    case kafe:fetch(-1, Topic, #{partition => CurrentPartition, offset => Offset, max_bytes => MaxBytes}) of
+                      {ok, [#{partitions := CurrentPartitions}]} ->
                         lists:foreach(fun wok_dispatcher:handle/1,
-                                      [{Key, Value} ||
-                                       #{message := #{key := Key, value := Value}} <- Partitions, Value =/= <<>>]);
+                                      [#message_transfert{
+                                          key = Key,
+                                          message = Value,
+                                          topic = Topic,
+                                          partition = CurrentPartition,
+                                          local_queue = LocalQueue,
+                                          consume_method = Consume} ||
+                                       #{message := #{key := Key, value := Value}} <- CurrentPartitions,
+                                       Value =/= <<>>]);
                       _ ->
-                        lager:error("Error fetching message ~p@~p#~p", [Topic, Partition, Offset])
+                        lager:error("Error fetching message ~p@~p#~p", [Topic, CurrentPartition, Offset])
                     end
                 end, Offsets);
             _ ->

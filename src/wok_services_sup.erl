@@ -11,12 +11,12 @@
 start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
-start_child(Message) ->
+start_child(MessageTransfert) ->
   case available_workers() of
     0 ->
-      {queue, Message};
+      {queue, MessageTransfert};
     N when N > 0 ->
-      supervisor:start_child(?MODULE, [Message])
+      supervisor:start_child(?MODULE, [MessageTransfert])
   end.
 
 terminate_child(Child) ->

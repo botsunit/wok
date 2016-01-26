@@ -31,7 +31,21 @@ build_childs(Topics) ->
 build_childs([], Childs) ->
   Childs;
 build_childs([{Name, Options}|Rest], Childs) ->
+  build_childs([{Name, one_for_all, Options}|Rest], Childs);
+build_childs([{Name, one_for_all, Options}|Rest], Childs) ->
   build_childs(Rest,
-               [?CHILD(bucs:to_atom(Name), wok_topic, worker, [Name, Options])|
-                Childs]).
+               [?CHILD(bucs:to_atom(Name), wok_topic, worker, [Name, [{consume, one_for_all}|Options]])|
+                Childs]);
+build_childs([{Name, one_for_one, Options}|Rest], Childs) ->
+  #{Name := Topic} = kafe:topics(),
+  build_childs(Rest,
+               [?CHILD(bucs:to_atom(<<Name/binary, "_", (bucs:to_binary(P))/binary>>),
+                       wok_topic,
+                       worker,
+                       [Name, [{partition, P}, {consume, one_for_one}|Options]])
+                || P <- maps:keys(Topic)] ++
+                Childs);
+build_childs([{Name, Consume, _Options}|Rest], Childs) ->
+  lager:error("Invalid consume definition (~p) for topic ~p", [Consume, Name]),
+  build_childs(Rest, Childs).
 
