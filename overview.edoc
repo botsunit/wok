@@ -88,7 +88,7 @@ application:ensure_all_started(wok).
 
 <h2>Start Kafka</h2>
 
-Update `docker-compose.yml` and change `KAFKA_ADVERTISED_HOST_NAME` to the IP of your `docker0` interface.
+Update <tt>docker-compose.yml</tt> and change <tt>KAFKA_ADVERTISED_HOST_NAME</tt> to the IP of your <tt>docker0</tt> interface.
 
 <pre>
 docker-compose up -d

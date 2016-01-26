@@ -17,7 +17,8 @@ init([]) ->
      [
       ?CHILD(wok_dispatcher, worker, 5000),
       ?CHILD(wok_services_sup, supervisor, infinity),
-      ?CHILD(wok_topics_sup, supervisor, infinity)
+      ?CHILD(wok_topics_sup, supervisor, infinity),
+      ?CHILD(wok_topics_manager, worker, 5000)
      ]
     }
   }.

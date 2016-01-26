@@ -123,6 +123,23 @@ application:ensure_all_started(wok).
 ![](wok.call.png)
 
 
+## Start Kafka ##
+
+Update `docker-compose.yml` and change `KAFKA_ADVERTISED_HOST_NAME` to the IP of your `docker0` interface.
+
+```
+
+docker-compose up -d
+kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 3 --topic test
+kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 3 --topic repl
+kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 3 --topic service
+kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 3 --topic public
+...
+docker-compose stop
+
+```
+
+
 ### Licence ###
 
 Copyright (c) 2015 Grégoire Lejeune

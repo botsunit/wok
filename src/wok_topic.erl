@@ -15,34 +15,41 @@
           consume
          }).
 
--export([start_link/2]).
+-export([start_link/2, info/1, fetch/1]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
 start_link(Name, Options) ->
-  lager:info("Start topic ~s", [Name]),
+  LocalQueue = bucs:to_atom(
+                 doteki:get_env([wok, messages, local_queue_name],
+                                ?DEFAULT_LOCAL_QUEUE)),
   case doteki:get_env([wok, messages, consumer_group]) of
     undefined ->
       lager:error("Missing consumer group in configuration"),
       {error, missing_consumer_group};
     ConsumerGroup ->
       {LocalName,
-       LocalQueue} = case lists:keyfind(partition, 1, Options) of
-                       {partition, P} ->
-                         {bucs:to_atom(<<Name/binary, "_", (bucs:to_binary(P))/binary>>),
-                          bucs:to_atom(<<Name/binary, "_", (bucs:to_binary(P))/binary>>)};
-                       _ -> {bucs:to_atom(Name),
-                             bucs:to_atom(
-                               doteki:get_env([wok, messages, local_queue_name],
-                                              ?DEFAULT_LOCAL_QUEUE))}
-                     end,
+       LocalQueue1} = case lists:keyfind(partition, 1, Options) of
+                        {partition, P} ->
+                          {bucs:to_atom(<<Name/binary, "_", (bucs:to_binary(P))/binary>>),
+                           bucs:to_atom(<<(bucs:to_binary(LocalQueue))/binary, "_",
+                                          Name/binary, "_", (bucs:to_binary(P))/binary>>)};
+                        _ -> {bucs:to_atom(Name), LocalQueue}
+                      end,
+      lager:info("Start topic ~s / server ~s", [Name, LocalName]),
       gen_server:start_link({local, LocalName},
                             ?MODULE,
                             [{consumer_group, ConsumerGroup},
                              {name, Name},
-                             {local_queue, LocalQueue}|Options],
+                             {local_queue, LocalQueue1}|Options],
                             [])
   end.
+
+info(TopicLocalName) ->
+  gen_server:call(TopicLocalName, info).
+
+fetch(TopicLocalName) ->
+  gen_server:call(TopicLocalName, fetch).
 
 %% ------------------------------------------------------------------
 
@@ -58,33 +65,29 @@ init(Args) ->
              local_queue = buclists:keyfind(local_queue, 1, Args),
              consume = buclists:keyfind(consume, 1, Args)
             },
-  erlang:send_after(Frequency, self(), fetch),
+  % TODO: REMOVE % erlang:send_after(Frequency, self(), fetch),
   {ok, Topic}.
 
-handle_call(_Request, _From, State) ->
-  {reply, ok, State}.
-
-handle_cast(_Msg, State) ->
-  {noreply, State}.
-
-handle_info(fetch, #topic{fetch_frequency = Frequency,
-                          name = Topic,
-                          consumer_group = ConsumerGroup,
-                          max_bytes = MaxBytes,
-                          max_messages = MaxMessages,
-                          partition = Partition,
-                          local_queue = LocalQueue,
-                          consume = Consume} = State) ->
+handle_call(info, _From, State) ->
+  {reply, State, State};
+handle_call(fetch, _From, #topic{fetch_frequency = Frequency,
+                                 name = Topic,
+                                 consumer_group = ConsumerGroup,
+                                 max_bytes = MaxBytes,
+                                 max_messages = MaxMessages,
+                                 partition = Partition,
+                                 local_queue = LocalQueue,
+                                 consume = Consume} = State) ->
+  lager:debug("Fetch topic ~s #~p", [Topic, Partition]),
   case pipette:ready(LocalQueue) of
     true ->
       Topic1 = if
                  Partition =:= all -> Topic;
                  true -> {Topic, [Partition]}
                end,
-      lager:debug("Fetch topic ~p", [Topic1]),
       _ = case kafe:offsets(Topic1, ConsumerGroup, MaxMessages) of
             Offsets when is_list(Offsets), Offsets =/= [] ->
-              lager:debug("Topic ~s will fetch ~p", [Topic, Offsets]),
+              lager:debug("Topic ~p will fetch ~p", [Topic1, Offsets]),
               lists:foreach(
                 fun({CurrentPartition, Offset}) ->
                     lager:debug("Fetch message #~p on ~p (partition ~p)", [Offset, Topic, CurrentPartition]),
@@ -105,13 +108,30 @@ handle_info(fetch, #topic{fetch_frequency = Frequency,
                     end
                 end, Offsets);
             _ ->
-              lager:debug("No new message on ~p for ~p", [Topic, ConsumerGroup])
+              lager:debug("No new message on ~s #~p for ~p", [Topic, Partition, ConsumerGroup])
           end,
-      erlang:send_after(Frequency, self(), fetch);
+      lager:debug("~s#~p next fetch: ~p", [Topic, Partition, Frequency]);
+      % TODO: REMOVE % erlang:send_after(Frequency, self(), fetch);
+    missing_queue ->
+      case pipette:new_queue(LocalQueue) of
+        {ok, _} ->
+          lager:info("Local queue ~p created", [LocalQueue]);
+          % TODO: REMOVE % erlang:send_after(1000, self(), fetch);
+        {error, Reason} ->
+          lager:error("Faild to create local queue ~p: ~p", [LocalQueue, Reason]),
+          exit(Reason)
+      end;
     false ->
-      erlang:send_after(1000, self(), fetch)
+      lager:debug("Missing local queue: ~p", [LocalQueue])
+      % TODO: REMOVE % erlang:send_after(1000, self(), fetch)
   end,
-  {noreply, State};
+  {reply, ok, State};
+handle_call(_Request, _From, State) ->
+  {reply, ok, State}.
+
+handle_cast(_Msg, State) ->
+  {noreply, State}.
+
 handle_info(_Info, State) ->
   {noreply, State}.
 

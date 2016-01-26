@@ -1,9 +1,9 @@
 digraph wok {
   node[shape=box];
-  graph[ 
+  graph[
     overlap=false,
     splines=ortho
-  ] 
+  ]
 
   wok[shape=oval, label="wok (*)"];
   wok_app[label="wok_app (*)"];
@@ -45,6 +45,10 @@ digraph wok {
   wok_messages_sup -> wok_dispatcher [style=dotted];
   wok_messages_sup -> wok_services_sup [style=dotted];
   wok_messages_sup -> wok_topics_sup [style=dotted];
+  wok_messages_sup -> wok_topics_manager [style=dotted];
+
+  wok_topics_manager -> wok_topics_sup;
+  wok_topics_manager -> wok_topic;
 
   wok_dispatcher -> wok_services_sup;
   wok_dispatcher -> wok_middlewares;
@@ -60,7 +64,7 @@ digraph wok {
   wok_service -> "<handler :: wok_provider_handler>";
   wok_service -> wok_state
 
-  
+
   "<handler :: wok_provider_handler>" -> wok_message_handler;
 
   __wok_config__ -> wok_config;

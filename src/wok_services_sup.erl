@@ -6,8 +6,6 @@
 -export([start_link/0, start_child/1, terminate_child/1, workers/0, available_workers/0]).
 -export([init/1]).
 
--define(CHILD(I, Type), {I, {I, start_link, []}, temporary, 2000, Type, [I]}).
-
 start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
@@ -44,6 +42,6 @@ init([]) ->
                period => 1},
   ChildSpecs = [#{id => wok_service,
                   start => {wok_service, start_link, []},
-                  shutdown => brutal_kill}],
+                  shutdown => 2000}],
   {ok, {SupFlags, ChildSpecs}}.
 
