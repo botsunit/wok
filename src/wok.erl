@@ -13,9 +13,9 @@ start() ->
 % @doc
 % Send a message
 % @end
--spec provide(Topic :: binary() | list() | atom(), 
-              From :: binary(), 
-              To :: binary(), 
+-spec provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+              From :: binary(),
+              To :: binary(),
               Body :: term()) -> {ok, term()} | {error, term()}.
 provide(Topic, From, To, Body) ->
   wok_producer:provide(Topic, From, To, Body).
@@ -23,9 +23,9 @@ provide(Topic, From, To, Body) ->
 % @doc
 % Send a message
 % @end
--spec provide(Topic :: binary() | list() | atom(), 
-              From :: binary(), 
-              To :: binary(), 
+-spec provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+              From :: binary(),
+              To :: binary(),
               Body :: term(),
               Options :: map()) -> {ok, term()} | {error, term()}.
 provide(Topic, From, To, Body, Options) ->
@@ -34,7 +34,7 @@ provide(Topic, From, To, Body, Options) ->
 % @doc
 % Send a message
 % @end
--spec provide(Topic :: binary() | list() | atom(), 
+-spec provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
               Message :: binary()) -> {ok, term()} | {error, term()}.
 provide(Topic, Message) ->
   wok_producer:provide(Topic, Message).

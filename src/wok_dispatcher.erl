@@ -167,7 +167,8 @@ service_match([X|To], [Y|Service], ServiceName, Result) when X == Y;
 
 consume(_, [], _) ->
   ok;
-consume(#message_transfert{message = ParsedMessage, local_queue = LocalQueue} = MessageTransfert,
+consume(#message_transfert{message = ParsedMessage,
+                           local_queue = LocalQueue} = MessageTransfert,
         Services, #{services := ServicesActions}) ->
   case wok_middlewares:incoming_message(ParsedMessage) of
     {ok, ParsedMessage1} ->
@@ -178,7 +179,8 @@ consume(#message_transfert{message = ParsedMessage, local_queue = LocalQueue} = 
           exit(config_error);
         LocalConsumerGroup ->
           lists:foreach(fun(Service) ->
-                            LocalConsumerGroupOffset = pipette:offset(LocalQueue, #{consumer => LocalConsumerGroup}),
+                            LocalConsumerGroupOffset = pipette:offset(LocalQueue,
+                                                                      #{consumer => LocalConsumerGroup}),
                             MessageTransfert1 = MessageTransfert#message_transfert{
                                                   message = ParsedMessage1,
                                                   service = Service,
@@ -188,15 +190,14 @@ consume(#message_transfert{message = ParsedMessage, local_queue = LocalQueue} = 
                                 case wok_services_sup:start_child(MessageTransfert1) of
                                   {ok, Child} ->
                                     gen_server:cast(Child, serve);
-                                  {ok, Child, _} ->
-                                    gen_server:cast(Child, serve);
                                   {queue, Data} ->
                                     queue(Data);
-                                  {error, Reason} ->
+                                  {error, Reason, Data} ->
                                     lager:error("Faild to start service : ~p", [Reason]),
-                                    error
+                                    queue(Data)
                                 end;
-                              {LocalQueue, CurrentConsumerGroupOffset, _, _, _} when CurrentConsumerGroupOffset > LocalConsumerGroupOffset ->
+                              {LocalQueue, CurrentConsumerGroupOffset, _, _, _} when
+                                  CurrentConsumerGroupOffset > LocalConsumerGroupOffset ->
                                 queue(MessageTransfert1);
                               Other ->
                                 lager:error("Queue ~p error: ~p", [LocalQueue, Other])

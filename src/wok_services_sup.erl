@@ -1,5 +1,6 @@
 % @hidden
 -module(wok_services_sup).
+-compile([{parse_transform, lager_transform}]).
 -behaviour(supervisor).
 -include("../include/wok.hrl").
 
@@ -9,12 +10,31 @@
 start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
-start_child(MessageTransfert) ->
+start_child(#message_transfert{consume_method = one_for_all} = MessageTransfert) ->
   case available_workers() of
     0 ->
       {queue, MessageTransfert};
     N when N > 0 ->
-      supervisor:start_child(?MODULE, [MessageTransfert])
+      lager:info("Start service one_for_all"),
+      start_child2(MessageTransfert)
+  end;
+start_child(#message_transfert{consume_method = one_for_one, service_name = ServiceName} = MessageTransfert) ->
+  Childs = lists:usort(
+             [buclists:keyfind(registered_name, 1, erlang:process_info(P), undefined) ||
+              {_,P,_,_} <- supervisor:which_children(?MODULE)]),
+  case lists:member(ServiceName, Childs) of
+    true ->
+      {queue, MessageTransfert};
+    false ->
+      lager:info("Start service one_for_one : ~p | ~p", [ServiceName, Childs]),
+      start_child2(MessageTransfert)
+  end.
+
+start_child2(MessageTransfert) ->
+  case supervisor:start_child(?MODULE, [MessageTransfert]) of
+    {ok, Child} -> {ok, Child};
+    {ok, Child, _} -> {ok, Child};
+    {error, Reason} -> {error, Reason, MessageTransfert}
   end.
 
 terminate_child(Child) ->

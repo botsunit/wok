@@ -59,17 +59,19 @@ manage_topic(Topics, State) ->
   maps:fold(fun(LocalName, #{name := Name, options := Options} = Info, Acc) ->
                 case maps:merge(maps:get(LocalName, State, #{}), Info) of
                   Info ->
+                    lager:debug("topic ~p not started.", [LocalName]),
                     start_child(LocalName, Name, Options, Info, Acc);
-                  #{name := Name, options := Options, pid := PID} = Info1 ->
+                  #{name := Name, options := Options, pid := PID, timer := _ } = Info1 ->
                     lager:debug("topic ~p already started (PID: ~p)", [LocalName, PID]),
                     maps:put(LocalName, Info1, Acc);
                   #{pid := PID, timer := Timer} ->
+                    lager:debug("topic ~p (PID: ~p) must be restarted", [LocalName, PID]),
                     _ = erlang:cancel_timer(Timer, [{async, true}, {info, false}]),
                     case wok_topics_sup:terminate_child(PID) of
                       ok ->
                         start_child(LocalName, Name, Options, Info, Acc);
                       {error, Reason} ->
-                        lager:info("Terminate child (PID: ~p) faild: ~p", [PID, Reason]),
+                        lager:debug("Terminate child (PID: ~p) faild: ~p", [PID, Reason]),
                         Acc
                     end
                 end

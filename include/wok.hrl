@@ -17,6 +17,7 @@
           service,
           action,
           local_queue,
+          service_name,
           consume_method
          }).
 

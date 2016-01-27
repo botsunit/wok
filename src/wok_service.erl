@@ -9,8 +9,12 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
-start_link(MessageTransfert) ->
-  gen_server:start_link(?MODULE, MessageTransfert, []).
+start_link(#message_transfert{consume_method = one_for_all} = MessageTransfert) ->
+  gen_server:start_link({local, bucs:to_atom(uuid:to_string(uuid:uuid1()))},
+                        ?MODULE, MessageTransfert, []);
+start_link(#message_transfert{consume_method = one_for_one, service_name = ServiceName} = MessageTransfert) ->
+  gen_server:start_link({local, ServiceName},
+                        ?MODULE, MessageTransfert, []).
 
 init(#message_transfert{service = Service} = MessageTransfert) ->
   lager:debug("Start service ~p with message transfert ~p", [Service, MessageTransfert]),

@@ -100,6 +100,7 @@ handle_call(fetch, _From, #topic{fetch_frequency = Frequency,
                                           topic = Topic,
                                           partition = CurrentPartition,
                                           local_queue = LocalQueue,
+                                          service_name = service_name(LocalQueue),
                                           consume_method = Consume} ||
                                        #{message := #{key := Key, value := Value}} <- CurrentPartitions,
                                        Value =/= <<>>]);
@@ -140,4 +141,16 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
+
+service_name(Name) ->
+  bucs:to_atom(hexstring(crypto:hash(sha256, bucs:to_binary(Name)))).
+
+hexstring(<<X:128/big-unsigned-integer>>) ->
+  lists:flatten(io_lib:format("~32.16.0b", [X]));
+hexstring(<<X:160/big-unsigned-integer>>) ->
+  lists:flatten(io_lib:format("~40.16.0b", [X]));
+hexstring(<<X:256/big-unsigned-integer>>) ->
+  lists:flatten(io_lib:format("~64.16.0b", [X]));
+hexstring(<<X:512/big-unsigned-integer>>) ->
+  lists:flatten(io_lib:format("~128.16.0b", [X])).
 

@@ -25,7 +25,7 @@ Start wok.</td></tr></table>
 ### provide/2 ###
 
 <pre><code>
-provide(Topic::binary() | list() | atom(), Message::binary()) -&gt; {ok, term()} | {error, term()}
+provide(Topic::binary() | list() | atom() | {binary() | list() | atom(), integer()}, Message::binary()) -&gt; {ok, term()} | {error, term()}
 </code></pre>
 <br />
 
@@ -36,7 +36,7 @@ Send a message
 ### provide/4 ###
 
 <pre><code>
-provide(Topic::binary() | list() | atom(), From::binary(), To::binary(), Body::term()) -&gt; {ok, term()} | {error, term()}
+provide(Topic::binary() | list() | atom() | {binary() | list() | atom(), integer()}, From::binary(), To::binary(), Body::term()) -&gt; {ok, term()} | {error, term()}
 </code></pre>
 <br />
 
@@ -47,7 +47,7 @@ Send a message
 ### provide/5 ###
 
 <pre><code>
-provide(Topic::binary() | list() | atom(), From::binary(), To::binary(), Body::term(), Options::#{}) -&gt; {ok, term()} | {error, term()}
+provide(Topic::binary() | list() | atom() | {binary() | list() | atom(), integer()}, From::binary(), To::binary(), Body::term(), Options::#{}) -&gt; {ok, term()} | {error, term()}
 </code></pre>
 <br />
 

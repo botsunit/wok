@@ -13,7 +13,7 @@ my_action(Message, State) ->
   lager:info("BEGIN dummy_service_handler:my_action =>>>>>>>>>< ~p :: ~p", [Message, State]),
   timer:sleep(2000 + random:uniform(4000)),
   lager:info("END dummy_service_handler:my_action =>>>>>>>>>< ~p", [Message]),
-  {reply, <<"test">>, {<<"my_service/my_controler/my_answer">>, <<"Message response from my_action">>}, State}.
+  {reply, {<<"test">>, 1}, {<<"my_service/my_controler/my_answer">>, <<"Message response from my_action">>}, State}.
 
 my_answer(Message, State) ->
   lager:info("BEGIN dummy_service_handler:my_answer =>>>>>>>>>< ~p :: ~p", [Message, State]),
