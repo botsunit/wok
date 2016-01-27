@@ -25,7 +25,7 @@ handle_cast(_Msg, State) ->
   {noreply, State}.
 
 handle_info(manage, State) ->
-  lager:info("Manage topics"),
+  lager:debug("Manage topics"),
   State1 = case doteki:get_env([wok, messages, topics]) of
              undefined ->
                lager:debug("No topic declared in config"),
@@ -61,7 +61,7 @@ manage_topic(Topics, State) ->
                   Info ->
                     start_child(LocalName, Name, Options, Info, Acc);
                   #{name := Name, options := Options, pid := PID} = Info1 ->
-                    lager:info("topic ~p already started (PID: ~p)", [LocalName, PID]),
+                    lager:debug("topic ~p already started (PID: ~p)", [LocalName, PID]),
                     maps:put(LocalName, Info1, Acc);
                   #{pid := PID, timer := Timer} ->
                     _ = erlang:cancel_timer(Timer, [{async, true}, {info, false}]),

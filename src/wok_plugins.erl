@@ -80,11 +80,12 @@ update_plugin_state(Name, PluginState, #{confs := Confs} = State) ->
   State#{confs => maps:put(Name, PluginInfo#{state => PluginState}, Confs)}.
 
 start_plugin(Name, {Fun, Freq}) ->
+  lager:debug("Start plugin ~p : ~p", [Name, Freq]),
   case buctimer:next(Freq) of
     {ok, _, Sec} ->
       {ok, erlang:send_after(Sec * 1000, self(), {run, Name, {Fun, Freq}})};
     stop ->
-      lager:info("Plugin ~p:~p stopped", [Name, Fun]),
+      lager:debug("Plugin ~p:~p stopped", [Name, Fun]),
       stop;
     {error, Reason} ->
       lager:error("Plugin ~p:~p, configuration error: ~p", [Name, Fun, Reason]),

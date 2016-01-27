@@ -39,7 +39,7 @@ EUNIT_OPTS = verbose, {report, {eunit_surefire, [{dir, "test"}]}}
 
 include erlang.mk
 
-docs:: wok.call.png
+docs:: edoc wok.call.png
 	@${CP} *.png doc
 
 wok.call.png: wok.call.gv
