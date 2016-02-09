@@ -13,7 +13,9 @@
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-4">provide/4</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-5">provide/5</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#start-0">start/0</a></td><td>
-Start wok.</td></tr></table>
+Start wok.</td></tr><tr><td valign="top"><a href="#state-0">state/0</a></td><td>
+Return the global state.</td></tr><tr><td valign="top"><a href="#state-1">state/1</a></td><td>
+Set the global state.</td></tr></table>
 
 
 <a name="functions"></a>
@@ -60,4 +62,26 @@ Send a message
 `start() -> any()`
 
 Start wok
+
+<a name="state-0"></a>
+
+### state/0 ###
+
+<pre><code>
+state() -&gt; term()
+</code></pre>
+<br />
+
+Return the global state
+
+<a name="state-1"></a>
+
+### state/1 ###
+
+<pre><code>
+state(State::term()) -&gt; ok
+</code></pre>
+<br />
+
+Set the global state
 

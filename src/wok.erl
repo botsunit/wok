@@ -3,6 +3,7 @@
 
 -export([start/0]).
 -export([provide/5, provide/4, provide/2]).
+-export([state/0, state/1]).
 
 % @doc
 % Start wok
@@ -38,4 +39,18 @@ provide(Topic, From, To, Body, Options) ->
               Message :: binary()) -> {ok, term()} | {error, term()}.
 provide(Topic, Message) ->
   wok_producer:provide(Topic, Message).
+
+% @doc
+% Return the global state
+% @end
+-spec state() -> term().
+state() ->
+  wok_state:state().
+
+% @doc
+% Set the global state
+% @end
+-spec state(State :: term()) -> ok.
+state(State) ->
+  wok_state:state(State).
 

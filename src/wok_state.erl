@@ -41,12 +41,8 @@ handle_info(_Info, State) ->
 terminate(Reason, State) ->
   case doteki:get_env([wok, initializer]) of
     [{Module, _}] ->
-      case erlang:funcntion_exported(Module, terminate, 2) of
-        true ->
-          erlang:apply(Module, terminate, [Reason, State]);
-        false ->
-          ok
-      end;
+      _ = bucs:call(Module, terminate, [Reason, State]),
+      ok;
     _ ->
       ok
   end.
