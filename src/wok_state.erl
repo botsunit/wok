@@ -38,8 +38,18 @@ handle_cast(_Msg, State) ->
 handle_info(_Info, State) ->
   {noreply, State}.
 
-terminate(_Reason, _State) ->
-  ok.
+terminate(Reason, State) ->
+  case doteki:get_env([wok, initializer]) of
+    [{Module, _}] ->
+      case erlang:funcntion_exported(Module, terminate, 2) of
+        true ->
+          erlang:apply(Module, terminate, [Reason, State]);
+        false ->
+          ok
+      end;
+    _ ->
+      ok
+  end.
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.

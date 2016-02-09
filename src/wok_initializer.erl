@@ -6,3 +6,6 @@
   | {ok, State :: term(), hibernate}
   | {stop, Reason :: term()}
   | ignore.
+
+-callback terminate(Reason :: term(), State :: term()) -> ok.
+
