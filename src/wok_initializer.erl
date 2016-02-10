@@ -7,5 +7,6 @@
   | {stop, Reason :: term()}
   | ignore.
 
--callback terminate(Reason :: term(), State :: term()) -> ok.
+% This function is optional
+% -callback terminate(Reason :: term(), State :: term()) -> ok.
 
