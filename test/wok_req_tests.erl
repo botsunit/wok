@@ -33,4 +33,12 @@ wok_req_test_() ->
                     custom_data = undefined},
        ?assert(wok_req:undefined_function(R))
      end
+     , fun() ->
+        R = #wok_req{req = undefined,
+                     custom_data = "initial_custom_data"},
+        ?assertEqual("initial_custom_data", wok_req:custom_data(R)),
+        R2 = wok_req:custom_data(R, "new_custom_data"),
+        ?assert(is_record(R2, wok_req)),
+        ?assertEqual("new_custom_data", wok_req:custom_data(R2))
+     end
    ]}.

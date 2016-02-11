@@ -158,5 +158,6 @@ Proprietary and confidential
 <tr><td><a href="wok.md" class="module">wok</a></td></tr>
 <tr><td><a href="wok_http_handler.md" class="module">wok_http_handler</a></td></tr>
 <tr><td><a href="wok_initializer.md" class="module">wok_initializer</a></td></tr>
-<tr><td><a href="wok_provider_handler.md" class="module">wok_provider_handler</a></td></tr></table>
+<tr><td><a href="wok_provider_handler.md" class="module">wok_provider_handler</a></td></tr>
+<tr><td><a href="wok_req.md" class="module">wok_req</a></td></tr></table>
 
