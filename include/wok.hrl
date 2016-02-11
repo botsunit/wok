@@ -23,6 +23,6 @@
 
 -record(wok_req, {
     req,
-    custom_data
+    custom_data = undefined
   }).
 

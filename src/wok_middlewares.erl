@@ -195,11 +195,11 @@ middlewares_outgoing_http([Middleware|Middlewares], MStates, Resp, Req, Rules) -
 
 path_and_method(Req) ->
   {bucs:to_string(
-     cowboy_req:path(Req)),
+     wok_req:path(Req)),
    bucs:to_atom(
      string:to_upper(
        bucs:to_list(
-         cowboy_req:method(Req))))}.
+         wok_req:method(Req))))}.
 
 check_http_rules(Rules, Route, Verb) ->
   Only = buclists:keyfind(only, 1, Rules, []),
