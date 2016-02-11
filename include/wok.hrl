@@ -21,3 +21,8 @@
           consume_method
          }).
 
+-record(wok_req, {
+    req,
+    custom_data
+  }).
+
