@@ -1,6 +1,7 @@
 -module(wok_middlewares_http_tests).
 
 -include_lib("eunit/include/eunit.hrl").
+-include("../include/wok.hrl").
 
 meck_middleware_one() ->
   meck:new(fake_middleware_one, [non_strict]),
@@ -62,23 +63,24 @@ meck_middleware_four() ->
 unmeck_middleware_four() ->
   meck:unload(fake_middleware_four).
 
-cowboy_r() ->
-  cowboy_req:new(
-    undefined, % Socket
-    dummy_transport, % Transport
-    undefined, % Peer
-    <<"GET">>, % Method
-    <<"/test/path">>, % Path
-    <<"?a=b&c=d">>, % Query
-    'HTTP/1.1', % Version
-    [{<<"X-Wok-Test">>, <<"true">>}], % Headers
-    <<"botsunit.com">>, % Host
-    8080, % Port
-    <<>>, % Buffer
-    true, % CanKeepalive
-    true, % Compress
-    undefined % OnResponse
-   ).
+wok_r() ->
+  #wok_req{
+    req = cowboy_req:new(
+      undefined, % Socket
+      dummy_transport, % Transport
+      undefined, % Peer
+      <<"GET">>, % Method
+      <<"/test/path">>, % Path
+      <<"?a=b&c=d">>, % Query
+      'HTTP/1.1', % Version
+      [{<<"X-Wok-Test">>, <<"true">>}], % Headers
+      <<"botsunit.com">>, % Host
+      8080, % Port
+      <<>>, % Buffer
+      true, % CanKeepalive
+      true, % Compress
+      undefined % OnResponse
+    )}.
 
 %% Tests
 
@@ -87,7 +89,7 @@ wok_middelware_no_middleware_test_() ->
    fun() ->
        meck_middleware_one(),
        ok = doteki:set_env_from_config([{wok, [{middlewares, []}]}]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -100,7 +102,7 @@ wok_middelware_no_middleware_test_() ->
        {with, R,
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
-         fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
          fun({_, Req}) -> ?assertMatch({200, [], <<"ok">>},
                                        wok_middlewares:outgoing_http({200, [], <<"ok">>}, Req)) end]
        }
@@ -117,7 +119,7 @@ wok_middelware_inout_two_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -149,7 +151,7 @@ wok_middelware_one_and_two_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -183,7 +185,7 @@ wok_middelware_stop_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -224,7 +226,7 @@ wok_middelware_one_and_two_with_only_two_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -264,7 +266,7 @@ wok_middelware_one_and_two_with_only_one_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -304,7 +306,7 @@ wok_middelware_one_and_two_with_except_two_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -344,7 +346,7 @@ wok_middelware_one_and_two_with_except_one_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -386,7 +388,7 @@ wok_middelware_one_and_two_with_except_one_with_get_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -426,7 +428,7 @@ wok_middelware_one_and_two_with_except_one_with_post_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -468,7 +470,7 @@ wok_middelware_one_and_two_with_only_one_with_get_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -508,7 +510,7 @@ wok_middelware_one_and_two_with_only_one_with_post_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->
@@ -540,7 +542,7 @@ wok_middelware_with_missing_methods_test_() ->
                                            ]
                                           }]
                                         }]),
-       {wok_middlewares:start_link(), cowboy_r()}
+       {wok_middlewares:start_link(), wok_r()}
    end,
    fun
      ({{ok, _},_}) ->

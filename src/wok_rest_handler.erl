@@ -8,6 +8,8 @@
 -export([add_access_control_allow_origin/1, cors_headers/1]).
 -define(ALLOWED_METHODS, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH']).
 
+-include("../include/wok.hrl").
+
 routes(Routes) ->
   lager:debug("Routes : ~p", [Routes]),
   cowboy_router:compile([{'_', routes(Routes, [])}]).
@@ -22,20 +24,21 @@ init(Req, Opts) ->
       {ok, cowboy_req:reply(200, add_access_control_allow_origin(cors_headers(Path)), <<>>, Req), Opts};
     Action ->
       try
+        WokReq = #wok_req{req = Req},
         case lists:keyfind(Action, 1, Opts) of
           {Action, {Module, Function}} ->
-            {C, H, B} = case wok_middlewares:incoming_http(Req) of
-                          {continue, Req2} ->
-                            {C1, H1, B1, WokState} = erlang:apply(Module, Function, [Req2, wok_state:state()]),
+            {C, H, B} = case wok_middlewares:incoming_http(WokReq) of
+                          {continue, WokReq2} ->
+                            {C1, H1, B1, WokState} = erlang:apply(Module, Function, [WokReq2, wok_state:state()]),
                             _ = wok_state:state(WokState),
-                            wok_middlewares:outgoing_http({C1, H1, B1}, Req2);
+                            wok_middlewares:outgoing_http({C1, H1, B1}, WokReq2);
                           HttpResponse -> HttpResponse
                         end,
             {ok, cowboy_req:reply(C, H, B, Req), Opts};
           {Action, {Module, Function}, Middleware} ->
             {C, H, B, MidState} = erlang:apply(Module,
                                                Function,
-                                               [Req,
+                                               [WokReq,
                                                 wok_middlewares:state(Middleware)]),
             _ = wok_middlewares:state(Middleware, MidState),
             {ok, cowboy_req:reply(C, add_access_control_allow_origin(H), B, Req), Opts};
