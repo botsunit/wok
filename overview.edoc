@@ -80,11 +80,11 @@ application:ensure_all_started(wok).
 
 <h3>Dependencies</h3>
 
-![](wok.deps.png)
+![](images/wok.deps.png)
 
 <h3>Call tree</h3>
 
-![](wok.call.png)
+![](images/wok.call.png)
 
 <h2>Start Kafka</h2>
 

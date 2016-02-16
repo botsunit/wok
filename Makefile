@@ -25,6 +25,7 @@ dep_meck = git https://github.com/eproxus/meck.git master
 CP = cp
 CP_R = cp -r
 RM_RF = rm -rf
+MKDIR_P = mkdir -p
 DATE = $(shell date +"%F %T")
 
 EDOC_OPTS = {doclet, edown_doclet} \
@@ -40,11 +41,13 @@ EUNIT_OPTS = verbose, {report, {eunit_surefire, [{dir, "test"}]}}
 
 include erlang.mk
 
-docs:: edoc wok.call.png
-	@${CP} *.png doc
+docs:: edoc images/wok.call.png _doc/doc.yml
+	@${MKDIR_P} doc/images
+	@${CP} images/*.png doc/images
+	@${CP} _doc/* doc
 
-wok.call.png: wok.call.gv
-	@dot -T png -o wok.call.png wok.call.gv
+wok.call.png: images/wok.call.gv
+	@dot -T png -o images/wok.call.png images/wok.call.gv
 
 dev: deps app
 	@erl -pa ebin include deps/*/ebin deps/*/include -config config/${PROJECT}.config

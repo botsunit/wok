@@ -115,12 +115,12 @@ application:ensure_all_started(wok).
 
 ### Dependencies ###
 
-![](wok.deps.png)
+![](images/wok.deps.png)
 
 
 ### Call tree ###
 
-![](wok.call.png)
+![](images/wok.call.png)
 
 
 ## Start Kafka ##
