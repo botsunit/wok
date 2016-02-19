@@ -12,7 +12,9 @@
 
 routes(Routes) ->
   lager:debug("Routes : ~p", [Routes]),
-  cowboy_router:compile([{'_', routes(Routes, [])}]).
+  {Routes1, Static} = routes(Routes, {[], #{static_path => "",
+                                            static_route => ""}}),
+  {cowboy_router:compile([{'_', Routes1}]), Static}.
 
 init(Req, Opts) ->
   Path = cowboy_req:path(Req),
@@ -107,48 +109,52 @@ websocket_info(Module, Data, Req, State) ->
 
 % private
 
-routes([], Routes) ->
+routes([], {Routes, Static}) ->
   lager:debug("routes => ~p", [Routes]),
-  compile(lists:reverse(Routes));
+  {compile(lists:reverse(Routes)), Static};
 routes([{Path, Handler}|Rest], Acc) ->
   routes(Rest, add_route(Path, 'GET', Handler, Acc));
 routes([{Verb, Path, Handler}|Rest], Acc) ->
   routes(Rest, add_route(Path, Verb, Handler, Acc));
 routes([{Verb, Path, Handler, Middleware}|Rest], Acc) ->
   routes(Rest, add_route(Path, Verb, Handler, Middleware, Acc)).
+add_route(Path, static, Filepath, {Routes, _}) ->
+  StaticPath = static_path(Filepath),
+  StaticRoute = bucuri:join(Path, "[...]"),
+  {case lists:keyfind(StaticRoute,1, Routes) of
+    {StaticRoute, _} ->
+      lists:keyreplace(StaticRoute, 1, Routes, {StaticRoute,
+                                                cowboy_static,
+                                                {dir, StaticPath,
+                                                 [{mimetypes, cow_mimetypes, all},
+                                                  {default_file, "index.html"}]}});
+    false ->
+      [{StaticRoute,
+        cowboy_static,
+        {dir, StaticPath, [{mimetypes, cow_mimetypes, all},
+                           {default_file, "index.html"}]}}|Routes]
+  end, #{static_path => StaticPath, static_route => Path}};
+add_route(Path, Verb, Handler, {Routes, Static}) ->
+  {case lists:keyfind(Path, 1, Routes) of
+     {Path, Data} ->
+       lists:keyreplace(Path, 1, Routes, {Path, lists:reverse([{Verb, Handler}|Data])});
+     false ->
+       [{Path, [{Verb, Handler}]}|Routes]
+   end, Static}.
+add_route(Path, Verb, Handler, Middleware, {Routes, Static}) ->
+  {case lists:keyfind(Path, 1, Routes) of
+     {Path, Data} ->
+       lists:keyreplace(Path, 1, Routes, {Path, lists:reverse([{Verb, Handler, Middleware}|Data])});
+     false ->
+       [{Path, [{Verb, Handler, Middleware}]}|Routes]
+   end, Static}.
 
-add_route(Path, static, Filepath, Acc) ->
-  case Filepath of
-    {priv_dir, App} ->
-      [{bucuri:join(Path, "[...]"),
-        cowboy_static,
-        {dir, buccode:priv_dir(App), [{mimetypes, cow_mimetypes, all},
-                                      {default_file, "index.html"}]}}|Acc];
-    {priv_dir, App, Extra} ->
-      [{bucuri:join(Path, "[...]"),
-        cowboy_static,
-        {dir, filename:join(buccode:priv_dir(App), Extra), [{mimetypes, cow_mimetypes, all},
-                                                            {default_file, "index.html"}]}}|Acc];
-    {dir, Dir} ->
-      [{bucuri:join(Path, "[...]"),
-        cowboy_static,
-        {dir, Dir, [{mimetypes, cow_mimetypes, all},
-                    {default_file, "index.html"}]}}|Acc]
-  end;
-add_route(Path, Verb, Handler, Acc) ->
-  case lists:keyfind(Path, 1, Acc) of
-    {Path, Data} ->
-      lists:keyreplace(Path, 1, Acc, {Path, lists:reverse([{Verb, Handler}|Data])});
-    false ->
-      [{Path, [{Verb, Handler}]}|Acc]
-  end.
-add_route(Path, Verb, Handler, Middleware, Acc) ->
-  case lists:keyfind(Path, 1, Acc) of
-    {Path, Data} ->
-      lists:keyreplace(Path, 1, Acc, {Path, lists:reverse([{Verb, Handler, Middleware}|Data])});
-    false ->
-      [{Path, [{Verb, Handler, Middleware}]}|Acc]
-  end.
+static_path({priv_dir, App}) ->
+  buccode:priv_dir(App);
+static_path({priv_dir, App, Extra}) ->
+  filename:join(buccode:priv_dir(App), Extra);
+static_path({dir, Dir}) ->
+  Dir.
 
 compile(Routes) ->
   lists:map(fun

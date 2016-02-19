@@ -8,9 +8,9 @@
 
 start(_StartType, _StartArgs) ->
   _ = check_message_handler(),
-  _ = start_rest(),
+  Static = start_rest(),
   _ = start_messages(),
-  wok_sup:start_link().
+  wok_sup:start_link(Static).
 
 stop(_State) ->
   ok.
@@ -18,22 +18,24 @@ stop(_State) ->
 start_rest() ->
   case doteki:get_env([wok, rest]) of
     undefined ->
-      lager:debug("No REST configuration.");
+      lager:debug("No REST configuration."),
+      undefined;
     _ ->
       _ = application:ensure_all_started(cowboy),
       Port = doteki:get_env([wok, rest, port], ?DEFAULT_REST_PORT),
       IP = bucinet:to_ip(doteki:get_env([wok, rest, ip], ?DEFAULT_REST_IP)),
       TransOpts = [{port, Port}, {ip, IP}],
       MaxConn = doteki:get_env([wok, rest, max_conn], ?DEFAULT_REST_MAX_CONN),
-      Dispatch = wok_rest_handler:routes(
-                   doteki:get_env([wok, rest, routes], []) ++
-                   wok_middlewares:routes()
-                  ),
+      {Dispatch, Static} = wok_rest_handler:routes(
+                             doteki:get_env([wok, rest, routes], []) ++
+                             wok_middlewares:routes()
+                            ),
       ProtoOpts   = [{env, [{dispatch, Dispatch}]},
                      {middlewares, [cowboy_router, cowboy_default_static_file, cowboy_handler]}],
       case cowboy:start_http(http, MaxConn, TransOpts, ProtoOpts) of
         {ok, _} ->
-          lager:info("Start HTTP on port ~p", [Port]);
+          lager:info("Start HTTP on port ~p", [Port]),
+          Static;
         _ ->
           lager:error("Faild to start HTTP server"),
           exit(http_error)
