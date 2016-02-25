@@ -9,10 +9,12 @@
 -export([start_link/0, stop/0]).
 -export([state/1, state/2]).
 -export([incoming_message/1, outgoing_message/1]).
--export([incoming_http/1, outgoing_http/2]).
+-export([incoming_http/1, outgoing_http/1]).
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
+
+-include("../include/wok.hrl").
 
 routes() ->
   lists:foldl(fun({Name, Opts}, Acc) ->
@@ -37,11 +39,11 @@ incoming_message(Message) ->
 outgoing_message(Message) ->
   gen_server:call(?SERVER, {outgoing_message, Message}).
 
-incoming_http(Req) ->
-  gen_server:call(?SERVER, {incoming_http, Req}).
+incoming_http(WokReq) ->
+  gen_server:call(?SERVER, {incoming_http, WokReq}).
 
-outgoing_http(Resp, Req) ->
-  gen_server:call(?SERVER, {outgoing_http, Resp, Req}).
+outgoing_http(WokReq) ->
+  gen_server:call(?SERVER, {outgoing_http, WokReq}).
 
 init(_) ->
   {Middlewares,
@@ -80,16 +82,16 @@ handle_call({outgoing_message, Message}, _From, #{middlewares := Middlewares,
                                                   confs := MStates} = State) ->
   {Result, MStates2} = middlewares_message(outgoing_message, lists:reverse(Middlewares), MStates, Message),
   {reply, Result, State#{confs => MStates2}};
-handle_call({incoming_http, Req}, _From, #{middlewares := Middlewares,
+handle_call({incoming_http, WokReq}, _From, #{middlewares := Middlewares,
                                            confs := Mstates,
                                            http_rules := Rules} = State) ->
-  {Result, MStates2} = middlewares_incoming_http(Middlewares, Mstates, Req, Rules),
-  {reply, Result, State#{confs => MStates2}};
-handle_call({outgoing_http, Resp, Req}, _From, #{middlewares := Middlewares,
+  {WokReq2, MStates2} = middlewares_incoming_http(Middlewares, Mstates, WokReq, Rules),
+  {reply, WokReq2, State#{confs => MStates2}};
+handle_call({outgoing_http, WokReq}, _From, #{middlewares := Middlewares,
                                                  confs := Mstates,
                                                  http_rules := Rules} = State) ->
-  {Result, MStates2} = middlewares_outgoing_http(lists:reverse(Middlewares), Mstates, Resp, Req, Rules),
-  {reply, Result, State#{confs => MStates2}};
+  {WokReq2, MStates2} = middlewares_outgoing_http(lists:reverse(Middlewares), Mstates, WokReq, Rules),
+  {reply, WokReq2, State#{confs => MStates2}};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
@@ -155,51 +157,52 @@ middlewares_message(_, _, Result) ->
 middlewares_incoming_http(Middlewares, MStates, Req, Rules) ->
   middlewares_incoming_http(Middlewares, {{continue, Req}, MStates}, Rules).
 
-middlewares_incoming_http([Middleware|Middlewares], {{continue, Req}, MStates}, Rules) ->
-  {Path, Method} = path_and_method(Req),
+middlewares_incoming_http([Middleware|Middlewares], {{continue, WokReq}, MStates}, Rules) ->
+  {Path, Method} = path_and_method(WokReq),
   case check_http_rules(maps:get(Middleware, Rules, []), Path, Method) of
     true ->
       case bucs:function_exist(Middleware, incoming_http, 2) of
         true ->
-          case erlang:apply(Middleware, incoming_http, [Req, maps:get(Middleware, MStates, nostate)]) of
-            {continue, Req2, MState} ->
-              middlewares_incoming_http(Middlewares, {{continue, Req2}, maps:put(Middleware, MState, MStates)}, Rules);
+          case erlang:apply(Middleware, incoming_http, [WokReq, maps:get(Middleware, MStates, nostate)]) of
+            {continue, WokReq2, MState} ->
+              middlewares_incoming_http(Middlewares, {{continue, WokReq2}, maps:put(Middleware, MState, MStates)}, Rules);
             {C, H, B, MState} ->
-              {{C, H, B}, maps:put(Middleware, MState, MStates)}
+              MStates2 = maps:put(Middleware, MState, MStates),
+              {WokReq#wok_req{response = #wok_resp{code = C, headers = H, body = B}, local_state = MStates2}, MStates2}
           end;
         false ->
-          middlewares_incoming_http(Middlewares, {{continue, Req}, MStates}, Rules)
+          middlewares_incoming_http(Middlewares, {{continue, WokReq}, MStates}, Rules)
       end;
     false ->
-      middlewares_incoming_http(Middlewares, {{continue, Req}, MStates}, Rules)
+      middlewares_incoming_http(Middlewares, {{continue, WokReq}, MStates}, Rules)
   end;
-middlewares_incoming_http(_, Result, _) ->
-  Result.
+middlewares_incoming_http(_, {{continue, WokReq}, MState}, _) ->
+  {{continue, WokReq#wok_req{local_state = MState}}, MState}.
 
-middlewares_outgoing_http([], MStates, Result, _, _) ->
+middlewares_outgoing_http([], MStates, Result, _) ->
   {Result, MStates};
-middlewares_outgoing_http([Middleware|Middlewares], MStates, Resp, Req, Rules) ->
-  {Path, Method} = path_and_method(Req),
+middlewares_outgoing_http([Middleware|Middlewares], MStates, WokReq, Rules) ->
+  {Path, Method} = path_and_method(WokReq),
   case check_http_rules(maps:get(Middleware, Rules, []), Path, Method) of
     true ->
       case bucs:function_exist(Middleware, outgoing_http, 2) of
         true ->
-          {C, H, B, MState} = erlang:apply(Middleware, outgoing_http, [Resp, maps:get(Middleware, MStates, nostate)]),
-          middlewares_outgoing_http(Middlewares, maps:put(Middleware, MState, MStates), {C, H, B}, Req, Rules);
+          {WokReq2, MState} = erlang:apply(Middleware, outgoing_http, [WokReq, maps:get(Middleware, MStates, nostate)]),
+          middlewares_outgoing_http(Middlewares, maps:put(Middleware, MState, MStates), WokReq2, Rules);
         false ->
-          middlewares_outgoing_http(Middlewares, MStates, Resp, Req, Rules)
+          middlewares_outgoing_http(Middlewares, MStates, WokReq, Rules)
       end;
     false ->
-      middlewares_outgoing_http(Middlewares, MStates, Resp, Req, Rules)
+      middlewares_outgoing_http(Middlewares, MStates, WokReq, Rules)
   end.
 
-path_and_method(Req) ->
+path_and_method(WokReq) ->
   {bucs:to_string(
-     wok_req:path(Req)),
+     wok_req:path(WokReq)),
    bucs:to_atom(
      string:to_upper(
        bucs:to_list(
-         wok_req:method(Req))))}.
+         wok_req:method(WokReq))))}.
 
 check_http_rules(Rules, Route, Verb) ->
   Only = buclists:keyfind(only, 1, Rules, []),

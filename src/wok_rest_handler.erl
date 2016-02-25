@@ -22,21 +22,28 @@ init(Req, Opts) ->
          string:to_upper(
            binary_to_list(
              cowboy_req:method(Req)))) of
+
+
     'OPTIONS' ->
       {ok, cowboy_req:reply(200, add_access_control_allow_origin(cors_headers(Path)), <<>>, Req), Opts};
+
     Action ->
       try
-        WokReq = #wok_req{req = Req},
+        WokReq = #wok_req{request = Req, global_state = wok_state:state()},
         case lists:keyfind(Action, 1, Opts) of
           {Action, {Module, Function}} ->
-            {C, H, B} = case wok_middlewares:incoming_http(WokReq) of
+            WokReq5 = case wok_middlewares:incoming_http(WokReq) of
                           {continue, WokReq2} ->
-                            {C1, H1, B1, WokState} = erlang:apply(Module, Function, [WokReq2, wok_state:state()]),
-                            _ = wok_state:state(WokState),
-                            wok_middlewares:outgoing_http({C1, H1, B1}, WokReq2);
-                          HttpResponse -> HttpResponse
+                            WokReq3 = erlang:apply(Module, Function, [WokReq2]),
+                            WokReq4 = #wok_req{global_state = State} = wok_middlewares:outgoing_http(WokReq3),
+                            _ = wok_state:state(State),
+                            WokReq4;
+                          WokReq2 -> WokReq2
                         end,
-            {ok, cowboy_req:reply(C, H, B, Req), Opts};
+            {ok, wok_req:reply(WokReq5), Opts};
+
+
+
           {Action, {Module, Function}, Middleware} ->
             {C, H, B, MidState} = erlang:apply(Module,
                                                Function,
@@ -215,4 +222,3 @@ add_access_control_allow_origin(Headers) ->
     _ ->
       Headers
   end.
-

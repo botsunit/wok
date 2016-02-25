@@ -14,6 +14,7 @@
   , set_global_state/2
   , get_local_state/1
   , set_local_state/2
+  , reply/1
 ]).
 -export_type([wok_req/0]).
 
@@ -59,3 +60,9 @@ get_local_state(#wok_req{local_state = State}) ->
 set_local_state(Req, State) ->
   Req#wok_req{local_state = State}.
 
+% @doc
+% This function is an interface to cowboy_req:reply for wok_req
+% @end
+-spec reply(wok_req()) -> term().
+reply(#wok_req{response = #wok_resp{code = C, headers = H, body = B}, request = Req}) ->
+  cowboy_req:reply(C, H, B, Req).
