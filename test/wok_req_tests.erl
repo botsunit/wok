@@ -16,7 +16,7 @@ wok_req_test_() ->
    end,
    [
      fun() ->
-       R = #wok_req{req = cowboy_req:new(socket,
+       R = #wok_req{request = cowboy_req:new(socket,
                                         transport,
                                         peer,
                                         method,
@@ -34,7 +34,7 @@ wok_req_test_() ->
        ?assert(wok_req:undefined_function(R))
      end
      , fun() ->
-        R = #wok_req{req = undefined,
+        R = #wok_req{request = undefined,
                      custom_data = "initial_custom_data"},
         ?assertEqual("initial_custom_data", wok_req:custom_data(R)),
         R2 = wok_req:custom_data(R, "new_custom_data"),

@@ -179,8 +179,8 @@ middlewares_incoming_http([Middleware|Middlewares], {{continue, WokReq}, MStates
 middlewares_incoming_http(_, {{continue, WokReq}, MState}, _) ->
   {{continue, WokReq#wok_req{local_state = MState}}, MState}.
 
-middlewares_outgoing_http([], MStates, Result, _) ->
-  {Result, MStates};
+middlewares_outgoing_http([], MStates, WokReq, _) ->
+  {WokReq, MStates};
 middlewares_outgoing_http([Middleware|Middlewares], MStates, WokReq, Rules) ->
   {Path, Method} = path_and_method(WokReq),
   case check_http_rules(maps:get(Middleware, Rules, []), Path, Method) of

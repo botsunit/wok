@@ -14,8 +14,8 @@ meck_middleware_one() ->
                   {continue, R, S}
               end),
   meck:expect(fake_middleware_one, outgoing_http,
-              fun({C, _H, B}, S) ->
-                  {C, [{<<"Content-Type">>, <<"text/plain">>}], B, S}
+              fun(Req = #wok_req{response=Resp}, S) ->
+                  {Req#wok_req{response=Resp#wok_resp{headers=[{<<"Content-Type">>, <<"text/plain">>}]}}, S}
               end).
 
 unmeck_middleware_one() ->
@@ -32,8 +32,8 @@ meck_middleware_two() ->
                   {continue, R, S}
             end),
   meck:expect(fake_middleware_two, outgoing_http,
-              fun({C, _H, B}, S) ->
-                  {C, [{<<"Content-Type">>, <<"text/html">>}], B, S}
+              fun(Req = #wok_req{response=Resp}, S) ->
+                {Req#wok_req{response=Resp#wok_resp{headers=[{<<"Content-Type">>, <<"text/html">>}]}}, S}
               end).
 
 unmeck_middleware_two() ->
@@ -47,11 +47,11 @@ meck_middleware_three() ->
               end),
   meck:expect(fake_middleware_three, incoming_http,
               fun(_, S) ->
-                  {403, [{<<"Content-Type">>, <<"text/plain">>}], <<"Forbidden">>, S}
-            end),
+                {403, [{<<"Content-Type">>, <<"text/plain">>}], <<"Forbidden">>, S}
+              end),
   meck:expect(fake_middleware_three, outgoing_http,
-              fun({C, _H, B}, S) ->
-                  {C, [{<<"Content-Type">>, <<"text/html">>}], B, S}
+              fun(Req = #wok_req{response=Resp}, S) ->
+                {Req#wok_req{response=Resp#wok_resp{headers=[{<<"Content-Type">>, <<"text/html">>}]}}, S}
               end).
 
 unmeck_middleware_three() ->
@@ -63,9 +63,12 @@ meck_middleware_four() ->
 unmeck_middleware_four() ->
   meck:unload(fake_middleware_four).
 
+req_from_req(Req) ->
+  Req.
+
 wok_r() ->
   #wok_req{
-    req = cowboy_req:new(
+    request = cowboy_req:new(
       undefined, % Socket
       dummy_transport, % Transport
       undefined, % Peer
