@@ -9,29 +9,29 @@
 -define(DEFAULT_LOCAL_QUEUE, <<"local_queue">>).
 
 -record(message_transfert, {
-          key,
-          message,
-          result,
-          partition,
-          topic,
-          service,
-          action,
-          local_queue,
-          service_name,
-          consume_method
+          key
+          , message
+          , result
+          , partition
+          , topic
+          , service
+          , action
+          , local_queue
+          , service_name
+          , consume_method
          }).
 
 -record(wok_resp, {
-    code = 200
-    , headers = []
-    , body = <<>>
-  }).
+          code = 200
+          , headers = []
+          , body = <<>>
+         }).
 
 -record(wok_req, {
-    req,
-    ,custom_data = undefined
-    ,global_state = undefined
-    ,local_state = undefined
-    ,response = #wok_resp{}
-  }).
+          request = undefined
+          , custom_data = undefined
+          , global_state = undefined
+          , local_state = undefined
+          , response = #wok_resp{}
+         }).
 
