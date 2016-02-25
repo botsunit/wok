@@ -1,35 +1,61 @@
-% @doc
-% This modules responds to all cowboy_req functions.
-% @end
+% @hidden
 -module(wok_req).
 -include("../include/wok.hrl").
 -export([
-  '$handle_undefined_function'/2
-  , custom_data/1
-  , custom_data/2
+  set_response/2
+  , set_response_code/2
+  , set_response_headers/2
+  , set_response_body/2
+  , get_cowboy_req/1
+  , set_cowboy_req/2
+  , get_custom_data/1
+  , set_custom_data/2
+  , get_global_state/1
+  , set_global_state/2
+  , get_local_state/1
+  , set_local_state/2
 ]).
 -export_type([wok_req/0]).
 
 -type wok_req() :: #wok_req{}.
 
-% @hidden
-'$handle_undefined_function'(Fun, Args) ->
-  erlang:apply(cowboy_req, Fun, to_cowboy_req_args(Args)).
+set_response(Req, {Code, Headers, Body}) ->
+  bucs:pipecall([
+                 {fun set_response_code/2, [Req, Code]},
+                 {fun set_response_headers/2, [Headers]},
+                 {fun set_response_body/2, [Body]}
+                ]).
 
-% @doc
-% This function returns wok_req's custom data
-% @end
--spec custom_data(wok_req()) -> term().
-custom_data(#wok_req{custom_data = CustomData}) -> CustomData.
+set_response_code(#wok_req{response = Resp} = Req, Code) ->
+  Req#wok_req{response = Resp#wok_resp{code = Code}}.
 
-% @doc
-% This function sets wok_req's custom data
-% @end
--spec custom_data(wok_req(), term()) -> wok_req().
-custom_data(WokReq, CustomData) -> WokReq#wok_req{custom_data = CustomData}.
+set_response_headers(#wok_req{response = Resp} = Req, Headers) ->
+  Req#wok_req{response = Resp#wok_resp{headers = Headers}}.
 
-to_cowboy_req_args(WokReqArgs) ->
-  lists:map(fun
-    (#wok_req{req=Req}) -> Req;
-    (Arg) -> Arg
-  end, WokReqArgs).
+set_response_body(#wok_req{response = Resp} = Req, Body) ->
+  Req#wok_req{response = Resp#wok_resp{body = Body}}.
+
+set_cowboy_req(WokReq, CowboyReq) ->
+  WokReq#wok_req{request = CowboyReq}.
+
+get_cowboy_req(#wok_req{request = CowboyReq}) ->
+  CowboyReq.
+
+get_custom_data(#wok_req{custom_data = CustomData}) ->
+  CustomData.
+
+set_custom_data(Req, CustomData) ->
+  Req#wok_req{custom_data = CustomData}.
+
+get_global_state(#wok_req{global_state = State}) ->
+  State.
+
+set_global_state(Req, State) ->
+  Req#wok_req{global_state = State}.
+
+get_local_state(#wok_req{local_state = State}) ->
+  State.
+
+set_local_state(Req, State) ->
+  Req#wok_req{local_state = State}.
+
