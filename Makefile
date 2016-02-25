@@ -1,11 +1,18 @@
 PROJECT = wok
 
+DEP_PLUGINS = mix.mk
+BUILD_DEPS = mix.mk
+ELIXIR_VERSION = ~> 1.2
+ELIXIR_BINDINGS = wok wok_req wok_views
+
+dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
+
 DEPS = lager wok_message wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid
 
 dep_lager = git https://github.com/basho/lager.git master
-dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git master
-dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
-dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
+dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git 0.0.1
+dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git 0.0.1
+dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git 0.0.1
 dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
 dep_kafe = git https://github.com/botsunit/kafe.git master
 dep_cowboy_default_static_file = git https://github.com/botsunit/cowboy_default_static_file.git master
@@ -52,16 +59,5 @@ wok.call.png: images/wok.call.gv
 dev: deps app
 	@erl -pa ebin include deps/*/ebin deps/*/include -config config/${PROJECT}.config
 
-rel-dev: deps app
-	@${RM_RF} ../${PROJECT}-dev
-	git clone git@github.com:botsunit/${PROJECT}.git ../${PROJECT}-dev
-	@${CP} rebar.config.release ../${PROJECT}-dev/rebar.config
-	@${CP} Makefile.release ../${PROJECT}-dev/Makefile
-	@${CP} erlang.mk ../${PROJECT}-dev/erlang.mk
-	@${CP} README.md.release ../${PROJECT}-dev/README.md
-	@${CP_R} ebin ../${PROJECT}-dev
-	@${CP_R} config ../${PROJECT}-dev
-	@${CP_R} include ../${PROJECT}-dev
-	cd ../${PROJECT}-dev; git add .
-	cd ../${PROJECT}-dev; git commit -m "Update ${DATE}"
+release: app mix.all
 

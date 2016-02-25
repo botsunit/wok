@@ -16,7 +16,7 @@
 
 ERLANG_MK_FILENAME := $(realpath $(lastword $(MAKEFILE_LIST)))
 
-ERLANG_MK_VERSION = 2.0.0-pre.2-78-g06e9fbf
+ERLANG_MK_VERSION = 2.0.0-pre.2-81-gbb6b947
 
 # Core configuration.
 
@@ -2070,9 +2070,9 @@ pkg_jerg_commit = master
 PACKAGES += jesse
 pkg_jesse_name = jesse
 pkg_jesse_description = jesse (JSon Schema Erlang) is an implementation of a json schema validator for Erlang.
-pkg_jesse_homepage = https://github.com/klarna/jesse
+pkg_jesse_homepage = https://github.com/for-GET/jesse
 pkg_jesse_fetch = git
-pkg_jesse_repo = https://github.com/klarna/jesse
+pkg_jesse_repo = https://github.com/for-GET/jesse
 pkg_jesse_commit = master
 
 PACKAGES += jiffy
@@ -2122,6 +2122,14 @@ pkg_json_rec_homepage = https://github.com/justinkirby/json_rec
 pkg_json_rec_fetch = git
 pkg_json_rec_repo = https://github.com/justinkirby/json_rec
 pkg_json_rec_commit = master
+
+PACKAGES += jsone
+pkg_jsone_name = jsone
+pkg_jsone_description = An Erlang library for encoding, decoding JSON data.
+pkg_jsone_homepage = https://github.com/sile/jsone.git
+pkg_jsone_fetch = git
+pkg_jsone_repo = https://github.com/sile/jsone.git
+pkg_jsone_commit = master
 
 PACKAGES += jsonerl
 pkg_jsonerl_name = jsonerl
@@ -3434,6 +3442,14 @@ pkg_skel_homepage = https://github.com/ParaPhrase/skel
 pkg_skel_fetch = git
 pkg_skel_repo = https://github.com/ParaPhrase/skel
 pkg_skel_commit = master
+
+PACKAGES += slack
+pkg_slack_name = slack
+pkg_slack_description = Minimal slack notification OTP library.
+pkg_slack_homepage = https://github.com/DonBranson/slack
+pkg_slack_fetch = git
+pkg_slack_repo = https://github.com/DonBranson/slack.git
+pkg_slack_commit = 1.0.0
 
 PACKAGES += smother
 pkg_smother_name = smother

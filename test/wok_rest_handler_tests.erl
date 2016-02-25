@@ -8,42 +8,46 @@ wok_rest_handler_routes_test_() ->
    fun(_) -> ok end,
    [fun() ->
         ?assertMatch(
-           [{'_',[],[{
-               [<<"route">>, <<"one">>],
-               [],
-               wok_rest_handler,
-               [{'GET', {dummy_service_handler, my_service_get}}]
-              }]}],
+           {[{'_',[],[{
+                [<<"route">>, <<"one">>],
+                [],
+                wok_rest_handler,
+                [{'GET', {dummy_service_handler, my_service_get}}]
+               }]}],
+            #{static_path := [],static_route := []}},
            wok_rest_handler:routes([{'GET', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
-           [{'_',[],[{
-               [<<"route">>, <<"one">>],
-               [],
-               wok_rest_handler,
-               [{'POST', {dummy_service_handler, my_service_get}}]
-              }]}],
+           {[{'_',[],[{
+                [<<"route">>, <<"one">>],
+                [],
+                wok_rest_handler,
+                [{'POST', {dummy_service_handler, my_service_get}}]
+               }]}],
+            #{static_path := [],static_route := []}},
            wok_rest_handler:routes([{'POST', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
-           [{'_',[],[{
-               [<<"route">>, <<"one">>],
-               [],
-               wok_rest_handler,
-               [{'CUSTOM', {dummy_service_handler, my_service_get}}]
-              }]}],
+           {[{'_',[],[{
+                [<<"route">>, <<"one">>],
+                [],
+                wok_rest_handler,
+                [{'CUSTOM', {dummy_service_handler, my_service_get}}]
+               }]}],
+            #{static_path := [],static_route := []}},
            wok_rest_handler:routes([{'CUSTOM', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
-           [{'_',[],[{
-               [<<"priv">>, <<"public">>, '...'],
-               [],
-               cowboy_static,
-               {dir, "/tmp", [{mimetypes,cow_mimetypes,all}, {default_file, "index.html"}]}
-              }]}],
+           {[{'_',[],[{
+                [<<"priv">>, <<"public">>, '...'],
+                [],
+                cowboy_static,
+                {dir, "/tmp", [{mimetypes,cow_mimetypes,all}, {default_file, "index.html"}]}
+               }]}],
+            #{static_path := "/tmp",static_route := "/priv/public"}},
            wok_rest_handler:routes([{static, "/priv/public", {dir, "/tmp"}}]))
     end]}.
 

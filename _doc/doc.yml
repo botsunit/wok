@@ -6,6 +6,8 @@ toc:
   - configuration
   - wok_req
   - wok
+  - views_herlpers
+  - template_engines
 
 language_tabs:
   - erlang
