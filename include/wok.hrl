@@ -21,8 +21,17 @@
           consume_method
          }).
 
+-record(wok_resp, {
+    code = 200
+    , headers = []
+    , body = <<>>
+  }).
+
 -record(wok_req, {
     req,
-    custom_data = undefined
+    ,custom_data = undefined
+    ,global_state = undefined
+    ,local_state = undefined
+    ,response = #wok_resp{}
   }).
 
