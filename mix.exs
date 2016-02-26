@@ -17,9 +17,9 @@ defmodule Wok.Mixfile do
   defp deps do
     [ 
       {:lager, ~r/.*/, git: "https://github.com/basho/lager.git", branch: "master"},  
-      {:wok_message, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message.git", branch: "0.0.1"},  
-      {:wok_message_handler, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "0.0.1"},  
-      {:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", branch: "0.0.1"},  
+      {:wok_message, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message.git", branch: "master"},  
+      {:wok_message_handler, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"},  
+      {:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", branch: "master"},  
       {:pipette, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},  
       {:kafe, ~r/.*/, git: "https://github.com/botsunit/kafe.git", branch: "master"},  
       {:cowboy, ~r/.*/, git: "https://github.com/ninenines/cowboy.git", branch: "master"},  

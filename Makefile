@@ -3,7 +3,7 @@ PROJECT = wok
 DEP_PLUGINS = mix.mk
 BUILD_DEPS = mix.mk
 ELIXIR_VERSION = ~> 1.2
-ELIXIR_BINDINGS = wok wok_req wok_views
+ELIXIR_BINDINGS = wok wok_request wok_response
 
 dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
 
