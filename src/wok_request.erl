@@ -11,6 +11,10 @@
   , param/2
   , params/2
   , params/1
+  , header/2
+  , header/3
+  , cookies/1
+  , cookie/2
 ]).
 
 % @doc
@@ -103,6 +107,28 @@ params(Req) ->
     Error ->
       Error
   end.
+
+% @equiv header(Req, Name, undefined).
+header(Req, Name) ->
+  header(Req, Name, undefined).
+
+% @doc
+% @end
+-spec header(wok_req:wok_req(), binary(), any()) -> binary() | any() | undefined.
+header(Req, Name, Default) ->
+  cowboy_req:header(wok_req:get_cowboy_req(Req), Name, Default).
+
+% @doc
+% @end
+-spec cookies(wok_req:wok_req()) -> [{binary(), binary()}].
+cookies(Req) ->
+  cowboy_req:parse_cookies(wok_req:get_cowboy_req(Req)).
+
+% @doc
+% @end
+-spec cookie(wok_req:wok_req(), binary()) -> binary() | undefined.
+cookie(Req, Name) ->
+  buclists:keyfind(Name, 1, cookies(Req), undefined).
 
 % Private
 
