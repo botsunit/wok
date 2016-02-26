@@ -14,6 +14,9 @@
   , set_global_state/2
   , get_local_state/1
   , set_local_state/2
+  , method/1
+  , new/0
+  , path/1
   , reply/1
 ]).
 -export_type([wok_req/0]).
@@ -59,6 +62,27 @@ get_local_state(#wok_req{local_state = State}) ->
 
 set_local_state(Req, State) ->
   Req#wok_req{local_state = State}.
+
+% @doc
+% This function is an implementation of cowboy_req:method/1 for wok_req
+% @end
+-spec method(wok_req()) -> term().
+method(#wok_req{request = Req}) ->
+  cowboy_req:method(Req).
+
+% @doc
+% This function returns a new empty wok_req record
+% @end
+-spec new() -> wok_req().
+new() ->
+  #wok_req{}.
+
+% @doc
+% This function is an iimplementation of cowboy_req:path/1 for wok_req
+% @end
+-spec path(wok_req()) -> term().
+path(#wok_req{request = Req}) ->
+  cowboy_req:path(Req).
 
 % @doc
 % This function is an interface to cowboy_req:reply for wok_req

@@ -23,34 +23,32 @@ init(Req, Opts) ->
            binary_to_list(
              cowboy_req:method(Req)))) of
 
-
     'OPTIONS' ->
       {ok, cowboy_req:reply(200, add_access_control_allow_origin(cors_headers(Path)), <<>>, Req), Opts};
 
     Action ->
       try
-        WokReq = #wok_req{request = Req, global_state = wok_state:state()},
+        WokReq = wok_req:set_cowboy_req(wok_req:new(), Req),
+        WokReq1 = wok_req:set_global_state(WokReq, wok_state:state()),
         case lists:keyfind(Action, 1, Opts) of
           {Action, {Module, Function}} ->
-            WokReq5 = case wok_middlewares:incoming_http(WokReq) of
+            WokReq5 = case wok_middlewares:incoming_http(WokReq1) of
                           {continue, WokReq2} ->
                             WokReq3 = erlang:apply(Module, Function, [WokReq2]),
-                            WokReq4 = #wok_req{global_state = State} = wok_middlewares:outgoing_http(WokReq3),
-                            _ = wok_state:state(State),
+                            WokReq4 = wok_middlewares:outgoing_http(WokReq3),
+                            _ = wok_state:state(wok_req:get_global_state(WokReq4)),
                             WokReq4;
                           WokReq2 -> WokReq2
                         end,
             {ok, wok_req:reply(WokReq5), Opts};
 
-
-
           {Action, {Module, Function}, Middleware} ->
-            {C, H, B, MidState} = erlang:apply(Module,
-                                               Function,
-                                               [WokReq,
-                                                wok_middlewares:state(Middleware)]),
-            _ = wok_middlewares:state(Middleware, MidState),
-            {ok, cowboy_req:reply(C, add_access_control_allow_origin(H), B, Req), Opts};
+            WokReq2 = erlang:apply(Module, Function, [WokReq1])s,
+            _ = wok_middlewares:state(Middleware, WokReq2),
+            Headers = wok_req:get_response_headers(WokReq2),
+            Headers2 = add_access_control_allow_origin(Headers),
+            WokReq3 = wok_req:set_response_headers(Headers2, WokReq2)
+            {ok, wok_req:reply(WokReq3), Opts};
           false ->
             case lists:keyfind('WS', 1, Opts) of
               {'WS', Module} ->

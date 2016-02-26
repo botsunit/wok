@@ -95,8 +95,8 @@ handle_call({outgoing_http, WokReq}, _From, #{middlewares := Middlewares,
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({state, Middleware, MState}, #{confs := MStates} = State) ->
-  {noreply, State#{confs => maps:put(Middleware, MState, MStates)}};
+handle_cast({state, Middleware, WokReq}, #{confs := MStates} = State) ->
+  {noreply, State#{confs => maps:put(Middleware, wok_req:get_local_state(WokReq), MStates)}};
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
@@ -168,7 +168,9 @@ middlewares_incoming_http([Middleware|Middlewares], {{continue, WokReq}, MStates
               middlewares_incoming_http(Middlewares, {{continue, WokReq2}, maps:put(Middleware, MState, MStates)}, Rules);
             {C, H, B, MState} ->
               MStates2 = maps:put(Middleware, MState, MStates),
-              {WokReq#wok_req{response = #wok_resp{code = C, headers = H, body = B}, local_state = MStates2}, MStates2}
+              WokReq2 = wok_req:set_response(WokReq, {C, H, B}),
+              WokReq3 = wok_req:set_local_state(WokReq2, MStates2),
+              {WokReq3, MStates2}
           end;
         false ->
           middlewares_incoming_http(Middlewares, {{continue, WokReq}, MStates}, Rules)
@@ -177,7 +179,8 @@ middlewares_incoming_http([Middleware|Middlewares], {{continue, WokReq}, MStates
       middlewares_incoming_http(Middlewares, {{continue, WokReq}, MStates}, Rules)
   end;
 middlewares_incoming_http(_, {{continue, WokReq}, MState}, _) ->
-  {{continue, WokReq#wok_req{local_state = MState}}, MState}.
+  WokReq2 = wok_req:set_local_state(WokReq, MState),
+  {{continue, WokReq2}, MState}.
 
 middlewares_outgoing_http([], MStates, WokReq, _) ->
   {WokReq, MStates};
