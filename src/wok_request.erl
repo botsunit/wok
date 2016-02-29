@@ -7,10 +7,12 @@
   , client_ip/1
   , client_port/1
   , body/1
+  , method/1
   , param/3
   , param/2
   , params/2
   , params/1
+  , path/1
   , header/2
   , header/3
   , cookies/1
@@ -50,6 +52,13 @@ client_port(Req) ->
 body(Req) ->
   {Type, Data, CowboyReq} = cowboy_req:body(wok_req:get_cowboy_req(Req)),
   {Type, Data, wok_req:set_cowboy_req(Req, CowboyReq)}.
+
+% @doc
+% This function is an implementation of cowboy_req:method/1 for wok_req
+% @end
+-spec method(wok_req:wok_req()) -> term().
+method(#wok_req{request = Req}) ->
+  cowboy_req:method(Req).
 
 %% @doc
 %% @end
@@ -107,6 +116,13 @@ params(Req) ->
     Error ->
       Error
   end.
+
+% @doc
+% This function is an iimplementation of cowboy_req:path/1 for wok_req
+% @end
+-spec path(wok_req:wok_req()) -> term().
+path(#wok_req{request = Req}) ->
+  cowboy_req:path(Req).
 
 % @equiv header(Req, Name, undefined).
 header(Req, Name) ->

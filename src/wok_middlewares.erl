@@ -201,11 +201,11 @@ middlewares_outgoing_http([Middleware|Middlewares], MStates, WokReq, Rules) ->
 
 path_and_method(WokReq) ->
   {bucs:to_string(
-     wok_req:path(WokReq)),
+     wok_request:path(WokReq)),
    bucs:to_atom(
      string:to_upper(
        bucs:to_list(
-         wok_req:method(WokReq))))}.
+         wok_request:method(WokReq))))}.
 
 check_http_rules(Rules, Route, Verb) ->
   Only = buclists:keyfind(only, 1, Rules, []),
