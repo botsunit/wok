@@ -17,6 +17,10 @@
   , header/3
   , cookies/1
   , cookie/2
+  , local_state/1
+  , local_state/2
+  , global_state/1
+  , global_state/2
 ]).
 
 % @doc
@@ -145,6 +149,35 @@ cookies(Req) ->
 -spec cookie(wok_req:wok_req(), binary()) -> binary() | undefined.
 cookie(Req, Name) ->
   buclists:keyfind(Name, 1, cookies(Req), undefined).
+
+% @doc
+% This function get local_state of wok req
+% @end
+-spec local_state(wok_req:wok_req()) -> term().
+local_state(WokReq) ->
+  wok_req:get_local_state(WokReq).
+
+% @doc
+% This function set local_state of wok req
+% @end
+-spec local_state(wok_req:wok_req(), term()) -> wok_req:wok_req().
+local_state(WokReq, LocalState) ->
+  wok_req:set_local_state(WokReq, LocalState).
+
+% @doc
+% This function get global_state of wok req
+% @end
+-spec global_state(wok_req:wok_req()) -> term().
+global_state(WokReq) ->
+  wok_req:get_global_state(WokReq).
+
+% @doc
+% This function set global_state of wok req
+% @end
+-spec global_state(wok_req:wok_req(), term()) -> wok_req:wok_req().
+global_state(WokReq, GlobalState) ->
+  wok_req:set_global_state(WokReq, GlobalState).
+
 
 % Private
 

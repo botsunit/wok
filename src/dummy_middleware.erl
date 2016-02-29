@@ -25,18 +25,20 @@ outgoing_message(Message, State) ->
   lager:info("Middleware outgoing ~p was called - message: ~p - state: ~p", [?MODULE, Message, State]),
   {ok, Message, State}. % {stop, Reason, State}.
 
-incoming_http(Req, State) ->
-  {continue, Req, State}. % {Code, Headers, Body, State}
+incoming_http(WokReq) ->
+  {continue, WokReq}. % {Code, Headers, Body, State}
 
-outgoing_http({C, H, B}, State) ->
-  {C, H, B, State}.
+outgoing_http(WokReq) ->
+  WokReq.
 
-my_dummy_get(_Req, State) ->
+my_dummy_get(WokReq) ->
   {current_function, {M, F, A}} = process_info(self(), current_function),
+  State = wok_request:local_state(WokReq),
   lager:info("~p:~p/~p call with state = ~p", [M, F, A, State]),
-  {200, [{<<"content-type">>, <<"text/plain">>}], <<"Dummy GET">>, State}.
+  wok_response:set_response(WokReq, {200, [{<<"content-type">>, <<"text/plain">>}], <<"Dummy GET">>}).
 
-my_dummy_post(_Req, State) ->
+my_dummy_post(WokReq) ->
   {current_function, {M, F, A}} = process_info(self(), current_function),
+  State = wok_request:local_state(WokReq),
   lager:info("~p:~p/~p call with state = ~p", [M, F, A, State]),
-  {200, [{<<"content-type">>, <<"text/plain">>}], <<"Dummy POST">>, State}.
+  wok_response:set_response(WokReq, {200, [{<<"content-type">>, <<"text/plain">>}], <<"Dummy POST">>}).

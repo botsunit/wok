@@ -23,20 +23,23 @@ my_answer(Message, State) ->
 
 % rest
 
-my_service_get(_Req, State) ->
+my_service_get(WokReq) ->
   {current_function, {M, F, A}} = process_info(self(), current_function),
+  State = wok_request:local_state(WokReq),
   lager:info("~p:~p/~p call with state = ~p", [M, F, A, State]),
-  {200, [{<<"content-type">>, <<"text/plain">>}], <<"Hello GET">>, State}.
+  wok_response:set_response(WokReq, {200, [{<<"content-type">>, <<"text/plain">>}], <<"Hello GET">>}).
 
-my_service_post(_Req, State) ->
+my_service_post(WokReq) ->
   {current_function, {M, F, A}} = process_info(self(), current_function),
+  State = wok_request:local_state(WokReq),
   lager:info("~p:~p/~p call with state = ~p", [M, F, A, State]),
-  {200, [{<<"content-type">>, <<"text/plain">>}], <<"Hello POST">>, State}.
+  wok_response:set_response(WokReq, {200, [{<<"content-type">>, <<"text/plain">>}], <<"Hello POST">>}).
 
-my_service_get2(_Req, State) ->
+my_service_get2(WokReq) ->
   {current_function, {M, F, A}} = process_info(self(), current_function),
+  State = wok_request:local_state(WokReq),
   lager:info("~p:~p/~p call with state = ~p", [M, F, A, State]),
-  {200, [{<<"content-type">>, <<"text/plain">>}], <<"Hello GET2">>, State}.
+  wok_response:set_response(WokReq, {200, [{<<"content-type">>, <<"text/plain">>}], <<"Hello GET2">>}).
 
 % websocket
 
