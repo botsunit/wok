@@ -43,11 +43,11 @@ init(Req, Opts) ->
             {ok, wok_req:reply(WokReq5), Opts};
 
           {Action, {Module, Function}, Middleware} ->
-            WokReq2 = erlang:apply(Module, Function, [WokReq1])s,
+            WokReq2 = erlang:apply(Module, Function, [WokReq1]),
             _ = wok_middlewares:state(Middleware, WokReq2),
             Headers = wok_req:get_response_headers(WokReq2),
             Headers2 = add_access_control_allow_origin(Headers),
-            WokReq3 = wok_req:set_response_headers(Headers2, WokReq2)
+            WokReq3 = wok_req:set_response_headers(Headers2, WokReq2),
             {ok, wok_req:reply(WokReq3), Opts};
           false ->
             case lists:keyfind('WS', 1, Opts) of

@@ -3,6 +3,7 @@
 -include("../include/wok.hrl").
 -export([
   set_response/2
+  , get_response/1
   , set_response_code/2
   , set_response_headers/2
   , set_response_body/2
@@ -29,6 +30,9 @@ set_response(Req, {Code, Headers, Body}) ->
                  {fun set_response_headers/2, [Headers]},
                  {fun set_response_body/2, [Body]}
                 ]).
+
+get_response(#wok_req{response = Resp}) ->
+  Resp.
 
 set_response_code(#wok_req{response = Resp} = Req, Code) ->
   Req#wok_req{response = Resp#wok_resp{code = Code}}.

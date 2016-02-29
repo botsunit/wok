@@ -1,6 +1,7 @@
 -module(wok_middlewares_tests).
 
 -include_lib("eunit/include/eunit.hrl").
+-include("../include/wok.hrl").
 
 meck_middleware() ->
   meck:new(fake_middleware, [non_strict]),
@@ -18,6 +19,9 @@ meck_middleware() ->
 
 unmeck_middleware() ->
   meck:unload(fake_middleware).
+
+wok_r() ->
+  #wok_req{local_state = [init,new_parameters]}.
 
 % Tests
 wok_routes_no_ops_test_() ->
@@ -262,7 +266,7 @@ wok_middelware_with_state_test_() ->
        {with, R,
         [fun(X) -> ?assertMatch({ok, _}, X) end,
          fun(_) -> ?assertMatch([init,parameters], wok_middlewares:state(fake_middleware)) end,
-         fun(_) -> ?assertMatch(ok, wok_middlewares:state(fake_middleware, [init,new_parameters])) end,
+         fun(_) -> ?assertMatch(ok, wok_middlewares:state(fake_middleware, wok_r())) end,
          fun(_) -> ?assertMatch([init,new_parameters], wok_middlewares:state(fake_middleware)) end]
        }
    end}.

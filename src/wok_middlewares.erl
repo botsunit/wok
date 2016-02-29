@@ -30,8 +30,8 @@ stop() ->
 state(Middleware) ->
   gen_server:call(?SERVER, {state, Middleware}).
 
-state(Middleware, State) ->
-  gen_server:cast(?SERVER, {state, Middleware, State}).
+state(Middleware, WokReq) ->
+  gen_server:cast(?SERVER, {state, Middleware, WokReq}).
 
 incoming_message(Message) ->
   gen_server:call(?SERVER, {incoming_message, Message}).
