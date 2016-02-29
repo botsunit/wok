@@ -4,8 +4,8 @@
 
 -export([init/1, routes/0]).
 -export([incoming_message/2, outgoing_message/2]).
--export([incoming_http/2, outgoing_http/2]).
--export([my_dummy_get/2, my_dummy_post/2]).
+-export([incoming_http/1, outgoing_http/1]).
+-export([my_dummy_get/1, my_dummy_post/1]).
 
 init(Args) ->
   lager:info("Initialize middleware ~p", [?MODULE]),

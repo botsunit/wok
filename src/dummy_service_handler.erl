@@ -4,7 +4,7 @@
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
 -export([my_action/2, my_answer/2]).
--export([my_service_get/2, my_service_post/2, my_service_get2/2]).
+-export([my_service_get/1, my_service_post/1, my_service_get2/1]).
 -export([ws_init/3, ws_handle/4, ws_info/4]).
 
 % controler
