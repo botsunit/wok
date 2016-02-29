@@ -10,7 +10,9 @@
          set_cookie/3,
          set_cookie/4,
          delete_cookie/2,
-         set_response/2
+         set_response/2,
+         set_headers/2,
+         merge_headers/2
         ]).
 
 -define(DEFAULT_HEADERS, [{<<"content-type">>, <<"text/html">>}]).
@@ -104,6 +106,15 @@ delete_cookie(Req, Name) ->
 % @end
 set_response(Req, Response) ->
   wok_req:set_response(Req, Response).
+
+set_headers(Req, Headers) ->
+  wok_req:set_response_headers(Req, Headers).
+
+merge_headers(Req, Headers) ->
+  wok_req:set_response_headers(Req,
+                               lists:keymerge(1,
+                                              Headers,
+                                              wok_req:get_response_headers(Req))).
 
 % Private
 

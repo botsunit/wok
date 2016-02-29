@@ -1,6 +1,7 @@
 -module(wok_middlewares_http_tests).
 
 -include_lib("eunit/include/eunit.hrl").
+-include_lib("bucs/include/bucassert.hrl").
 -include("../include/wok.hrl").
 
 meck_middleware_one() ->
@@ -15,7 +16,7 @@ meck_middleware_one() ->
               end),
   meck:expect(fake_middleware_one, outgoing_http,
               fun(WokReq) ->
-                wok_req:set_response_headers(WokReq, [{<<"Content-Type">>, <<"text/plain">>}])
+                wok_response:set_headers(WokReq, [{<<"Content-Type">>, <<"text/plain">>}])
               end).
 
 unmeck_middleware_one() ->
@@ -33,7 +34,7 @@ meck_middleware_two() ->
             end),
   meck:expect(fake_middleware_two, outgoing_http,
               fun(WokReq) ->
-                wok_req:set_response_headers(WokReq, [{<<"Content-Type">>, <<"text/html">>}])
+                wok_response:set_headers(WokReq, [{<<"Content-Type">>, <<"text/html">>}])
               end).
 
 unmeck_middleware_two() ->
@@ -46,12 +47,12 @@ meck_middleware_three() ->
                   {ok, X}
               end),
   meck:expect(fake_middleware_three, incoming_http,
-              fun(_) ->
-                {403, [{<<"Content-Type">>, <<"text/plain">>}], <<"Forbidden">>}
+              fun(WokReq) ->
+                  {continue, WokReq}
               end),
   meck:expect(fake_middleware_three, outgoing_http,
               fun(WokReq) ->
-                wok_req:set_response_headers(WokReq, [{<<"Content-Type">>, <<"text/html">>}])
+                wok_response:set_headers(WokReq, [{<<"Content-Type">>, <<"text/html">>}])
               end).
 
 unmeck_middleware_three() ->
@@ -62,9 +63,6 @@ meck_middleware_four() ->
 
 unmeck_middleware_four() ->
   meck:unload(fake_middleware_four).
-
-req_from_req(Req) ->
-  Req.
 
 wok_r() ->
   #wok_req{
@@ -105,7 +103,9 @@ wok_middelware_no_middleware_test_() ->
        {with, R,
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
-         fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) ->
+             ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req))
+         end,
          fun({_, Req}) -> ?assertMatch(Req,
                                        wok_middlewares:outgoing_http(Req)) end]
        }
@@ -135,9 +135,17 @@ wok_middelware_inout_two_test_() ->
        {with, R,
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_two)) end,
-         fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) -> ?assertMatch({continue, Req}, wok_middlewares:incoming_http(Req)) end,
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/html">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -170,8 +178,16 @@ wok_middelware_one_and_two_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/plain">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -205,8 +221,16 @@ wok_middelware_stop_test_() ->
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}},
                                        wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/plain">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -245,8 +269,16 @@ wok_middelware_one_and_two_with_only_two_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/html">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -285,8 +317,16 @@ wok_middelware_one_and_two_with_only_one_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/plain">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -325,8 +365,16 @@ wok_middelware_one_and_two_with_except_two_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/plain">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -365,8 +413,16 @@ wok_middelware_one_and_two_with_except_one_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/html">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -407,8 +463,16 @@ wok_middelware_one_and_two_with_except_one_with_get_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/html">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -447,8 +511,16 @@ wok_middelware_one_and_two_with_except_one_with_post_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/plain">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -489,8 +561,16 @@ wok_middelware_one_and_two_with_only_one_with_get_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/plain">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -529,8 +609,16 @@ wok_middelware_one_and_two_with_only_one_with_post_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) ->
+             ?assertContinueIfMatch(Req2 = #wok_req{},
+                                    wok_middlewares:outgoing_http(Req),
+                                    Req2,
+                                    fun(ReqCont) ->
+                                        ?assertMatch(
+                                           [{<<"Content-Type">>, <<"text/html">>}],
+                                           wok_req:get_response_headers(ReqCont))
+                                    end)
+         end]
        }
    end}.
 
@@ -559,8 +647,7 @@ wok_middelware_with_missing_methods_test_() ->
         [fun(X) -> ?assertMatch({{ok, _}, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_four)) end,
          fun({_, Req}) -> ?assertMatch({continue, #wok_req{}}, wok_middlewares:incoming_http(Req)) end,
-         fun({_, Req}) -> ?assertMatch(Req,
-                                       wok_middlewares:outgoing_http(Req)) end]
+         fun({_, Req}) -> ?assertMatch(Req, wok_middlewares:outgoing_http(Req)) end]
        }
    end}.
 

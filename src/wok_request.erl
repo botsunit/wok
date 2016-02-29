@@ -61,8 +61,8 @@ body(Req) ->
 % This function is an implementation of cowboy_req:method/1 for wok_req
 % @end
 -spec method(wok_req:wok_req()) -> term().
-method(#wok_req{request = Req}) ->
-  cowboy_req:method(Req).
+method(Req) ->
+  cowboy_req:method(wok_req:get_cowboy_req(Req)).
 
 %% @doc
 %% @end
@@ -125,8 +125,8 @@ params(Req) ->
 % This function is an iimplementation of cowboy_req:path/1 for wok_req
 % @end
 -spec path(wok_req:wok_req()) -> term().
-path(#wok_req{request = Req}) ->
-  cowboy_req:path(Req).
+path(Req) ->
+  cowboy_req:path(wok_req:get_cowboy_req(Req)).
 
 % @equiv header(Req, Name, undefined).
 header(Req, Name) ->

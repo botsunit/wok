@@ -157,41 +157,37 @@ middlewares_message(_, _, Result) ->
 middlewares_incoming_http(Middlewares, MStates, Req, Rules) ->
   middlewares_incoming_http(Middlewares, {{continue, Req}, MStates}, Rules).
 
+middlewares_incoming_http([], {{continue, WokReq}, MStates}, _) ->
+  {{continue, wok_req:set_local_state(WokReq, undefined)}, MStates};
 middlewares_incoming_http([Middleware|Middlewares], {{continue, WokReq}, MStates}, Rules) ->
   {Path, Method} = path_and_method(WokReq),
   case check_http_rules(maps:get(Middleware, Rules, []), Path, Method) of
     true ->
-      case bucs:function_exist(Middleware, incoming_http, 2) of
+      case bucs:function_exist(Middleware, incoming_http, 1) of
         true ->
-          case erlang:apply(Middleware, incoming_http, [WokReq, maps:get(Middleware, MStates, nostate)]) of
-            {continue, WokReq2, MState} ->
-              middlewares_incoming_http(Middlewares, {{continue, WokReq2}, maps:put(Middleware, MState, MStates)}, Rules);
-            {C, H, B, MState} ->
-              MStates2 = maps:put(Middleware, MState, MStates),
-              WokReq2 = wok_req:set_response(WokReq, {C, H, B}),
-              WokReq3 = wok_req:set_local_state(WokReq2, MStates2),
-              {WokReq3, MStates2}
+          case erlang:apply(Middleware, incoming_http, [wok_req:set_local_state(WokReq, maps:get(Middleware, MStates, nostate))]) of
+            {continue, WokReq2} ->
+              middlewares_incoming_http(Middlewares, {{continue, WokReq2}, maps:put(Middleware, wok_req:get_local_state(WokReq2), MStates)}, Rules);
+            WokReq2 ->
+              {WokReq2, maps:put(Middleware, wok_req:get_local_state(WokReq2), MStates)}
           end;
         false ->
           middlewares_incoming_http(Middlewares, {{continue, WokReq}, MStates}, Rules)
       end;
     false ->
       middlewares_incoming_http(Middlewares, {{continue, WokReq}, MStates}, Rules)
-  end;
-middlewares_incoming_http(_, {{continue, WokReq}, MState}, _) ->
-  WokReq2 = wok_req:set_local_state(WokReq, MState),
-  {{continue, WokReq2}, MState}.
+  end.
 
 middlewares_outgoing_http([], MStates, WokReq, _) ->
-  {WokReq, MStates};
+  {wok_req:set_local_state(WokReq, undefined), MStates};
 middlewares_outgoing_http([Middleware|Middlewares], MStates, WokReq, Rules) ->
   {Path, Method} = path_and_method(WokReq),
   case check_http_rules(maps:get(Middleware, Rules, []), Path, Method) of
     true ->
-      case bucs:function_exist(Middleware, outgoing_http, 2) of
+      case bucs:function_exist(Middleware, outgoing_http, 1) of
         true ->
-          {WokReq2, MState} = erlang:apply(Middleware, outgoing_http, [WokReq, maps:get(Middleware, MStates, nostate)]),
-          middlewares_outgoing_http(Middlewares, maps:put(Middleware, MState, MStates), WokReq2, Rules);
+          WokReq2 = erlang:apply(Middleware, outgoing_http, [wok_req:set_local_state(WokReq, maps:get(Middleware, MStates, nostate))]),
+          middlewares_outgoing_http(Middlewares, maps:put(Middleware, wok_req:get_local_state(WokReq2), MStates), WokReq2, Rules);
         false ->
           middlewares_outgoing_http(Middlewares, MStates, WokReq, Rules)
       end;

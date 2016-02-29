@@ -6,6 +6,7 @@
   , get_response/1
   , set_response_code/2
   , set_response_headers/2
+  , get_response_headers/1
   , set_response_body/2
   , get_cowboy_req/1
   , set_cowboy_req/2
@@ -37,6 +38,9 @@ set_response_code(#wok_req{response = Resp} = Req, Code) ->
 
 set_response_headers(#wok_req{response = Resp} = Req, Headers) ->
   Req#wok_req{response = Resp#wok_resp{headers = Headers}}.
+
+get_response_headers(#wok_req{response = #wok_resp{headers = Headers}}) ->
+  Headers.
 
 set_response_body(#wok_req{response = Resp} = Req, Body) ->
   Req#wok_req{response = Resp#wok_resp{body = Body}}.
