@@ -16,29 +16,11 @@ wok_req_test_() ->
    end,
    [
      fun() ->
-       R = #wok_req{request = cowboy_req:new(socket,
-                                        transport,
-                                        peer,
-                                        method,
-                                        path,
-                                        qquery,
-                                        version,
-                                        headers,
-                                        host,
-                                        port,
-                                        buffer,
-                                        false,
-                                        compress,
-                                        onResponse),
-                    custom_data = undefined},
-       ?assert(wok_req:undefined_function(R))
-     end
-     , fun() ->
         R = #wok_req{request = undefined,
                      custom_data = "initial_custom_data"},
-        ?assertEqual("initial_custom_data", wok_req:custom_data(R)),
-        R2 = wok_req:custom_data(R, "new_custom_data"),
+        ?assertEqual("initial_custom_data", wok_req:get_custom_data(R)),
+        R2 = wok_req:set_custom_data(R, "new_custom_data"),
         ?assert(is_record(R2, wok_req)),
-        ?assertEqual("new_custom_data", wok_req:custom_data(R2))
+        ?assertEqual("new_custom_data", wok_req:get_custom_data(R2))
      end
    ]}.
