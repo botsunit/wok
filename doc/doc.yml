@@ -4,10 +4,8 @@ title: Wok
 toc:
   - quickstart
   - configuration
-  - wok
-  - wok_request
-  - wok_response
   - template_engines
+  - api
 
 language_tabs:
   - erlang
