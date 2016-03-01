@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_helpers_lib).
 
 % Mandatory
@@ -18,7 +19,7 @@ foo(Value, V) ->
 static(Data) ->
   Static = wok_state:static(route),
   Static1 = if
-              is_binary(Static) -> 
+              is_binary(Static) ->
                 lists:flatten(binary_to_list(Static));
               true ->
                 Static

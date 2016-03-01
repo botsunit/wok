@@ -5,9 +5,7 @@
 -export([provide/5, provide/4, provide/2]).
 -export([state/0, state/1]).
 
-% @doc
-% Start wok
-% @end
+% @hidden
 start() ->
   application:ensure_all_started(?MODULE).
 
@@ -40,16 +38,12 @@ provide(Topic, From, To, Body, Options) ->
 provide(Topic, Message) ->
   wok_producer:provide(Topic, Message).
 
-% @doc
-% Return the global state
-% @end
+% @hidden
 -spec state() -> term().
 state() ->
   wok_state:state().
 
-% @doc
-% Set the global state
-% @end
+% @hidden
 -spec state(State :: term()) -> ok.
 state(State) ->
   wok_state:state(State).

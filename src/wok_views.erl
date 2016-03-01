@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_views).
 
 -export([render/2, render/3, render/4, render/5]).

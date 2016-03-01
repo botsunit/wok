@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_initializer).
 
 -callback init(Args :: list()) ->

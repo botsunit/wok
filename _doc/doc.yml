@@ -4,9 +4,9 @@ title: Wok
 toc:
   - quickstart
   - configuration
-  - wok_req
   - wok
-  - views_herlpers
+  - wok_request
+  - wok_response
   - template_engines
 
 language_tabs:

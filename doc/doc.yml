@@ -4,8 +4,10 @@ title: Wok
 toc:
   - quickstart
   - configuration
-  - wok_req
   - wok
+  - wok_request
+  - wok_response
+  - template_engines
 
 language_tabs:
   - erlang

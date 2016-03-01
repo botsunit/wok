@@ -128,7 +128,7 @@ params(Req) ->
 path(Req) ->
   cowboy_req:path(wok_req:get_cowboy_req(Req)).
 
-% @equiv header(Req, Name, undefined).
+% @equiv header(Req, Name, undefined)
 header(Req, Name) ->
   header(Req, Name, undefined).
 

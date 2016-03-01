@@ -156,8 +156,6 @@ Proprietary and confidential
 
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="wok.md" class="module">wok</a></td></tr>
-<tr><td><a href="wok_http_handler.md" class="module">wok_http_handler</a></td></tr>
-<tr><td><a href="wok_initializer.md" class="module">wok_initializer</a></td></tr>
-<tr><td><a href="wok_provider_handler.md" class="module">wok_provider_handler</a></td></tr>
-<tr><td><a href="wok_req.md" class="module">wok_req</a></td></tr></table>
+<tr><td><a href="wok_request.md" class="module">wok_request</a></td></tr>
+<tr><td><a href="wok_response.md" class="module">wok_response</a></td></tr></table>
 

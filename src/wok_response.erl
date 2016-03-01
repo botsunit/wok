@@ -18,13 +18,17 @@
 -define(DEFAULT_HEADERS, [{<<"content-type">>, <<"text/html">>}]).
 -define(DEFAULT_CODE, 200).
 
-% @equiv render(Req, 200, [{<<"content-type">>, <<"text/html">>}], View, []).
+% @doc
+% render(Req, 200, [{&lt;&lt;"content-type"&gt;&gt;, &lt;&lt;"text/html"&gt;&gt;}], View, [])
+% @end
 render(Req, View) when (is_atom(View) orelse is_list(View) orelse is_binary(View)) ->
   render(Req, ?DEFAULT_CODE, ?DEFAULT_HEADERS, View, []).
 
-% @equiv render(Req, Code, [{<<"content-type">>, <<"text/html">>}], View, []).
-% @equiv render(Req, 200, Headers, View, []).
-% @equiv render(Req, 200, [{<<"content-type">>, <<"text/html">>}], View, Data).
+% @doc
+% render(Req, Code, [{&lt;&lt;"content-type"&gt;&gt;, &lt;&lt;"text/html"&gt;&gt;}], View, [])
+% render(Req, 200, Headers, View, [])
+% render(Req, 200, [{&lt;&lt;"content-type"&gt;&gt;, &lt;&lt;"text/html"&gt;&gt;}], View, Data)
+% @end
 render(Req, Code, View) when is_integer(Code),
                              (is_atom(View) orelse is_list(View) orelse is_binary(View)) ->
   render(Req, Code, ?DEFAULT_HEADERS, View, []);
@@ -35,9 +39,11 @@ render(Req, View, Data) when (is_atom(View) orelse is_list(View) orelse is_binar
                              (is_list(Data) orelse is_map(Data)) ->
   render(Req, ?DEFAULT_CODE, ?DEFAULT_HEADERS, View, Data).
 
-% @equiv render(Req, 200, Headers, View, Data).
-% @equiv render(Req, Code, [{<<"content-type">>, <<"text/html">>}], View, Data).
-% @equiv render(Req, Code, Headers, View, []).
+% @doc
+% render(Req, 200, Headers, View, Data)
+% render(Req, Code, [{&lt;&lt;"content-type"&gt;&gt;, &lt;&lt;"text/html"&gt;&gt;}], View, Data)
+% render(Req, Code, Headers, View, [])
+% @end
 render(Req, Headers, View, Data) when (is_list(Headers) orelse is_map(Headers)),
                                       (is_atom(View) orelse is_list(View) orelse is_binary(View)),
                                       (is_list(Data) orelse is_map(Data)) ->
@@ -85,7 +91,7 @@ render(Req, Code, Headers, View, Data) when is_integer(Code),
 redirect(Req, Path) ->
   wok_req:set_resp(Req, {302, [{<<"Location">>, bucs:to_binary(Path)}], <<>>}).
 
-% @equiv set_cookie(Req, Name, Value, []).
+% @equiv set_cookie(Req, Name, Value, [])
 set_cookie(Req, Name, Value) ->
   set_cookie(Req, Name, Value, []).
 
