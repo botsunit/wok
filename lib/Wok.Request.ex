@@ -42,6 +42,9 @@ defmodule Wok.Request do
 	def unquote(:"header")(arg1, arg2, arg3) do
 		:erlang.apply(:"wok_request", :"header", [arg1, arg2, arg3])
 	end
+	def unquote(:"headers")(arg1) do
+		:erlang.apply(:"wok_request", :"headers", [arg1])
+	end
 	def unquote(:"cookies")(arg1) do
 		:erlang.apply(:"wok_request", :"cookies", [arg1])
 	end

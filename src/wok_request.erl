@@ -15,6 +15,7 @@
   , path/1
   , header/2
   , header/3
+  , headers/1
   , cookies/1
   , cookie/2
   , local_state/1
@@ -66,7 +67,7 @@ method(Req) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), get | post | bind, string()) -> {ok, string(), wok_req:req()}
+-spec param(wok_req:wok_req(), get | post | bind, binary()) -> {ok, binary(), wok_req:req()}
                                                                | {undefined, wok_req:wok_req()}
                                                                | {error, wok_req:wok_req()}.
 param(Req, Type, Name) ->
@@ -82,7 +83,7 @@ param(Req, Type, Name) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), string()) -> {ok, string(), wok_req:req()}
+-spec param(wok_req:wok_req(), binary()) -> {ok, binary(), wok_req:req()}
                                             | {undefined, wok_req:wok_req()}
                                             | {error, wok_req:wok_req()}.
 param(Req, Name) ->
@@ -137,6 +138,10 @@ header(Req, Name) ->
 -spec header(wok_req:wok_req(), binary(), any()) -> binary() | any() | undefined.
 header(Req, Name, Default) ->
   cowboy_req:header(wok_req:get_cowboy_req(Req), Name, Default).
+
+-spec headers(wok_req:wok_req()) -> [{binary(), iodata()}].
+headers(Req) ->
+  cowboy_req:headers(wok_req:get_cowboy_req(Req)).
 
 % @doc
 % @end
