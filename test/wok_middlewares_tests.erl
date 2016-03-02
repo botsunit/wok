@@ -50,7 +50,7 @@ wok_routes_no_ops_test_() ->
     end
    ]}.
 
-wok_routes_no_route_prefix_test_() ->
+wok_routes_no_default_namespace_test_() ->
   {setup,
    fun() ->
        meck_middleware(),
@@ -58,7 +58,7 @@ wok_routes_no_route_prefix_test_() ->
               [{wok,
                 [{middlewares,
                   [{fake_middleware,
-                    [no_route_prefix]
+                    [no_default_namespace]
                    }]
                  }]
                }])
@@ -76,7 +76,7 @@ wok_routes_no_route_prefix_test_() ->
     end
    ]}.
 
-wok_routes_route_prefix_test_() ->
+wok_routes_namespace_test_() ->
   {setup,
    fun() ->
        meck_middleware(),
@@ -84,7 +84,7 @@ wok_routes_route_prefix_test_() ->
               [{wok,
                 [{middlewares,
                   [{fake_middleware,
-                    [{route_prefix, "/custom"}]
+                    [{namespace, "/custom"}]
                    }]
                  }]
                }])
@@ -166,7 +166,7 @@ wok_routes_route_change_with_custom_prefix_test_() ->
                 [{middlewares,
                   [{fake_middleware,
                     [
-                     {route_prefix, "/custom"},
+                     {namespace, "/custom"},
                      {route, "/dummy_get", "/get_dummy"}
                     ]
                    }]
@@ -195,7 +195,7 @@ wok_routes_route_change_with_no_prefix_test_() ->
                 [{middlewares,
                   [{fake_middleware,
                     [
-                     no_route_prefix,
+                     no_default_namespace,
                      {route, "/dummy_get", "/get_dummy"}
                     ]
                    }]

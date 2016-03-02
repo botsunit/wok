@@ -117,6 +117,40 @@ websocket_info(Module, Data, Req, State) ->
 routes([], {Routes, Static}) ->
   lager:debug("routes => ~p", [Routes]),
   {compile(lists:reverse(Routes)), Static};
+routes([{namespace, NS, Routes}|Rest], Acc) ->
+  routes(
+    lists:map(fun
+                ({Path, Handler}) ->
+                  {NS ++ Path, Handler};
+                ({resources, Name, Handler}) ->
+                  {resources, Name, Handler, NS};
+                ({resources, Name, Handler, Namespace}) ->
+                  {resources, Name, Handler, NS ++ Namespace};
+                ({Verb, Path, Handler}) ->
+                  {Verb, NS ++ Path, Handler};
+                (Route) ->
+                  Route
+              end, Routes) ++ Rest, Acc);
+routes([{resources, Name, Handler}|Rest], Acc) ->
+  routes([{resources, Name, Handler, ""}|Rest], Acc);
+routes([{resources, Name, Handler, NS}|Rest], Acc) ->
+  BasePath = NS ++ "/" ++ bucs:to_string(Name),
+  routes(
+    lists:foldl(fun({Verb, Method, CmplPath}, NewRoutes) ->
+                    case bucs:function_exists(Handler, Method, 1) of
+                      true ->
+                        [{Verb, BasePath ++ CmplPath, {Handler, Method}}|NewRoutes];
+                      false ->
+                        NewRoutes
+                    end
+                end, [], [{'GET', index, ""},
+                          {'GET', new, "/new"},
+                          {'POST', create, ""},
+                          {'GET', show, "/:id"},
+                          {'GET', edit, "/:id/edit"},
+                          {'PATCH', update, "/:id"},
+                          {'PUT', update, "/:id"},
+                          {'DELETE', destroy, "/:id"}]) ++ Rest, Acc);
 routes([{Path, Handler}|Rest], Acc) ->
   routes(Rest, add_route(Path, 'GET', Handler, Acc));
 routes([{Verb, Path, Handler}|Rest], Acc) ->
