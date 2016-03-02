@@ -112,11 +112,11 @@ code_change(_OldVsn, State, _Extra) ->
 update_routes([], _, _, Result) ->
   Result;
 update_routes([{Verb, Route, Action}|Rest], Opts, Name, Result) ->
-  Prefix = case lists:keyfind(route_prefix, 1, Opts) of
-             {route_prefix, RoutePrefix} ->
+  Prefix = case lists:keyfind(namespace, 1, Opts) of
+             {namespace, RoutePrefix} ->
                RoutePrefix;
              _ ->
-               case lists:member(no_route_prefix, Opts) of
+               case lists:member(no_default_namespace, Opts) of
                  true ->
                    "";
                  false ->
