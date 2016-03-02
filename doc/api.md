@@ -88,28 +88,74 @@ Wok.Request.method(req :: wok_req()) -> binary()
 
 ## param/2
 
-Return the value for the given parameter. The parameter is sought in the qrery string, in the body and in the bindings.
+Return the value for the given parameter. 
+The parameter is sought in the query string, in the body and in the bindings.
 
 ```erlang
-wok_request:param(Req :: wok_req(), Param :: binary()) -> {ok, binary(), wok_req()}
-                                                          | {undefined, wok_req()}
-                                                          | {error, wok_req()}.
+wok_request:param(Req :: wok_req(), Param :: term()) -> {ok, binary(), wok_req()}
+                                                        | {undefined, wok_req()}
+                                                        | {error, wok_req()}.
 ```
 
 ```elixir
-Wok.Request.param(req :: wok_req(), param :: binary()) -> {:ok, binary(), wok_req()}
+Wok.Request.param(req :: wok_req(), param :: term()) -> {:ok, binary(), wok_req()}
                                                           | {:undefined, wok_req()}
                                                           | {:error, wok_req()}
 ```
 
 ## param/3
 
-Return the value for the given parameter and domain.
+
+Return the value for the given parameter and seek-domain (get | post | bind).
 
 ```erlang
 wok_request:param(Req :: wok_req(), 
                   From :: get | post | bind,
-                  Param :: binary()) -> {ok, binary(), wok_req()}
+                  Param :: term()) -> {ok, binary(), wok_req()}
+                                      | {undefined, wok_req()}
+                                      | {error, wok_req()}.
+```
+
+```elixir
+Wok.Request.param(req :: wok_req(), 
+                  from :: :get | :post | :bind,
+                  param :: term()) -> {:ok, binary(), wok_req()}
+                                      | {:undefined, wok_req()}
+                                      | {:error, wok_req()}
+```
+
+## param/3 (2nd flavour)
+
+Return the value for the given parameter.
+The parameter is sought in the query string, in the body and in the bindings.
+The given 'Default' value is returned if the parameter is not found anywhere in the request.
+
+```erlang
+wok_request:param(Req :: wok_req(), 
+                  Param :: term(),
+                  Default :: term()) -> {ok, term(), wok_req()}
+                                        | {undefined, wok_req()}
+                                        | {error, wok_req()}.
+```
+
+```elixir
+Wok.Request.param(req :: wok_req(), 
+                  param :: term(),
+                  default :: term()) -> {:ok, term(), wok_req()}
+                                        | {:undefined, wok_req()}
+                                        | {:error, wok_req()}
+```
+
+## param/4
+
+Return the value for the given parameter and seek-domain (get | post | bind).
+The given 'Default' value is returned if the parameter is not found anywhere in the request.
+
+```erlang
+wok_request:param(Req :: wok_req(), 
+                  From :: get | post | bind,
+                  Param :: term(),
+                  Default :: term()) -> {ok, binary(), wok_req()}
                                         | {undefined, wok_req()}
                                         | {error, wok_req()}.
 ```
@@ -117,7 +163,8 @@ wok_request:param(Req :: wok_req(),
 ```elixir
 Wok.Request.param(req :: wok_req(), 
                   from :: :get | :post | :bind,
-                  param :: binary()) -> {:ok, binary(), wok_req()}
+                  param :: term()
+                  default :: term()) -> {:ok, binary(), wok_req()}
                                         | {:undefined, wok_req()}
                                         | {:error, wok_req()}
 ```
