@@ -76,7 +76,11 @@ param(Req, Type, Name, Default) ->
     {ok, Params, Req1} ->
       case lists:keyfind(Name, 1, Params) of
         {Name, Value} -> {ok, Value, Req1};
-        _ -> {Default, Req1}
+        _ ->
+          case Default of
+            undefined -> {undefined, Req1};
+            _ -> {ok, Default, Req1}
+          end
       end;
     Error ->
       Error
@@ -87,12 +91,16 @@ param(Req, Type, Name, Default) ->
                                                                | {error, wok_req:wok_req()}.
 param(Req, Type, Name) when Type =:= get; Type =:= post; Type =:= bind ->
   param(Req, Type, Name, undefined);
-param(Req, Name, Default)  when is_list(Name);is_binary(Name) ->
+param(Req, Name, Default) ->
   case params(Req) of
     {ok, Params, Req1} ->
       case lists:keyfind(Name, 1, Params) of
         {Name, Value} -> {ok, Value, Req1};
-        _ -> {Default, Req1}
+        _ ->
+          case Default of
+            undefined -> {undefined, Req};
+            _ -> {ok, Default, Req1}
+          end
       end;
     Error ->
       Error
@@ -100,9 +108,9 @@ param(Req, Name, Default)  when is_list(Name);is_binary(Name) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), binary()) -> {ok, binary(), wok_req:req()}
-                                            | {undefined, wok_req:wok_req()}
-                                            | {error, wok_req:wok_req()}.
+-spec param(wok_req:wok_req(), term()) -> {ok, binary(), wok_req:req()}
+                                          | {undefined, wok_req:wok_req()}
+                                          | {error, wok_req:wok_req()}.
 param(Req, Name) ->
   param(Req, Name, undefined).
 
@@ -208,7 +216,8 @@ binding_vals(Req) ->
   {ok, merge_params_array(cowboy_req:bindings(wok_req:get_cowboy_req(Req))), Req}.
 
 merge_params_array(Params) ->
-  lists:foldl(fun({Key, Value}, Acc) ->
+  lists:foldl(fun({KeyRaw, Value}, Acc) ->
+                  Key = bucs:to_list(KeyRaw),
                   RealKey = case re:run(Key, "([^\\[]*)\\[[^\\]]*\\]$",[{capture,[1],list}]) of
                               {match, [Key1]} -> eutils:to_binary(Key1);
                               nomatch -> Key
