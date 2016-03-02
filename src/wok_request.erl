@@ -68,9 +68,9 @@ method(Req) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), get | post | bind, binary(), term()) -> {ok, binary(), wok_req:req()}
-                                                               | {undefined, wok_req:wok_req()}
-                                                               | {error, wok_req:wok_req()}.
+-spec param(wok_req:wok_req(), get | post | bind, term(), term()) -> {ok, term(), wok_req:req()}
+                                                                                | {undefined, wok_req:wok_req()}
+                                                                                | {error, wok_req:wok_req()}.
 param(Req, Type, Name, Default) ->
   case params(Req, Type) of
     {ok, Params, Req1} ->
@@ -86,9 +86,9 @@ param(Req, Type, Name, Default) ->
       Error
   end.
 
--spec param(wok_req:wok_req(), get | post | bind | string(), binary() | term() ) -> {ok, binary(), wok_req:req()}
-                                                               | {undefined, wok_req:wok_req()}
-                                                               | {error, wok_req:wok_req()}.
+-spec param(wok_req:wok_req(), get | post | bind | term(), term()) -> {ok, term(), wok_req:req()}
+                                                                      | {undefined, wok_req:wok_req()}
+                                                                      | {error, wok_req:wok_req()}.
 param(Req, Type, Name) when Type =:= get; Type =:= post; Type =:= bind ->
   param(Req, Type, Name, undefined);
 param(Req, Name, Default) ->
@@ -98,7 +98,7 @@ param(Req, Name, Default) ->
         {Name, Value} -> {ok, Value, Req1};
         _ ->
           case Default of
-            undefined -> {undefined, Req};
+            undefined -> {undefined, Req1};
             _ -> {ok, Default, Req1}
           end
       end;
