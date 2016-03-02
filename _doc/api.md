@@ -1,4 +1,4 @@
-# Message
+# Messages API
 
 ## provide/2
 
@@ -6,7 +6,7 @@
 
 ## provide/5
 
-# HTTP Request
+# HTTP Request API
 
 ## custom_data/1
 
@@ -280,7 +280,7 @@ wok_request:global_state(Req :: wok_req(), State :: any()) -> wok_req().
 Wok.Request.global_state(req :: wok_req(), state :: any()) -> wok_req().
 ```
 
-# HTTP Response
+# HTTP Response API
 
 ## render/2
 
