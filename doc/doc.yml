@@ -3,8 +3,12 @@ title: Wok
 
 toc:
   - quickstart
-  - configuration
+  - messages
+  - http
   - template_engines
+  - middlewares
+  - plugins
+  - configuration
   - api
 
 language_tabs:
