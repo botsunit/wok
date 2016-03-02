@@ -8,6 +8,7 @@
   , client_port/1
   , body/1
   , method/1
+  , param/4
   , param/3
   , param/2
   , params/2
@@ -67,15 +68,31 @@ method(Req) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), get | post | bind, binary()) -> {ok, binary(), wok_req:req()}
+-spec param(wok_req:wok_req(), get | post | bind, binary(), term()) -> {ok, binary(), wok_req:req()}
                                                                | {undefined, wok_req:wok_req()}
                                                                | {error, wok_req:wok_req()}.
-param(Req, Type, Name) ->
+param(Req, Type, Name, Default) ->
   case params(Req, Type) of
     {ok, Params, Req1} ->
       case lists:keyfind(Name, 1, Params) of
         {Name, Value} -> {ok, Value, Req1};
-        _ -> {undefined, Req1}
+        _ -> {Default, Req1}
+      end;
+    Error ->
+      Error
+  end.
+
+-spec param(wok_req:wok_req(), get | post | bind | string(), binary() | term() ) -> {ok, binary(), wok_req:req()}
+                                                               | {undefined, wok_req:wok_req()}
+                                                               | {error, wok_req:wok_req()}.
+param(Req, Type, Name) when Type =:= get; Type =:= post; Type =:= bind ->
+  param(Req, Type, Name, undefined);
+param(Req, Name, Default)  when is_list(Name);is_binary(Name) ->
+  case params(Req) of
+    {ok, Params, Req1} ->
+      case lists:keyfind(Name, 1, Params) of
+        {Name, Value} -> {ok, Value, Req1};
+        _ -> {Default, Req1}
       end;
     Error ->
       Error
@@ -87,15 +104,7 @@ param(Req, Type, Name) ->
                                             | {undefined, wok_req:wok_req()}
                                             | {error, wok_req:wok_req()}.
 param(Req, Name) ->
-  case params(Req) of
-    {ok, Params, Req1} ->
-      case lists:keyfind(Name, 1, Params) of
-        {Name, Value} -> {ok, Value, Req1};
-        _ -> {undefined, Req1}
-      end;
-    Error ->
-      Error
-  end.
+  param(Req, Name, undefined).
 
 %% @doc
 %% @end
