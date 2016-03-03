@@ -221,10 +221,10 @@ binding_vals(Req) ->
 
 merge_params_array(Params) ->
   lists:foldl(fun({KeyRaw, Value}, Acc) ->
-                  Key = bucs:to_list(KeyRaw),
+                  Key = bucs:to_string(KeyRaw),
                   RealKey = case re:run(Key, "([^\\[]*)\\[[^\\]]*\\]$",[{capture,[1],list}]) of
-                              {match, [Key1]} -> eutils:to_binary(Key1);
-                              nomatch -> eutils:to_binary(Key)
+                              {match, [Key1]} -> bucs:to_binary(Key1);
+                              nomatch -> bucs:to_binary(Key)
                             end,
                   case lists:keyfind(RealKey, 1, Acc) of
                     {RealKey, CurrentValue} when is_list(CurrentValue) ->
@@ -238,7 +238,7 @@ merge_params_array(Params) ->
 
 value_to_list(Value) ->
   case re:run(Value, "\\[([^\\]]*)]$",[{capture,[1],list}]) of
-    {match, [Value1]} -> [eutils:to_binary(X) || X <- string:tokens(eutils:to_string(Value1), ",")];
+    {match, [Value1]} -> [bucs:to_binary(X) || X <- string:tokens(bucs:to_string(Value1), ",")];
     nomatch -> Value
   end.
 
