@@ -183,7 +183,7 @@ param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Name::term()
 ### param/3 ###
 
 <pre><code>
-param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | post | bind | term(), Name::term()) -&gt; {ok, term(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | post | bind | string() | binary() | atom(), Name::term() | string() | binary() | atom()) -&gt; {ok, term(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
 </code></pre>
 <br />
 
@@ -192,7 +192,7 @@ param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | 
 ### param/4 ###
 
 <pre><code>
-param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | post | bind, Name::term(), Default::term()) -&gt; {ok, term(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | post | bind, Name::string() | binary() | atom(), Default::term()) -&gt; {ok, term(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
 </code></pre>
 <br />
 

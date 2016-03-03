@@ -68,34 +68,26 @@ method(Req) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), get | post | bind, term(), term()) -> {ok, term(), wok_req:req()}
-                                                                                | {undefined, wok_req:wok_req()}
-                                                                                | {error, wok_req:wok_req()}.
+-spec param(wok_req:wok_req(), get | post | bind, string() | binary() | atom(), term()) -> {ok, term(), wok_req:req()}
+                                                                                           | {undefined, wok_req:wok_req()}
+                                                                                           | {error, wok_req:wok_req()}.
 param(Req, Type, Name, Default) ->
-  case params(Req, Type) of
-    {ok, Params, Req1} ->
-      case lists:keyfind(Name, 1, Params) of
-        {Name, Value} -> {ok, Value, Req1};
-        _ ->
-          case Default of
-            undefined -> {undefined, Req1};
-            _ -> {ok, Default, Req1}
-          end
-      end;
-    Error ->
-      Error
-  end.
+  param2(params(Req, Type), Name, Default).
 
--spec param(wok_req:wok_req(), get | post | bind | term(), term()) -> {ok, term(), wok_req:req()}
-                                                                      | {undefined, wok_req:wok_req()}
-                                                                      | {error, wok_req:wok_req()}.
+-spec param(wok_req:wok_req(), get | post | bind | string() | binary() | atom(), term() | string() | binary() | atom()) -> {ok, term(), wok_req:req()}
+                                                                                                                           | {undefined, wok_req:wok_req()}
+                                                                                                                           | {error, wok_req:wok_req()}.
 param(Req, Type, Name) when Type =:= get; Type =:= post; Type =:= bind ->
   param(Req, Type, Name, undefined);
 param(Req, Name, Default) ->
-  case params(Req) of
-    {ok, Params, Req1} ->
-      case lists:keyfind(Name, 1, Params) of
-        {Name, Value} -> {ok, Value, Req1};
+  param2(params(Req), Name, Default).
+
+param2(Params, Name, Default) ->
+  RealName = bucs:to_binary(Name),
+  case Params of
+    {ok, ParamsList, Req1} ->
+      case lists:keyfind(RealName, 1, ParamsList) of
+        {RealName, Value} -> {ok, Value, Req1};
         _ ->
           case Default of
             undefined -> {undefined, Req1};
@@ -220,7 +212,7 @@ merge_params_array(Params) ->
                   Key = bucs:to_list(KeyRaw),
                   RealKey = case re:run(Key, "([^\\[]*)\\[[^\\]]*\\]$",[{capture,[1],list}]) of
                               {match, [Key1]} -> eutils:to_binary(Key1);
-                              nomatch -> Key
+                              nomatch -> eutils:to_binary(Key)
                             end,
                   case lists:keyfind(RealKey, 1, Acc) of
                     {RealKey, CurrentValue} when is_list(CurrentValue) ->
