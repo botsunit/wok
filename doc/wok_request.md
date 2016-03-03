@@ -16,7 +16,7 @@ This function get global_state of wok req.</td></tr><tr><td valign="top"><a href
 This function set global_state of wok req.</td></tr><tr><td valign="top"><a href="#header-2">header/2</a></td><td>Equivalent to <a href="#header-3"><tt>header(Req, Name, undefined)</tt></a>.</td></tr><tr><td valign="top"><a href="#header-3">header/3</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
 This function get local_state of wok req.</td></tr><tr><td valign="top"><a href="#local_state-2">local_state/2</a></td><td>
 This function set local_state of wok req.</td></tr><tr><td valign="top"><a href="#method-1">method/1</a></td><td>
-This function is an implementation of cowboy_req:method/1 for wok_req.</td></tr><tr><td valign="top"><a href="#param-2">param/2</a></td><td></td></tr><tr><td valign="top"><a href="#param-3">param/3</a></td><td></td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td></td></tr><tr><td valign="top"><a href="#params-2">params/2</a></td><td></td></tr><tr><td valign="top"><a href="#path-1">path/1</a></td><td>
+This function is an implementation of cowboy_req:method/1 for wok_req.</td></tr><tr><td valign="top"><a href="#param-2">param/2</a></td><td></td></tr><tr><td valign="top"><a href="#param-3">param/3</a></td><td></td></tr><tr><td valign="top"><a href="#param-4">param/4</a></td><td></td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td></td></tr><tr><td valign="top"><a href="#params-2">params/2</a></td><td></td></tr><tr><td valign="top"><a href="#path-1">path/1</a></td><td>
 This function is an iimplementation of cowboy_req:path/1 for wok_req.</td></tr></table>
 
 
@@ -174,7 +174,7 @@ This function is an implementation of cowboy_req:method/1 for wok_req
 ### param/2 ###
 
 <pre><code>
-param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Name::binary()) -&gt; {ok, binary(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Name::term()) -&gt; {ok, binary(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
 </code></pre>
 <br />
 
@@ -183,7 +183,16 @@ param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Name::binary
 ### param/3 ###
 
 <pre><code>
-param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | post | bind, Name::binary()) -&gt; {ok, binary(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | post | bind | term(), Name::term()) -&gt; {ok, term(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+</code></pre>
+<br />
+
+<a name="param-4"></a>
+
+### param/4 ###
+
+<pre><code>
+param(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get | post | bind, Name::term(), Default::term()) -&gt; {ok, term(), <a href="wok_req.md#type-req">wok_req:req()</a>} | {undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
 </code></pre>
 <br />
 

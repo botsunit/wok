@@ -25,7 +25,7 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 
 2. Create your services and routes.
 
-3. Reference your services and routes in the `config` file (see [Configuration](https://gitlab.botsunit.com/msaas/wok/tree/master/doc/README.md#conf))
+3. Reference your services and routes in the `config` file (see [Configuration](https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/README.md#conf))
 
 3. Start your service :
 
@@ -50,9 +50,9 @@ application:ensure_all_started(wok).
 
 ### Configuration ###
 
-* `messages :: list()` : [Messages configuration](https://gitlab.botsunit.com/msaas/wok/tree/master/doc/README.md#messages_conf)
+* `messages :: list()` : [Messages configuration](https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/README.md#messages_conf)
 
-* `rest :: list()` : [REST configuration](https://gitlab.botsunit.com/msaas/wok/tree/master/doc/README.md#rest_conf)
+* `rest :: list()` : [REST configuration](https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/README.md#rest_conf)
 
 <a name="messages_conf"></a>
 
@@ -60,7 +60,7 @@ application:ensure_all_started(wok).
 
 * `handler :: atom()` : handler used to create and parse messages. See [wok_message_handler](https://gitlab.botsunit.com/msaas/wok_message_handler) for more informations.
 
-* `services :: list()` : [Services configuration](https://gitlab.botsunit.com/msaas/wok/tree/master/doc/README.md#services_conf)
+* `services :: list()` : [Services configuration](https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/README.md#services_conf)
 
 * `consumer_group :: binary()` : Name of the Kafka' consumer group
 
@@ -70,7 +70,7 @@ application:ensure_all_started(wok).
 
 * `max_services_fork :: integer()` : Maximum number of messages in parallel
 
-* `topics :: list()` : [Topics configuration](https://gitlab.botsunit.com/msaas/wok/tree/master/doc/README.md#topic_conf)
+* `topics :: list()` : [Topics configuration](https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/README.md#topic_conf)
 
 <a name="rest_conf"></a>
 
@@ -82,7 +82,7 @@ application:ensure_all_started(wok).
 
 * `max_conn :: integer()` : Max number of  connexions (default: `100`)
 
-* `routes :: list()` : [Routes configuration](https://gitlab.botsunit.com/msaas/wok/tree/master/doc/README.md#routes_conf)
+* `routes :: list()` : [Routes configuration](https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/README.md#routes_conf)
 
 <a name="services_conf"></a>
 
@@ -155,7 +155,7 @@ Proprietary and confidential
 
 
 <table width="100%" border="0" summary="list of modules">
-<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok.md" class="module">wok</a></td></tr>
-<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok_request.md" class="module">wok_request</a></td></tr>
-<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok_response.md" class="module">wok_response</a></td></tr></table>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/wok.md" class="module">wok</a></td></tr>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/wok_request.md" class="module">wok_request</a></td></tr>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/default_params/doc/wok_response.md" class="module">wok_response</a></td></tr></table>
 

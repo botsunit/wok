@@ -88,7 +88,8 @@ Wok.Request.method(req :: wok_req()) -> binary()
 
 ## param/2
 
-Return the value for the given parameter. The parameter is sought in the qrery string, in the body and in the bindings.
+Return the value for the given parameter. 
+The parameter is sought in the query string, in the body and in the bindings.
 
 ```erlang
 wok_request:param(Req :: wok_req(), Param :: binary()) -> {ok, binary(), wok_req()}

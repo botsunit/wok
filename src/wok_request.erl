@@ -8,6 +8,7 @@
   , client_port/1
   , body/1
   , method/1
+  , param/4
   , param/3
   , param/2
   , params/2
@@ -67,15 +68,39 @@ method(Req) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), get | post | bind, binary()) -> {ok, binary(), wok_req:req()}
-                                                               | {undefined, wok_req:wok_req()}
-                                                               | {error, wok_req:wok_req()}.
-param(Req, Type, Name) ->
+-spec param(wok_req:wok_req(), get | post | bind, term(), term()) -> {ok, term(), wok_req:req()}
+                                                                                | {undefined, wok_req:wok_req()}
+                                                                                | {error, wok_req:wok_req()}.
+param(Req, Type, Name, Default) ->
   case params(Req, Type) of
     {ok, Params, Req1} ->
       case lists:keyfind(Name, 1, Params) of
         {Name, Value} -> {ok, Value, Req1};
-        _ -> {undefined, Req1}
+        _ ->
+          case Default of
+            undefined -> {undefined, Req1};
+            _ -> {ok, Default, Req1}
+          end
+      end;
+    Error ->
+      Error
+  end.
+
+-spec param(wok_req:wok_req(), get | post | bind | term(), term()) -> {ok, term(), wok_req:req()}
+                                                                      | {undefined, wok_req:wok_req()}
+                                                                      | {error, wok_req:wok_req()}.
+param(Req, Type, Name) when Type =:= get; Type =:= post; Type =:= bind ->
+  param(Req, Type, Name, undefined);
+param(Req, Name, Default) ->
+  case params(Req) of
+    {ok, Params, Req1} ->
+      case lists:keyfind(Name, 1, Params) of
+        {Name, Value} -> {ok, Value, Req1};
+        _ ->
+          case Default of
+            undefined -> {undefined, Req1};
+            _ -> {ok, Default, Req1}
+          end
       end;
     Error ->
       Error
@@ -83,19 +108,11 @@ param(Req, Type, Name) ->
 
 %% @doc
 %% @end
--spec param(wok_req:wok_req(), binary()) -> {ok, binary(), wok_req:req()}
-                                            | {undefined, wok_req:wok_req()}
-                                            | {error, wok_req:wok_req()}.
+-spec param(wok_req:wok_req(), term()) -> {ok, binary(), wok_req:req()}
+                                          | {undefined, wok_req:wok_req()}
+                                          | {error, wok_req:wok_req()}.
 param(Req, Name) ->
-  case params(Req) of
-    {ok, Params, Req1} ->
-      case lists:keyfind(Name, 1, Params) of
-        {Name, Value} -> {ok, Value, Req1};
-        _ -> {undefined, Req1}
-      end;
-    Error ->
-      Error
-  end.
+  param(Req, Name, undefined).
 
 %% @doc
 %% @end
@@ -199,7 +216,8 @@ binding_vals(Req) ->
   {ok, merge_params_array(cowboy_req:bindings(wok_req:get_cowboy_req(Req))), Req}.
 
 merge_params_array(Params) ->
-  lists:foldl(fun({Key, Value}, Acc) ->
+  lists:foldl(fun({KeyRaw, Value}, Acc) ->
+                  Key = bucs:to_list(KeyRaw),
                   RealKey = case re:run(Key, "([^\\[]*)\\[[^\\]]*\\]$",[{capture,[1],list}]) of
                               {match, [Key1]} -> eutils:to_binary(Key1);
                               nomatch -> Key
