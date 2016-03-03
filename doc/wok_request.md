@@ -9,11 +9,11 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#client_ip-1">client_ip/1</a></td><td></td></tr><tr><td valign="top"><a href="#client_port-1">client_port/1</a></td><td></td></tr><tr><td valign="top"><a href="#cookie-2">cookie/2</a></td><td></td></tr><tr><td valign="top"><a href="#cookies-1">cookies/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#body_length-1">body_length/1</a></td><td></td></tr><tr><td valign="top"><a href="#client_ip-1">client_ip/1</a></td><td></td></tr><tr><td valign="top"><a href="#client_port-1">client_port/1</a></td><td></td></tr><tr><td valign="top"><a href="#cookie-2">cookie/2</a></td><td></td></tr><tr><td valign="top"><a href="#cookies-1">cookies/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td>
 This function returns wok_req's custom data.</td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td>
 This function sets wok_req's custom data.</td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td>
 This function get global_state of wok req.</td></tr><tr><td valign="top"><a href="#global_state-2">global_state/2</a></td><td>
-This function set global_state of wok req.</td></tr><tr><td valign="top"><a href="#header-2">header/2</a></td><td>Equivalent to <a href="#header-3"><tt>header(Req, Name, undefined)</tt></a>.</td></tr><tr><td valign="top"><a href="#header-3">header/3</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
+This function set global_state of wok req.</td></tr><tr><td valign="top"><a href="#has_body-1">has_body/1</a></td><td></td></tr><tr><td valign="top"><a href="#header-2">header/2</a></td><td>Equivalent to <a href="#header-3"><tt>header(Req, Name, undefined)</tt></a>.</td></tr><tr><td valign="top"><a href="#header-3">header/3</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
 This function get local_state of wok req.</td></tr><tr><td valign="top"><a href="#local_state-2">local_state/2</a></td><td>
 This function set local_state of wok req.</td></tr><tr><td valign="top"><a href="#method-1">method/1</a></td><td>
 This function is an implementation of cowboy_req:method/1 for wok_req.</td></tr><tr><td valign="top"><a href="#param-2">param/2</a></td><td></td></tr><tr><td valign="top"><a href="#param-3">param/3</a></td><td></td></tr><tr><td valign="top"><a href="#param-4">param/4</a></td><td></td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td></td></tr><tr><td valign="top"><a href="#params-2">params/2</a></td><td></td></tr><tr><td valign="top"><a href="#path-1">path/1</a></td><td>
@@ -29,6 +29,12 @@ This function is an iimplementation of cowboy_req:path/1 for wok_req.</td></tr><
 ### body/1 ###
 
 `body(Req) -> any()`
+
+<a name="body_length-1"></a>
+
+### body_length/1 ###
+
+`body_length(Req) -> any()`
 
 <a name="client_ip-1"></a>
 
@@ -109,6 +115,12 @@ global_state(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Gl
 <br />
 
 This function set global_state of wok req
+
+<a name="has_body-1"></a>
+
+### has_body/1 ###
+
+`has_body(Req) -> any()`
 
 <a name="header-2"></a>
 

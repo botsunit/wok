@@ -72,6 +72,32 @@ Wok.Request.body(req :: wok_req()) -> {:ok, binary(), wok_req()}
                                       | {:more, binary(), wok_req()}
 ```
 
+## has_body/1
+
+Return whether the request has a body.
+
+```erlang
+wok_request:has_body(Req :: wok_req()) -> boolean().
+```
+
+```elixir
+Wok.Request.has_body(req :: wok_req()) -> boolean()
+```
+
+## body_length/1
+
+Return the length of the request body.
+
+The length will only be returned if the request does not use any transfer-encoding and if the content-length header is present.
+
+```erlang
+wok_request:body_length(Req :: wok_req()) -> non_neg_integer() | undefined.
+```
+
+```elixir
+Wok.Request.body_length(req :: wok_req()) -> non_neg_integer() | undefined
+```
+
 ## method/1
 
 Return the method.

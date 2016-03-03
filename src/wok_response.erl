@@ -77,7 +77,7 @@ render(Req, Code, Headers, View, Data) when is_integer(Code),
              Other -> % TODO : elixir template
                {500, [], bucs:to_binary(Other)} % TODO
            end,
-  wok_req:set_resp(Req, Result).
+  set_response(Req, Result).
 
 % @doc
 % Redirect
@@ -89,7 +89,7 @@ render(Req, Code, Headers, View, Data) when is_integer(Code),
 % </code>
 % @end
 redirect(Req, Path) ->
-  wok_req:set_resp(Req, {302, [{<<"Location">>, bucs:to_binary(Path)}], <<>>}).
+  set_response(Req, {302, [{<<"Location">>, bucs:to_binary(Path)}], <<>>}).
 
 % @equiv set_cookie(Req, Name, Value, [])
 set_cookie(Req, Name, Value) ->

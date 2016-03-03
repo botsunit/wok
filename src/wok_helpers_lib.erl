@@ -16,7 +16,7 @@ tags() -> [static].
 foo(Value, V) ->
   "foo:" ++ bucs:to_string(Value) ++ ":" ++ bucs:to_string(V).
 
-static(Data) ->
+static([Data]) ->
   Static = wok_state:static(route),
   Static1 = if
               is_binary(Static) ->

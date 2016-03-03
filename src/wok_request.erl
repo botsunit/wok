@@ -7,6 +7,8 @@
   , client_ip/1
   , client_port/1
   , body/1
+  , has_body/1
+  , body_length/1
   , method/1
   , param/4
   , param/3
@@ -58,6 +60,16 @@ client_port(Req) ->
 body(Req) ->
   {Type, Data, CowboyReq} = cowboy_req:body(wok_req:get_cowboy_req(Req)),
   {Type, Data, wok_req:set_cowboy_req(Req, CowboyReq)}.
+
+% @doc
+% @end
+has_body(Req) ->
+  cowboy_req:has_body(wok_req:get_cowboy_req(Req)).
+
+% @doc
+% @end
+body_length(Req) ->
+  cowboy_req:body_length(wok_req:get_cowboy_req(Req)).
 
 % @doc
 % This function is an implementation of cowboy_req:method/1 for wok_req
