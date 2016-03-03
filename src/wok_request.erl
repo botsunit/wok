@@ -158,7 +158,7 @@ header(Req, Name) ->
 % @end
 -spec header(wok_req:wok_req(), binary(), any()) -> binary() | any() | undefined.
 header(Req, Name, Default) ->
-  cowboy_req:header(wok_req:get_cowboy_req(Req), Name, Default).
+  cowboy_req:header(Name, wok_req:get_cowboy_req(Req), Default).
 
 -spec headers(wok_req:wok_req()) -> [{binary(), iodata()}].
 headers(Req) ->
