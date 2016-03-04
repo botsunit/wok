@@ -36,7 +36,7 @@ init(Req, Opts) ->
                             wok_middlewares:outgoing_http({C1, H1, B1}, WokReq2);
                           HttpResponse -> HttpResponse
                         end,
-            {ok, cowboy_req:reply(C, H, B, Req), Opts};
+            {ok, cowboy_req:reply(C, add_access_control_allow_origin(H), B, Req), Opts};
           {Action, {Module, Function}, Middleware} ->
             {C, H, B, MidState} = erlang:apply(Module,
                                                Function,
