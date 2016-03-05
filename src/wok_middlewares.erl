@@ -30,8 +30,8 @@ stop() ->
 state(Middleware) ->
   gen_server:call(?SERVER, {state, Middleware}).
 
-state(Middleware, WokReq) ->
-  gen_server:cast(?SERVER, {state, Middleware, WokReq}).
+state(Middleware, State) ->
+  gen_server:cast(?SERVER, {state, Middleware, State}).
 
 incoming_message(Message) ->
   gen_server:call(?SERVER, {incoming_message, Message}).
@@ -95,8 +95,8 @@ handle_call({outgoing_http, WokReq}, _From, #{middlewares := Middlewares,
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({state, Middleware, WokReq}, #{confs := MStates} = State) ->
-  {noreply, State#{confs => maps:put(Middleware, wok_req:get_local_state(WokReq), MStates)}};
+handle_cast({state, Middleware, MState}, #{confs := MStates} = State) ->
+  {noreply, State#{confs => maps:put(Middleware, MState, MStates)}};
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
