@@ -32,6 +32,7 @@
           , custom_data = undefined
           , global_state = undefined
           , local_state = undefined
+          , handler = undefined
           , response = #wok_resp{}
          }).
 

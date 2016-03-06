@@ -5,7 +5,7 @@
 
 -export([my_action/2, my_answer/2]).
 -export([my_service_get/1, my_service_post/1, my_service_get2/1]).
--export([ws_init/3, ws_handle/4, ws_info/4]).
+-export([ws_init/1, ws_handle/2, ws_info/2]).
 
 % controler
 
@@ -43,18 +43,18 @@ my_service_get2(WokReq) ->
 
 % websocket
 
-ws_init(Req, Handler, State) ->
-  erlang:start_timer(1000, Handler, <<"Hello!">>),
-  {ok, Req, State}.
+ws_init(Req) ->
+  erlang:start_timer(1000, wok_request:handler(Req), <<"Hello!">>),
+  {ok, Req}.
 
-ws_handle({text, Msg}, Req, _Handler, State) ->
-  {reply, {text, << "That's what she said! ", Msg/binary >>}, Req, State};
-ws_handle(_Data, Req, _Handler, State) ->
-  {ok, Req, State}.
+ws_handle({text, Msg}, Req) ->
+  {reply, {text, << "That's what she said! ", Msg/binary >>}, Req};
+ws_handle(_Data, Req) ->
+  {ok, Req}.
 
-ws_info({timeout, _Ref, Msg}, Req, Handler, State) ->
-  erlang:start_timer(1000, Handler, <<"How' you doin'?">>),
-  {reply, {text, Msg}, Req, State};
-ws_info(_Info, Req, _Handler, State) ->
-  {ok, Req, State}.
+ws_info({timeout, _Ref, Msg}, Req) ->
+  erlang:start_timer(1000, wok_request:handler(Req), <<"How' you doin'?">>),
+  {reply, {text, Msg}, Req};
+ws_info(_Info, Req) ->
+  {ok, Req}.
 

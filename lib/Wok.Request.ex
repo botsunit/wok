@@ -72,4 +72,7 @@ defmodule Wok.Request do
 	def unquote(:"global_state")(arg1, arg2) do
 		:erlang.apply(:"wok_request", :"global_state", [arg1, arg2])
 	end
+	def unquote(:"handler")(arg1) do
+		:erlang.apply(:"wok_request", :"handler", [arg1])
+	end
 end

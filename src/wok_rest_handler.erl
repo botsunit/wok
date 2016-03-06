@@ -36,41 +36,35 @@ init(Req, Opts) ->
 
     Action ->
       try
-        WokReq = wok_req:set_cowboy_req(wok_req:new(), Req),
-        WokReq1 = wok_req:set_global_state(WokReq, wok_state:state()),
+        WokReq1 = init_req(Req),
         case lists:keyfind(Action, 1, Opts) of
           {Action, {Module, Function}} ->
             WokReq5 = case wok_middlewares:incoming_http(WokReq1) of
                           {continue, WokReq2} ->
                             WokReq3 = erlang:apply(Module, Function, [WokReq2]),
                             WokReq4 = wok_middlewares:outgoing_http(WokReq3),
-                            _ = wok_state:state(wok_req:get_global_state(WokReq4)),
-                            WokReq4;
+                            terminate_req(WokReq4);
                           WokReq2 -> WokReq2
                         end,
-            Headers = wok_req:get_response_headers(WokReq5),
-            Headers2 = add_access_control_allow_origin(Headers),
-            WokReq6 = wok_req:set_response_headers(WokReq5, Headers2),
+            WokReq6 = set_response_headers(WokReq5),
             {ok, wok_req:reply(WokReq6), Opts};
           {Action, {Module, Function}, Middleware} ->
             WokReq2 = wok_req:set_local_state(WokReq1, wok_middlewares:state(Middleware)),
             WokReq3 = erlang:apply(Module, Function, [WokReq2]),
-            _ = wok_middlewares:state(Middleware, wok_req:get_local_state(WokReq3)),
-            WokReq4 = wok_req:set_local_state(WokReq3, undefined),
-            Headers = wok_req:get_response_headers(WokReq4),
-            Headers2 = add_access_control_allow_origin(Headers),
-            WokReq5 = wok_req:set_response_headers(WokReq4, Headers2),
+            WokReq4 = terminate_req(WokReq3, Middleware),
+            WokReq5 = set_response_headers(WokReq4),
             {ok, wok_req:reply(WokReq5), Opts};
           false ->
             case lists:keyfind('WS', 1, Opts) of
               {'WS', Module} ->
-                {ok, Req2, WokState} = erlang:apply(Module, ws_init, [Req, self(), wok_state:state()]),
-                _ = wok_state:state(WokState),
-                {cowboy_websocket, Req2, Module};
+                {ok, WokReq2} = erlang:apply(Module, ws_init, [WokReq1]),
+                WokReq3 = terminate_req(WokReq2),
+                {cowboy_websocket, wok_req:get_cowboy_req(WokReq3), Module};
               {'WS', Module, Middleware} ->
-                {ok, Req2, MidState} = erlang:apply(Module, ws_init, [Req, self(), wok_middlewares:state(Middleware)]),
-                _ = wok_middlewares:state(Middleware, MidState),
-                {cowboy_websocket, Req2, {Module, Middleware}};
+                WokReq2 = wok_req:set_local_state(WokReq1, wok_middlewares:state(Middleware)),
+                {ok, WokReq3} = erlang:apply(Module, ws_init, [WokReq2]),
+                WokReq4 = terminate_req(WokReq3, Middleware),
+                {cowboy_websocket, wok_req:get_cowboy_req(WokReq4), {Module, Middleware}};
               false ->
                 {ok, cowboy_req:reply(404, add_access_control_allow_origin([]), <<>>, Req), Opts}
             end
@@ -83,48 +77,81 @@ init(Req, Opts) ->
   end.
 
 websocket_handle(Data, Req, {Module, Middleware} = Opts) ->
-  case websocket_handle(Module, Data, Req, wok_middlewares:state(Middleware)) of
-    {ok, Req2, State} ->
-      _ = wok_middlewares:state(Middleware, State),
-      {ok, Req2, Opts};
-    {reply, Response, Req2, State} ->
-      _ = wok_middlewares:state(Middleware, State),
-      {reply, Response, Req2, Opts}
+  WokReq1 = init_req(Req),
+  WokReq2 = wok_req:set_local_state(WokReq1, wok_middlewares:state(Middleware)),
+  case erlang:apply(Module, ws_handle, [Data, WokReq2]) of
+    {R, WokReq3} when R == ok; R == stop ->
+      WokReq4 = terminate_req(WokReq3, Middleware),
+      {R, wok_req:get_cowboy_req(WokReq4), Opts};
+    {R, WokReq3, hibernate} when R == ok; R == stop ->
+      WokReq4 = terminate_req(WokReq3, Middleware),
+      {R, wok_req:get_cowboy_req(WokReq4), Opts, hibernate};
+    {reply, Response, WokReq3} ->
+      WokReq4 = terminate_req(WokReq3, Middleware),
+      {reply, Response, wok_req:get_cowboy_req(WokReq4), Opts}
   end;
 websocket_handle(Data, Req, Module) ->
-  case websocket_handle(Module, Data, Req, wok_state:state()) of
-    {ok, Req2, State} ->
-      _ = wok_state:state(State),
-      {ok, Req2, Module};
-    {reply, Response, Req2, State} ->
-      _ = wok_state:state(State),
-      {reply, Response, Req2, Module}
+  WokReq1 = init_req(Req),
+  case erlang:apply(Module, ws_handle, [Data, WokReq1]) of
+    {R, WokReq2} when R == ok; R == stop ->
+      WokReq3 = terminate_req(WokReq2),
+      {R, wok_req:get_cowboy_req(WokReq3), Module};
+    {R, WokReq2, hibernate} when R == ok; R == stop ->
+      WokReq3 = terminate_req(WokReq2),
+      {R, wok_req:get_cowboy_req(WokReq3), Module, hibernate};
+    {reply, Response, WokReq2} ->
+      WokReq3 = terminate_req(WokReq2),
+      {reply, Response, wok_req:get_cowboy_req(WokReq3), Module}
   end.
-websocket_handle(Module, Data, Req, State) ->
-  erlang:apply(Module, ws_handle, [Data, Req, self(), State]).
 
 websocket_info(Data, Req, {Module, Middleware} = Opts) ->
-  case websocket_info(Module, Data, Req, wok_middlewares:state(Middleware)) of
-    {ok, Req2, State} ->
-      _ = wok_middlewares:state(Middleware, State),
-      {ok, Req2, Opts};
-    {reply, Response, Req2, State} ->
-      _ = wok_middlewares:state(Middleware, State),
-      {reply, Response, Req2, Opts}
+  WokReq1 = init_req(Req),
+  WokReq2 = wok_req:set_local_state(WokReq1, wok_middlewares:state(Middleware)),
+  case erlang:apply(Module, ws_info, [Data, WokReq2]) of
+    {R, WokReq3} when R == ok; R == stop ->
+      WokReq4 = terminate_req(WokReq3, Middleware),
+      {R, wok_req:get_cowboy_req(WokReq4), Opts};
+    {R, WokReq3, hibernate} when R == ok; R == stop ->
+      WokReq4 = terminate_req(WokReq3, Middleware),
+      {R, wok_req:get_cowboy_req(WokReq4), Opts, hibernate};
+    {reply, Response, WokReq3} ->
+      WokReq4 = terminate_req(WokReq3, Middleware),
+      {reply, Response, wok_req:get_cowboy_req(WokReq4), Opts}
   end;
 websocket_info(Data, Req, Module) ->
-  case websocket_info(Module, Data, Req, wok_state:state()) of
-    {ok, Req2, State} ->
-      _ = wok_state:state(State),
-      {ok, Req2, Module};
-    {reply, Response, Req2, State} ->
-      _ = wok_state:state(State),
-      {reply, Response, Req2, Module}
+  WokReq1 = init_req(Req),
+  case erlang:apply(Module, ws_info, [Data, WokReq1]) of
+    {R, WokReq2} when R == ok; R == stop ->
+      WokReq3 = terminate_req(WokReq2),
+      {R, wok_req:get_cowboy_req(WokReq3), Module};
+    {R, WokReq2, hibernate} when R == ok; R == stop ->
+      WokReq3 = terminate_req(WokReq2),
+      {R, wok_req:get_cowboy_req(WokReq3), Module, hibernate};
+    {reply, Response, WokReq2} ->
+      WokReq3 = terminate_req(WokReq2),
+      {reply, Response, wok_req:get_cowboy_req(WokReq3), Module}
   end.
-websocket_info(Module, Data, Req, State) ->
-  erlang:apply(Module, ws_info, [Data, Req, self(), State]).
 
 % private
+
+init_req(Req) ->
+  WokReq = wok_req:set_cowboy_req(wok_req:new(), Req),
+  WokReq0 = wok_req:set_handler(WokReq, self()),
+  wok_req:set_global_state(WokReq0, wok_state:state()).
+
+terminate_req(WokReq) ->
+  _ = wok_state:state(wok_req:get_global_state(WokReq)),
+  WokReq.
+
+terminate_req(WokReq, Middleware) ->
+  WokReq1 = terminate_req(WokReq),
+  _ = wok_middlewares:state(Middleware, wok_req:get_local_state(WokReq1)),
+  wok_req:set_local_state(WokReq1, undefined).
+
+set_response_headers(WokReq) ->
+  Headers = wok_req:get_response_headers(WokReq),
+  Headers2 = add_access_control_allow_origin(Headers),
+  wok_req:set_response_headers(WokReq, Headers2).
 
 routes([], {Routes, Static}) ->
   lager:debug("routes => ~p", [Routes]),

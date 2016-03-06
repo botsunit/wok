@@ -13,7 +13,8 @@
 This function returns wok_req's custom data.</td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td>
 This function sets wok_req's custom data.</td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td>
 This function get global_state of wok req.</td></tr><tr><td valign="top"><a href="#global_state-2">global_state/2</a></td><td>
-This function set global_state of wok req.</td></tr><tr><td valign="top"><a href="#has_body-1">has_body/1</a></td><td></td></tr><tr><td valign="top"><a href="#header-2">header/2</a></td><td>Equivalent to <a href="#header-3"><tt>header(Req, Name, undefined)</tt></a>.</td></tr><tr><td valign="top"><a href="#header-3">header/3</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
+This function set global_state of wok req.</td></tr><tr><td valign="top"><a href="#handler-1">handler/1</a></td><td>
+Get the handler reference.</td></tr><tr><td valign="top"><a href="#has_body-1">has_body/1</a></td><td></td></tr><tr><td valign="top"><a href="#header-2">header/2</a></td><td>Equivalent to <a href="#header-3"><tt>header(Req, Name, undefined)</tt></a>.</td></tr><tr><td valign="top"><a href="#header-3">header/3</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
 This function get local_state of wok req.</td></tr><tr><td valign="top"><a href="#local_state-2">local_state/2</a></td><td>
 This function set local_state of wok req.</td></tr><tr><td valign="top"><a href="#method-1">method/1</a></td><td>
 This function is an implementation of cowboy_req:method/1 for wok_req.</td></tr><tr><td valign="top"><a href="#param-2">param/2</a></td><td></td></tr><tr><td valign="top"><a href="#param-3">param/3</a></td><td></td></tr><tr><td valign="top"><a href="#param-4">param/4</a></td><td></td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td></td></tr><tr><td valign="top"><a href="#params-2">params/2</a></td><td></td></tr><tr><td valign="top"><a href="#path-1">path/1</a></td><td>
@@ -115,6 +116,17 @@ global_state(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Gl
 <br />
 
 This function set global_state of wok req
+
+<a name="handler-1"></a>
+
+### handler/1 ###
+
+<pre><code>
+handler(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; pid()
+</code></pre>
+<br />
+
+Get the handler reference
 
 <a name="has_body-1"></a>
 

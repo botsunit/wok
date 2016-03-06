@@ -25,6 +25,7 @@
   , local_state/2
   , global_state/1
   , global_state/2
+  , handler/1
 ]).
 
 % @doc
@@ -204,6 +205,12 @@ global_state(WokReq) ->
 global_state(WokReq, GlobalState) ->
   wok_req:set_global_state(WokReq, GlobalState).
 
+% @doc
+% Get the handler reference
+% @end
+-spec handler(wok_req:wok_req()) -> pid().
+handler(WokReq) ->
+  wok_req:get_handler(WokReq).
 
 % Private
 

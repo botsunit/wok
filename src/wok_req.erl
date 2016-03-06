@@ -16,6 +16,8 @@
   , set_global_state/2
   , get_local_state/1
   , set_local_state/2
+  , get_handler/1
+  , set_handler/2
   , new/0
   , reply/1
 ]).
@@ -68,6 +70,12 @@ get_local_state(#wok_req{local_state = State}) ->
 
 set_local_state(Req, State) ->
   Req#wok_req{local_state = State}.
+
+get_handler(#wok_req{handler = Handler}) ->
+  Handler.
+
+set_handler(Req, Handler) ->
+  Req#wok_req{handler = Handler}.
 
 % @doc
 % This function returns a new empty wok_req record
