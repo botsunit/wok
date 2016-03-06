@@ -22,7 +22,7 @@ defmodule Wok.Mixfile do
 			{:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", branch: "master"},  
 			{:pipette, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},  
 			{:kafe, ~r/.*/, git: "https://github.com/botsunit/kafe.git", branch: "master"},  
-			{:cowboy, ~r/.*/, git: "https://github.com/ninenines/cowboy.git", branch: "master"},  
+			{:cowboy, ~r/.*/, git: "https://github.com/ninenines/cowboy.git", branch: "2.0.0-pre.3"},  
 			{:cowboy_default_static_file, ~r/.*/, git: "https://github.com/botsunit/cowboy_default_static_file.git", branch: "master"},  
 			{:bucs, ~r/.*/, git: "https://github.com/botsunit/bucs.git", branch: "master"},  
 			{:doteki, ~r/.*/, git: "https://github.com/botsunit/doteki.git", branch: "master"},  

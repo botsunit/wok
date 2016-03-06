@@ -18,8 +18,17 @@ defmodule Wok.Request do
 	def unquote(:"body")(arg1) do
 		:erlang.apply(:"wok_request", :"body", [arg1])
 	end
+	def unquote(:"has_body")(arg1) do
+		:erlang.apply(:"wok_request", :"has_body", [arg1])
+	end
+	def unquote(:"body_length")(arg1) do
+		:erlang.apply(:"wok_request", :"body_length", [arg1])
+	end
 	def unquote(:"method")(arg1) do
 		:erlang.apply(:"wok_request", :"method", [arg1])
+	end
+	def unquote(:"param")(arg1, arg2, arg3, arg4) do
+		:erlang.apply(:"wok_request", :"param", [arg1, arg2, arg3, arg4])
 	end
 	def unquote(:"param")(arg1, arg2, arg3) do
 		:erlang.apply(:"wok_request", :"param", [arg1, arg2, arg3])
