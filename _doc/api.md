@@ -599,7 +599,7 @@ Wok.Response.redirect(req, {:handler, :fun})
 wok_response:redirect(Req, {handler, fun, #{id => 1, name => <<"John">>}}).
 ```
 ```elixir
-Wok.Response.redirect(Req, {handler, fun, %{id => 1, name => <<"John">>}})
+Wok.Response.redirect(Req, {:handler, :fun, %{id => 1, name => <<"John">>}})
 ```
 > If, in the configuration, you have `{'GET', "/chat/:id/user/:name", {handler, fun}}`,  you will be redirected to `/chat/1/user/John`
 
