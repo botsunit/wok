@@ -26,10 +26,7 @@ start_rest() ->
       IP = bucinet:to_ip(doteki:get_env([wok, rest, ip], ?DEFAULT_REST_IP)),
       TransOpts = [{port, Port}, {ip, IP}],
       MaxConn = doteki:get_env([wok, rest, max_conn], ?DEFAULT_REST_MAX_CONN),
-      {Dispatch, Static} = wok_rest_handler:routes(
-                             doteki:get_env([wok, rest, routes], []) ++
-                             wok_middlewares:routes()
-                            ),
+      {Dispatch, Static} = wok_cowboy_handler:routes(),
       ProtoOpts   = [{env, [{dispatch, Dispatch}]},
                      {middlewares, [cowboy_router, cowboy_default_static_file, cowboy_handler]}],
       case cowboy:start_http(http, MaxConn, TransOpts, ProtoOpts) of

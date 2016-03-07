@@ -8,7 +8,7 @@ digraph wok {
   wok[shape=oval, label="wok (*)"];
   wok_app[label="wok_app (*)"];
   wok_sup[label="wok_sup (*)"];
-  wok_rest_handler[label="wok_rest_handler (*)"];
+  wok_cowboy_handler[label="wok_cowboy_handler (*)"];
   wok_middlewares[label="wok_middlewares (*)"];
   wok_dispatcher[label="wok_dispatcher (*)"];
   wok_services_sup[label="wok_services_sup (*)"];
@@ -23,7 +23,7 @@ digraph wok {
 
   wok_app -> wok_sup;
   wok_app -> cowboy [style=dashed];
-  wok_app -> wok_rest_handler;
+  wok_app -> wok_cowboy_handler;
   wok_app -> wok_middlewares;
 
   wok_sup -> wok_messages_sup [style=dotted];
@@ -34,11 +34,11 @@ digraph wok {
 
   wok_plugins -> "<plugin>";
 
-  cowboy -> wok_rest_handler [style=dashed];
+  cowboy -> wok_cowboy_handler [style=dashed];
 
-  wok_rest_handler -> "<handler :: wok_http_handler>";
-  wok_rest_handler -> wok_middlewares;
-  wok_rest_handler -> wok_state;
+  wok_cowboy_handler -> "<handler :: wok_http_handler>";
+  wok_cowboy_handler -> wok_middlewares;
+  wok_cowboy_handler -> wok_state;
 
   wok_middlewares -> "<middleware>";
 

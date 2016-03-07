@@ -46,38 +46,37 @@ custom_data(Req, Data) ->
 % @end
 -spec client_ip(wok_req:wok_req()) -> inet:ip_address().
 client_ip(Req) ->
-  {IP, _} = cowboy_req:peer(wok_req:get_cowboy_req(Req)),
-  IP.
+  wok_req:client_ip(Req).
 
 % @doc
 % @end
 -spec client_port(wok_req:wok_req()) -> inet:port_number().
 client_port(Req) ->
-  {_, Port} = cowboy_req:peer(wok_req:get_cowboy_req(Req)),
-  Port.
+  wok_req:client_port(Req).
 
 % @doc
 % @end
+-spec body(wok_req:wok_req()) -> {ok | more, binary(), wok_req:wok_req()}.
 body(Req) ->
-  {Type, Data, CowboyReq} = cowboy_req:body(wok_req:get_cowboy_req(Req)),
-  {Type, Data, wok_req:set_cowboy_req(Req, CowboyReq)}.
+  wok_req:body(Req).
 
 % @doc
 % @end
+-spec has_body(wok_req:wok_req()) -> boolean().
 has_body(Req) ->
-  cowboy_req:has_body(wok_req:get_cowboy_req(Req)).
+  wok_req:has_body(Req).
 
 % @doc
 % @end
+-spec body_length(wok_req:wok_req()) -> integer().
 body_length(Req) ->
-  cowboy_req:body_length(wok_req:get_cowboy_req(Req)).
+  wok_req:body_length(Req).
 
 % @doc
-% This function is an implementation of cowboy_req:method/1 for wok_req
 % @end
 -spec method(wok_req:wok_req()) -> term().
 method(Req) ->
-  cowboy_req:method(wok_req:get_cowboy_req(Req)).
+  wok_req:method(Req).
 
 %% @doc
 %% @end
@@ -145,11 +144,10 @@ params(Req) ->
   end.
 
 % @doc
-% This function is an iimplementation of cowboy_req:path/1 for wok_req
 % @end
 -spec path(wok_req:wok_req()) -> term().
 path(Req) ->
-  cowboy_req:path(wok_req:get_cowboy_req(Req)).
+  wok_req:path(Req).
 
 % @equiv header(Req, Name, undefined)
 header(Req, Name) ->
@@ -159,17 +157,17 @@ header(Req, Name) ->
 % @end
 -spec header(wok_req:wok_req(), binary(), any()) -> binary() | any() | undefined.
 header(Req, Name, Default) ->
-  cowboy_req:header(Name, wok_req:get_cowboy_req(Req), Default).
+  wok_req:header(Req, Name, Default).
 
 -spec headers(wok_req:wok_req()) -> [{binary(), iodata()}].
 headers(Req) ->
-  cowboy_req:headers(wok_req:get_cowboy_req(Req)).
+  wok_req:headers(Req).
 
 % @doc
 % @end
 -spec cookies(wok_req:wok_req()) -> [{binary(), binary()}].
 cookies(Req) ->
-  cowboy_req:parse_cookies(wok_req:get_cowboy_req(Req)).
+  wok_req:get_cookies(Req).
 
 % @doc
 % @end
@@ -215,16 +213,22 @@ handler(WokReq) ->
 % Private
 
 post_vals(Req) ->
-  case cowboy_req:body_qs(wok_req:get_cowboy_req(Req)) of
-    {ok, List, CowboyReq} -> {ok, merge_params_array(List), wok_req:set_cowboy_req(Req, CowboyReq)};
-    {_, CowboyReq} -> {error, wok_req:set_cowboy_req(Req, CowboyReq)}
+  case wok_req:post_values(Req) of
+    {ok, List, Req1} -> {ok, merge_params_array(List), Req1};
+    Other -> Other
   end.
 
 get_vals(Req) ->
-  {ok, merge_params_array(cowboy_req:parse_qs(wok_req:get_cowboy_req(Req))), Req}.
+  case wok_req:get_values(Req) of
+    {ok, List, Req1} -> {ok, merge_params_array(List), Req1};
+    Other -> Other
+  end.
 
 binding_vals(Req) ->
-  {ok, merge_params_array(cowboy_req:bindings(wok_req:get_cowboy_req(Req))), Req}.
+  case wok_req:binding_values(Req) of
+    {ok, List, Req1} -> {ok, merge_params_array(List), Req1};
+    Other -> Other
+  end.
 
 merge_params_array(Params) ->
   lists:foldl(fun({KeyRaw, Value}, Acc) ->

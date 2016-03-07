@@ -66,6 +66,7 @@ unmeck_middleware_four() ->
 
 wok_r() ->
   #wok_req{
+    adapter = wok_cowboy_req,
     request = cowboy_req:new(
       undefined, % Socket
       dummy_transport, % Transport

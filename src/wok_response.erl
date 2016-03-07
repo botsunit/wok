@@ -99,9 +99,7 @@ set_cookie(Req, Name, Value) ->
 % Otions = [{max_age, non_neg_integer()} | {domain, binary()} | {path, binary()} | {secure, boolean()} | {http_only, boolean()}]
 % @end
 set_cookie(Req, Name, Value, Options) ->
-  wok_req:set_cowboy_req(Req,
-                         cowboy_req:set_resp_cookie(Name, Value, Options,
-                                                    wok_req:get_cowboy_req(Req))).
+  wok_req:set_cookie(Req, Name, Value, Options).
 
 % @doc
 % @end

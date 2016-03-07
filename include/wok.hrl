@@ -33,6 +33,7 @@
           , global_state = undefined
           , local_state = undefined
           , handler = undefined
+          , adapter = undefined
           , response = #wok_resp{}
          }).
 

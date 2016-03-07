@@ -16,9 +16,7 @@ This function get global_state of wok req.</td></tr><tr><td valign="top"><a href
 This function set global_state of wok req.</td></tr><tr><td valign="top"><a href="#handler-1">handler/1</a></td><td>
 Get the handler reference.</td></tr><tr><td valign="top"><a href="#has_body-1">has_body/1</a></td><td></td></tr><tr><td valign="top"><a href="#header-2">header/2</a></td><td>Equivalent to <a href="#header-3"><tt>header(Req, Name, undefined)</tt></a>.</td></tr><tr><td valign="top"><a href="#header-3">header/3</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
 This function get local_state of wok req.</td></tr><tr><td valign="top"><a href="#local_state-2">local_state/2</a></td><td>
-This function set local_state of wok req.</td></tr><tr><td valign="top"><a href="#method-1">method/1</a></td><td>
-This function is an implementation of cowboy_req:method/1 for wok_req.</td></tr><tr><td valign="top"><a href="#param-2">param/2</a></td><td></td></tr><tr><td valign="top"><a href="#param-3">param/3</a></td><td></td></tr><tr><td valign="top"><a href="#param-4">param/4</a></td><td></td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td></td></tr><tr><td valign="top"><a href="#params-2">params/2</a></td><td></td></tr><tr><td valign="top"><a href="#path-1">path/1</a></td><td>
-This function is an iimplementation of cowboy_req:path/1 for wok_req.</td></tr></table>
+This function set local_state of wok req.</td></tr><tr><td valign="top"><a href="#method-1">method/1</a></td><td></td></tr><tr><td valign="top"><a href="#param-2">param/2</a></td><td></td></tr><tr><td valign="top"><a href="#param-3">param/3</a></td><td></td></tr><tr><td valign="top"><a href="#param-4">param/4</a></td><td></td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td></td></tr><tr><td valign="top"><a href="#params-2">params/2</a></td><td></td></tr><tr><td valign="top"><a href="#path-1">path/1</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -29,13 +27,19 @@ This function is an iimplementation of cowboy_req:path/1 for wok_req.</td></tr><
 
 ### body/1 ###
 
-`body(Req) -> any()`
+<pre><code>
+body(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; {ok | more, binary(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+</code></pre>
+<br />
 
 <a name="body_length-1"></a>
 
 ### body_length/1 ###
 
-`body_length(Req) -> any()`
+<pre><code>
+body_length(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; integer()
+</code></pre>
+<br />
 
 <a name="client_ip-1"></a>
 
@@ -132,7 +136,10 @@ Get the handler reference
 
 ### has_body/1 ###
 
-`has_body(Req) -> any()`
+<pre><code>
+has_body(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; boolean()
+</code></pre>
+<br />
 
 <a name="header-2"></a>
 
@@ -191,8 +198,6 @@ method(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; term(
 </code></pre>
 <br />
 
-This function is an implementation of cowboy_req:method/1 for wok_req
-
 <a name="param-2"></a>
 
 ### param/2 ###
@@ -246,6 +251,4 @@ params(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Type::get |
 path(Req::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; term()
 </code></pre>
 <br />
-
-This function is an iimplementation of cowboy_req:path/1 for wok_req
 

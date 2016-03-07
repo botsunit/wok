@@ -1,4 +1,4 @@
--module(wok_rest_handler_tests).
+-module(wok_cowboy_handler_tests).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -12,7 +12,7 @@ meck_rest_handler() ->
 unmeck_rest_handler() ->
   meck:unload(fake_rest_handler).
 
-wok_rest_handler_uncompiled_routes_test_() ->
+wok_cowboy_handler_uncompiled_routes_test_() ->
   {setup,
    fun() ->
     meck_rest_handler(),
@@ -33,21 +33,21 @@ wok_rest_handler_uncompiled_routes_test_() ->
         ?assertMatch(
           {
             [{
-            "/api/users/:id", wok_rest_handler, [
+            "/api/users/:id", [
               {'PATCH', {fake_rest_handler, update}},
               {'PUT', {fake_rest_handler, update}},
               {'GET', {fake_rest_handler, show}}
             ]},{
-            "/api/users", wok_rest_handler, [
+            "/api/users", [
               {'POST', {fake_rest_handler, create}},
               {'GET', {fake_rest_handler, index}}]}
             ], #{static_path := [],static_route := []}
           },
-           wok_rest_handler:wok_routes()
+           wok_http_handler:routes()
         )
     end]}.
 
-wok_rest_handler_routes_test_() ->
+wok_cowboy_handler_routes_test_() ->
   {setup,
    fun() -> ok end,
    fun(_) -> ok end,
@@ -56,33 +56,33 @@ wok_rest_handler_routes_test_() ->
            {[{'_',[],[{
                 [<<"route">>, <<"one">>],
                 [],
-                wok_rest_handler,
+                wok_cowboy_handler,
                 [{'GET', {dummy_service_handler, my_service_get}}]
                }]}],
             #{static_path := [],static_route := []}},
-           wok_rest_handler:routes([{'GET', "/route/one", {dummy_service_handler, my_service_get}}]))
+           wok_cowboy_handler:routes([{'GET', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
            {[{'_',[],[{
                 [<<"route">>, <<"one">>],
                 [],
-                wok_rest_handler,
+                wok_cowboy_handler,
                 [{'POST', {dummy_service_handler, my_service_get}}]
                }]}],
             #{static_path := [],static_route := []}},
-           wok_rest_handler:routes([{'POST', "/route/one", {dummy_service_handler, my_service_get}}]))
+           wok_cowboy_handler:routes([{'POST', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
            {[{'_',[],[{
                 [<<"route">>, <<"one">>],
                 [],
-                wok_rest_handler,
+                wok_cowboy_handler,
                 [{'CUSTOM', {dummy_service_handler, my_service_get}}]
                }]}],
             #{static_path := [],static_route := []}},
-           wok_rest_handler:routes([{'CUSTOM', "/route/one", {dummy_service_handler, my_service_get}}]))
+           wok_cowboy_handler:routes([{'CUSTOM', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
@@ -93,10 +93,10 @@ wok_rest_handler_routes_test_() ->
                 {dir, "/tmp", [{mimetypes,cow_mimetypes,all}, {default_file, "index.html"}]}
                }]}],
             #{static_path := "/tmp",static_route := "/priv/public"}},
-           wok_rest_handler:routes([{static, "/priv/public", {dir, "/tmp"}}]))
+           wok_cowboy_handler:routes([{static, "/priv/public", {dir, "/tmp"}}]))
     end]}.
 
-wok_rest_handler_CORS_default_test_() ->
+wok_cowboy_handler_CORS_default_test_() ->
   {setup,
    fun() ->
        doteki:set_env_from_config(
@@ -124,7 +124,7 @@ wok_rest_handler_CORS_default_test_() ->
        X
    end,
    [fun() ->
-        CORS = wok_rest_handler:cors_headers(<<"/test">>),
+        CORS = wok_http_handler:cors_headers(<<"/test">>),
         ?assertMatch(<<"DELETE, PUT, POST, GET, OPTIONS">>,
                      buclists:keyfind(<<"Access-Control-Allow-Methods">>, 1, CORS)),
         ?assertMatch(<<"1728000">>,
@@ -140,7 +140,7 @@ wok_rest_handler_CORS_default_test_() ->
                      buclists:keyfind(<<"Access-Control-Allow-Headers">>, 1, CORS))
     end,
     fun() ->
-        CORS = wok_rest_handler:add_access_control_allow_origin(wok_rest_handler:cors_headers(<<"/test">>)),
+        CORS = wok_http_handler:add_access_control_allow_origin(wok_http_handler:cors_headers(<<"/test">>)),
         ?assertMatch(<<"DELETE, PUT, POST, GET, OPTIONS">>,
                      buclists:keyfind(<<"Access-Control-Allow-Methods">>, 1, CORS)),
         ?assertMatch(<<"1728000">>,

@@ -87,9 +87,9 @@ path(Verb, Handler, Function, Args) when (Verb == 'GET' orelse
 -spec paths(Handler :: atom(), Function :: atom()) -> string().
 paths(Handler, Function) when is_atom(Handler),
                               is_atom(Function) ->
-  {Routes, _} = wok_rest_handler:wok_routes(),
+  {Routes, _} = wok_http_handler:routes(),
   lists:foldl(fun
-                ({Path, _, Handlers}, Acc) when is_list(Handlers) ->
+                ({Path, Handlers}, Acc) when is_list(Handlers) ->
                   Acc ++ lists:foldl(fun
                                        ({Verb, {Handler1, Function1}}, Acc2)
                                          when Handler1 == Handler,

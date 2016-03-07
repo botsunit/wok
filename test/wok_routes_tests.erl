@@ -15,7 +15,7 @@ meck_rest_handler() ->
 unmeck_rest_handler() ->
   meck:unload(fake_rest_handler).
 
-wok_rest_handler_uncompiled_routes_test_() ->
+routes_test_() ->
   {setup,
    fun() ->
     meck_rest_handler(),
@@ -40,31 +40,31 @@ wok_rest_handler_uncompiled_routes_test_() ->
         ?assertMatch(
           {
             [{
-            "/api/users/:id", wok_rest_handler, [
+            "/api/users/:id", [
               {'PATCH', {fake_rest_handler, update}},
               {'PUT', {fake_rest_handler, update}},
               {'GET', {fake_rest_handler, show}}
             ]},{
-            "/api/users", wok_rest_handler, [
+            "/api/users", [
               {'POST', {fake_rest_handler, create}},
               {'GET', {fake_rest_handler, index}}
             ]},{
-            "/api/get", wok_rest_handler, [
+            "/api/get", [
               {'GET', {fake_rest_handler, get}}
             ]},{
-            "/about", wok_rest_handler, [
+            "/about", [
               {'GET', {fake_rest_handler, about}}
             ]},{
-            "/chat/:id/private/:idroom", wok_rest_handler, [
+            "/chat/:id/private/:idroom", [
               {'POST', {fake_rest_handler, chat}}
             ]},{
-            "/public/[...]",cowboy_static,
+            "/public/[...]", cowboy_static,
               {dir,StaticPath,
                 [{mimetypes,cow_mimetypes,all},{default_file,"index.html"}]}
             }
             ], #{static_path := StaticPath, static_route := "/public"}
           },
-           wok_rest_handler:wok_routes()
+           wok_http_handler:routes()
         )
     end
     , fun() ->
