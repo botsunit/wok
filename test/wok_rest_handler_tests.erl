@@ -2,6 +2,51 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
+meck_rest_handler() ->
+  meck:new(fake_rest_handler, [non_strict]),
+  meck:expect(fake_rest_handler, create, fun(WokReq) -> WokReq end),
+  meck:expect(fake_rest_handler, index, fun(WokReq) -> WokReq end),
+  meck:expect(fake_rest_handler, show, fun(WokReq) -> WokReq end),
+  meck:expect(fake_rest_handler, update, fun(WokReq) -> WokReq end).
+
+unmeck_rest_handler() ->
+  meck:unload(fake_rest_handler).
+
+wok_rest_handler_uncompiled_routes_test_() ->
+  {setup,
+   fun() ->
+    meck_rest_handler(),
+    ok = doteki:set_env_from_config(
+      [{wok,
+        [{rest,
+          [{routes, [
+            {namespace, "/api", [
+              {resources, users, fake_rest_handler}
+            ]}
+          ]}]
+        }]
+      }]
+    )
+   end,
+   fun(_) -> unmeck_rest_handler() end,
+   [fun() ->
+        ?assertMatch(
+          {
+            [{
+            "/api/users/:id", wok_rest_handler, [
+              {'PATCH', {fake_rest_handler, update}},
+              {'PUT', {fake_rest_handler, update}},
+              {'GET', {fake_rest_handler, show}}
+            ]},{
+            "/api/users", wok_rest_handler, [
+              {'POST', {fake_rest_handler, create}},
+              {'GET', {fake_rest_handler, index}}]}
+            ], #{static_path := [],static_route := []}
+          },
+           wok_rest_handler:wok_routes()
+        )
+    end]}.
+
 wok_rest_handler_routes_test_() ->
   {setup,
    fun() -> ok end,
