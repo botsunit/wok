@@ -86,10 +86,16 @@ render(Req, Code, Headers, View, Data) when is_integer(Code),
 %
 % <code>
 % wok_response:redirect(Req, "/logout").
+% wok_response:redirect(Req, {handler, fun}).
+% wok_response:redirect(Req, {handler, fun, #{id => 1, name => &lt;&lt;"John"&gt;&gt;}}).
 % </code>
 % @end
-redirect(Req, Path) ->
-  set_response(Req, {302, [{<<"Location">>, bucs:to_binary(Path)}], <<>>}).
+redirect(Req, Path) when is_list(Path) orelse is_binary(Path) ->
+  set_response(Req, {302, [{<<"Location">>, bucs:to_binary(Path)}], <<>>});
+redirect(Req, {Handler, Function}) ->
+  redirect(Req, wok_routes:path(Handler, Function));
+redirect(Req, {Handler, Function, Args}) ->
+  redirect(Req, wok_routes:path(Handler, Function, Args)).
 
 % @equiv set_cookie(Req, Name, Value, [])
 set_cookie(Req, Name, Value) ->

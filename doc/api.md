@@ -569,6 +569,35 @@ end
 
 ## redirect/2
 
+Redirects the browser to the specified target.
+
+The target can be :
+
+* A string. 
+```erlang
+wok_response:redirect(Req, "/logout").
+``` 
+```elixir
+Wok.Response.redirect(req, "/logout")
+```
+> will redirect to `/logout`.
+* A tuple with a  handler and a function.
+```erlang
+wok_response:redirect(Req, {handler, fun}).
+```
+```elixir
+Wok.Response.redirect(req, {:handler, :fun})
+```
+> If, in the configuration, you have `{'GET', "/my/route", {handler, get}}`, you will be redirected to `/my/route`.
+* A tuple with a handler, a function and the bindings values.
+```erlang
+wok_response:redirect(Req, {handler, fun, #{id => 1, name => <<"John">>}}).
+```
+```elixir
+Wok.Response.redirect(Req, {handler, fun, #{id => 1, name => <<"John">>}})
+```
+> If, in the configuration, you have `{'GET', "/chat/:id/user/:name", {handler, fun}}`,  you will be redirected to `/chat/1/user/John`
+
 ## set_cookie/3
 
 ## set_cookie/4
@@ -582,4 +611,18 @@ Otions = [{max_age, non_neg_integer()} | {domain, binary()} | {path, binary()} |
 ## set_headers/2
 
 ## merge_headers/2
+
+# HTTP routes API
+
+## static/0
+
+## static/1
+
+## paths/2
+
+## path/2
+
+## path/3
+
+## path/4
 

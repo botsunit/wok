@@ -51,6 +51,8 @@ Example :
 
 `
 wok_response:redirect(Req, "/logout").
+wok_response:redirect(Req, {handler, fun}).
+wok_response:redirect(Req, {handler, fun, #{id => 1, name => <<"John">>}}).
 `
 
 <a name="render-2"></a>
