@@ -157,5 +157,6 @@ Proprietary and confidential
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok.md" class="module">wok</a></td></tr>
 <tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok_request.md" class="module">wok_request</a></td></tr>
-<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok_response.md" class="module">wok_response</a></td></tr></table>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok_response.md" class="module">wok_response</a></td></tr>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/master/doc/wok_routes.md" class="module">wok_routes</a></td></tr></table>
 
