@@ -574,6 +574,7 @@ Redirects the browser to the specified target.
 The target can be :
 
 * A string. 
+
 ```erlang
 wok_response:redirect(Req, "/logout").
 ``` 
@@ -581,7 +582,9 @@ wok_response:redirect(Req, "/logout").
 Wok.Response.redirect(req, "/logout")
 ```
 > will redirect to `/logout`.
+
 * A tuple with a  handler and a function.
+
 ```erlang
 wok_response:redirect(Req, {handler, fun}).
 ```
@@ -589,7 +592,9 @@ wok_response:redirect(Req, {handler, fun}).
 Wok.Response.redirect(req, {:handler, :fun})
 ```
 > If, in the configuration, you have `{'GET', "/my/route", {handler, get}}`, you will be redirected to `/my/route`.
+
 * A tuple with a handler, a function and the bindings values.
+
 ```erlang
 wok_response:redirect(Req, {handler, fun, #{id => 1, name => <<"John">>}}).
 ```
