@@ -10,9 +10,9 @@ dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
 DEPS = lager wok_message wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid
 
 dep_lager = git https://github.com/basho/lager.git master
-dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git master
-dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
-dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
+dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git 0.0.2
+dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git 0.0.2
+dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git 0.0.2
 dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
 dep_kafe = git https://github.com/botsunit/kafe.git master
 dep_cowboy_default_static_file = git https://github.com/botsunit/cowboy_default_static_file.git master
