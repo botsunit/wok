@@ -43,19 +43,8 @@ wok_rest_handler_uncompiled_routes_test_() ->
               {'GET', {fake_rest_handler, index}}]}
             ], #{static_path := [],static_route := []}
           },
-           wok_rest_handler:uncompiled_routes()
+           wok_rest_handler:wok_routes()
         )
-    end,
-    fun() ->
-        ?assertMatch(
-           {[{'_',[],[{
-                [<<"priv">>, <<"public">>, '...'],
-                [],
-                cowboy_static,
-                {dir, "/tmp", [{mimetypes,cow_mimetypes,all}, {default_file, "index.html"}]}
-               }]}],
-            #{static_path := "/tmp",static_route := "/priv/public"}},
-           wok_rest_handler:routes([{static, "/priv/public", {dir, "/tmp"}}]))
     end]}.
 
 wok_rest_handler_routes_test_() ->

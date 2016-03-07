@@ -2,7 +2,7 @@
 -module(wok_rest_handler).
 -compile([{parse_transform, lager_transform}]).
 
--export([routes/1, uncompiled_routes/0]).
+-export([routes/1, wok_routes/0, wok_routes/1]).
 -export([init/2]).
 -export([websocket_handle/3, websocket_info/3]).
 -export([add_access_control_allow_origin/1, cors_headers/1]).
@@ -11,18 +11,17 @@
 -include("../include/wok.hrl").
 
 
-uncompiled_routes() ->
-  uncompiled_routes(
+wok_routes() ->
+  wok_routes(
     doteki:get_env([wok, rest, routes], []) ++ wok_middlewares:routes()
   ).
-uncompiled_routes(Routes) ->
-  lager:debug("Routes : ~p", [Routes]),
+wok_routes(Routes) ->
   routes(Routes, {[], #{static_path => "",
                         static_route => ""}}).
 
 routes(Routes) ->
   lager:debug("Routes : ~p", [Routes]),
-  {Routes1, Static} = uncompiled_routes(Routes),
+  {Routes1, Static} = wok_routes(Routes),
   {cowboy_router:compile([{'_', Routes1}]), Static}.
 
 init(Req, Opts) ->
