@@ -7,9 +7,10 @@ ELIXIR_BINDINGS = wok wok_request wok_response wok_routes
 
 dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
 
-DEPS = lager wok_message wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid
+DEPS = lager wok_http_adapter wok_message wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid
 
 dep_lager = git https://github.com/basho/lager.git master
+dep_wok_http_adapter = git git@gitlab.botsunit.com:msaas/wok_http_adapter.git master
 dep_wok_message = git git@gitlab.botsunit.com:msaas/wok_message.git master
 dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
 dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master

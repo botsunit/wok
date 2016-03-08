@@ -22,8 +22,11 @@
 ]).
 
 -spec reply(wok_req:wok_req()) -> term().
-reply(#wok_req{response = #wok_resp{code = C, headers = H, body = B}, request = Req}) ->
-  cowboy_req:reply(C, H, B, Req).
+reply(Req) ->
+  cowboy_req:reply(wok_req:get_response_code(Req),
+                   wok_req:get_response_headers(Req),
+                   wok_req:get_response_body(Req),
+                   Req).
 
 -spec set_cookie(wok_req:wok_req(),
                  iodata(),

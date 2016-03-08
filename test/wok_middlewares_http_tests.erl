@@ -2,6 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("bucs/include/bucassert.hrl").
+-include_lib("wok_http_adapter/include/wok_req.hrl").
 -include("../include/wok.hrl").
 
 meck_middleware_one() ->
