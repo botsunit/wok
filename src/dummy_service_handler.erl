@@ -3,23 +3,30 @@
 -compile([{parse_transform, lager_transform}]).
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
--export([my_action/2, my_answer/2]).
+-export([my_action/1, my_answer/1]).
 -export([my_service_get/1, my_service_post/1, my_service_get2/1]).
 -export([ws_init/1, ws_handle/2, ws_info/2]).
 
 % controler
 
-my_action(Message, State) ->
-  lager:info("BEGIN dummy_service_handler:my_action =>>>>>>>>>< ~p :: ~p", [Message, State]),
+my_action(Message) ->
+  lager:info("BEGIN dummy_service_handler:my_action =>>>>>>>>>< ~p :: ~p",
+             [wok_message:content(Message), wok_message:global_state(Message)]),
   timer:sleep(2000 + random:uniform(4000)),
-  lager:info("END dummy_service_handler:my_action =>>>>>>>>>< ~p", [Message]),
-  {reply, {<<"test">>, 1}, {<<"my_service/my_controler/my_answer">>, <<"Message response from my_action">>}, State}.
+  lager:info("END dummy_service_handler:my_action =>>>>>>>>>< ~p",
+             [wok_message:content(Message)]),
+  wok_message:reply(Message,
+                    {<<"test">>, 1},
+                    <<"my_service/my_controler/my_answer">>,
+                    <<"Message response from my_action">>).
 
-my_answer(Message, State) ->
-  lager:info("BEGIN dummy_service_handler:my_answer =>>>>>>>>>< ~p :: ~p", [Message, State]),
+my_answer(Message) ->
+  lager:info("BEGIN dummy_service_handler:my_answer =>>>>>>>>>< ~p :: ~p",
+             [wok_message:content(Message), wok_message:global_state(Message)]),
   timer:sleep(2000 + random:uniform(4000)),
-  lager:info("END dummy_service_handler:my_answer =>>>>>>>>>< ~p", [Message]),
-  {noreply, State}.
+  lager:info("END dummy_service_handler:my_answer =>>>>>>>>>< ~p",
+             [wok_message:content(Message)]),
+  wok_message:noreply(Message).
 
 % rest
 

@@ -3,7 +3,7 @@
 -compile([{parse_transform, lager_transform}]).
 
 -export([init/1, routes/0]).
--export([incoming_message/2, outgoing_message/2]).
+-export([incoming_message/1, outgoing_message/1]).
 -export([incoming_http/1, outgoing_http/1]).
 -export([my_dummy_get/1, my_dummy_post/1]).
 
@@ -17,13 +17,13 @@ routes() ->
    {'POST', "/dummy_post", {?MODULE, my_dummy_post}}
   ].
 
-incoming_message(Message, State) ->
-  lager:info("Middleware ingoing ~p was called - message: ~p - state: ~p", [?MODULE, Message, State]),
-  {ok, Message, State}. % {stop, Reason, State}.
+incoming_message(Message) ->
+  lager:info("Middleware ingoing ~p was called - message: ~p - state: ~p", [?MODULE, wok_message:content(Message), wok_message:local_state(Message)]),
+  {ok, Message}. % {stop, Reason, Message}.
 
-outgoing_message(Message, State) ->
-  lager:info("Middleware outgoing ~p was called - message: ~p - state: ~p", [?MODULE, Message, State]),
-  {ok, Message, State}. % {stop, Reason, State}.
+outgoing_message(Message) ->
+  lager:info("Middleware outgoing ~p was called - message: ~p - state: ~p", [?MODULE, wok_message:content(Message), wok_message:local_state(Message)]),
+  {ok, Message}. % {stop, Reason, Message}.
 
 incoming_http(WokReq) ->
   {continue, WokReq}. % WokReq

@@ -8,10 +8,25 @@
 -define(DEFAULT_MESSAGE_HANDLER, wok_message).
 -define(DEFAULT_LOCAL_QUEUE, <<"local_queue">>).
 
+-record(wok_msg_resp, {
+          reply = false,
+          from = undefined,
+          to = undefined,
+          topic = undefined,
+          body = <<>>
+         }).
+
+-record(wok_msg, {
+          message = undefined,
+          response = #wok_msg_resp{},
+          global_state = undefined,
+          local_state = undefined,
+          custom_data = undefined
+         }).
+
 -record(message_transfert, {
           key
           , message
-          , result
           , partition
           , topic
           , service

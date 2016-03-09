@@ -140,13 +140,16 @@ middlewares_message(Direction, Middlewares, MStates, Message) ->
   middlewares_message(Direction, Middlewares, {{ok, Message}, MStates}).
 
 middlewares_message(Direction, [Middleware|Middlewares], {{ok, Message}, MStates}) ->
-  case bucs:function_exist(Middleware, Direction, 2) of
+  case bucs:function_exist(Middleware, Direction, 1) of
     true ->
-      case erlang:apply(Middleware, Direction, [Message, maps:get(Middleware, MStates, nostate)]) of
-        {ok, Message1, MState} ->
-          middlewares_message(Direction, Middlewares, {{ok, Message1}, maps:put(Middleware, MState, MStates)});
-        {stop, Reason, MState} ->
-          {{stop, Middleware, Reason}, maps:put(Middleware, MState, MStates)}
+      case erlang:apply(Middleware, Direction,
+                        [wok_msg:set_local_state(Message, maps:get(Middleware, MStates, nostate))]) of
+        {ok, Message1} ->
+          middlewares_message(Direction, Middlewares,
+                              {{ok, Message1},
+                               maps:put(Middleware, wok_msg:get_local_state(Message1), MStates)});
+        {stop, Reason, Message1} ->
+          {{stop, Middleware, Reason}, maps:put(Middleware, wok_msg:get_local_state(Message1), MStates)}
       end;
     false ->
       middlewares_message(Direction, Middlewares, {{ok, Message}, MStates})

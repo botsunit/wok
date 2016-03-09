@@ -96,7 +96,7 @@ handle_call(fetch, _From, #topic{fetch_frequency = Frequency,
                         lists:foreach(fun wok_dispatcher:handle/1,
                                       [#message_transfert{
                                           key = Key,
-                                          message = Value,
+                                          message = wok_msg:set_message(wok_msg:new(), Value),
                                           topic = Topic,
                                           partition = CurrentPartition,
                                           local_queue = LocalQueue,

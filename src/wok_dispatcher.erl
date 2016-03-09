@@ -30,14 +30,14 @@ init(_Args) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({handle, #message_transfert{message = Message} = MessageTransfert}, State) ->
+handle_cast({handle, MessageTransfert}, State) ->
   try
     case erlang:apply(doteki:get_env([wok, messages, handler],
                                      ?DEFAULT_MESSAGE_HANDLER),
-                      parse, [Message]) of
-      {ok, #message{to = To} = ParsedMessage, _} ->
-        _ = consume(MessageTransfert#message_transfert{message = ParsedMessage},
-                    get_services(To, State),
+                      parse, [wok_msg:get_message(MessageTransfert)]) of
+      {ok, ParsedMessage, _} ->
+        _ = consume(wok_msg:set_message(MessageTransfert, ParsedMessage),
+                    get_services(wok_msg:get_to(ParsedMessage), State),
                     State);
       {error, Reason} ->
         lager:error("Error parsing message: ~p", [Reason]);
@@ -49,25 +49,31 @@ handle_cast({handle, #message_transfert{message = Message} = MessageTransfert}, 
       lager:error("Parser faild: ~p:~p~n~p", [Class, Reason1, erlang:get_stacktrace()])
   end,
   {noreply, State};
-handle_cast({terminate, Child, #message_transfert{result = Result,
-                                                  local_queue = LocalQueue}}, State) ->
-  case Result of
+handle_cast({terminate, Child, #message_transfert{message = Message,
+                                                  local_queue = LocalQueue} = MessageTransfert}, State) ->
+  case wok_msg:get_response(MessageTransfert) of
     noreply ->
       ok;
-    {reply, Topic, Message} ->
+    {_, _, _, _} ->
       case wok_middlewares:outgoing_message(Message) of
         {ok, Message1} ->
-          case wok:provide(Topic, Message1) of
-            {ok, _} ->
-              lager:debug("Message provided");
-            E ->
-              lager:error("Faild to provide message : ~p", [E]) % TODO: Queue message and retry later
+          MessageTransfert1 = MessageTransfert#message_transfert{message = Message1},
+          case wok_msg:get_response(MessageTransfert1) of
+            {Topic, From, To, Body} ->
+              case wok_message:provide(Topic, From, To, Body) of
+                {ok, _} ->
+                  lager:debug("Message provided");
+                E ->
+                  lager:error("Faild to provide message : ~p", [E]) % TODO: Queue message and retry later
+              end;
+            noreply ->
+              ok
           end;
         {stop, Middleware, Reason} ->
           lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason])
       end;
-    _ ->
-      lager:error("Invalid response : ~p", [Result]),
+    R ->
+      lager:error("Invalid response : ~p", [R]),
       ignore
   end,
   _ = case wok_services_sup:terminate_child(Child) of
@@ -170,8 +176,10 @@ consume(_, [], _) ->
 consume(#message_transfert{message = ParsedMessage,
                            local_queue = LocalQueue} = MessageTransfert,
         Services, #{services := ServicesActions}) ->
-  case wok_middlewares:incoming_message(ParsedMessage) of
-    {ok, ParsedMessage1} ->
+  ParsedMessage1 = wok_msg:set_local_state(ParsedMessage, undefined),
+  ParsedMessage2 = wok_msg:set_global_state(ParsedMessage1, wok_state:state()),
+  case wok_middlewares:incoming_message(ParsedMessage2) of
+    {ok, ParsedMessage3} ->
       case doteki:get_env([wok, messages, local_consumer_group],
                           doteki:get_env([wok, messages, consumer_group], undefined)) of
         undefined ->
@@ -182,12 +190,13 @@ consume(#message_transfert{message = ParsedMessage,
                             LocalConsumerGroupOffset = pipette:offset(LocalQueue,
                                                                       #{consumer => LocalConsumerGroup}),
                             MessageTransfert1 = MessageTransfert#message_transfert{
-                                                  message = ParsedMessage1,
+                                                  message = ParsedMessage3,
                                                   service = Service,
                                                   action = maps:get(Service, ServicesActions)},
+                            MessageTransfert2 = wok_msg:set_local_state(MessageTransfert1, undefined),
                             case pipette:queue(LocalQueue) of
                               {LocalQueue, LocalConsumerGroupOffset, _, _, _} ->
-                                case wok_services_sup:start_child(MessageTransfert1) of
+                                case wok_services_sup:start_child(MessageTransfert2) of
                                   {ok, Child} ->
                                     gen_server:cast(Child, serve);
                                   {queue, Data} ->
@@ -198,7 +207,7 @@ consume(#message_transfert{message = ParsedMessage,
                                 end;
                               {LocalQueue, CurrentConsumerGroupOffset, _, _, _} when
                                   CurrentConsumerGroupOffset > LocalConsumerGroupOffset ->
-                                queue(MessageTransfert1);
+                                queue(MessageTransfert2);
                               Other ->
                                 lager:error("Queue ~p error: ~p", [LocalQueue, Other])
                             end
@@ -212,7 +221,9 @@ force_consume(#message_transfert{message = ParsedMessage,
                                  service = Service,
                                  action = Action} = MessageTransfert) ->
   lager:debug("Force consume message ~p:~p(~p)", [Service, Action, ParsedMessage]),
-  case wok_services_sup:start_child(MessageTransfert) of
+  MessageTransfert1 = wok_msg:set_local_state(MessageTransfert, undefined),
+  MessageTransfert2 = wok_msg:set_global_state(MessageTransfert1, wok_state:state()),
+  case wok_services_sup:start_child(MessageTransfert2) of
     {ok, Child} ->
       gen_server:cast(Child, serve);
     {ok, Child, _} ->
@@ -224,8 +235,10 @@ force_consume(#message_transfert{message = ParsedMessage,
       error
   end.
 
-queue(#message_transfert{local_queue = LocalQueue, message = ParsedMessage} = Data) ->
-  case pipette:in(LocalQueue, Data) of
+queue(#message_transfert{local_queue = LocalQueue, message = ParsedMessage} = MessageTransfert) ->
+  MessageTransfert1 = wok_msg:set_local_state(MessageTransfert, undefined),
+  MessageTransfert2 = wok_msg:set_global_state(MessageTransfert1, undefined),
+  case pipette:in(LocalQueue, MessageTransfert2) of
     {ok, LocalOffset} ->
       lager:debug("Message ~p queued with local offset ~p", [ParsedMessage, LocalOffset]),
       ok;

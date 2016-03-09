@@ -24,22 +24,10 @@ handle_call(_Request, _From, Message) ->
   {reply, ok, Message}.
 
 handle_cast(serve, #message_transfert{message = Message,
-                                      action = {Module, Function},
-                                      service = Service} = State) ->
+                                      action = {Module, Function}} = State) ->
   lager:debug("Serve message ~p", [Message]),
-  WokState = wok_state:state(),
-  {Result, WokState1} = case erlang:apply(Module, Function, [Message, WokState]) of
-                          {noreply, RestState} ->
-                            {noreply, RestState};
-                          {reply, Topic, {Dest, Response}, RestState} ->
-                            {{reply, Topic, {Service, Dest, Response}}, RestState};
-                          {reply, Topic, Response, RestState} ->
-                            {{reply, Topic, Response}, RestState};
-                          _ ->
-                            {noreply, WokState}
-                        end,
-  State1 = State#message_transfert{result = Result},
-  _ = wok_state:state(WokState1),
+  Message1 = erlang:apply(Module, Function, [Message]),
+  State1 = State#message_transfert{message = Message1},
   _ = wok_dispatcher:finish(self(), State1),
   {noreply, State1};
 handle_cast(_Msg, Message) ->

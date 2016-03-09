@@ -1,10 +1,207 @@
 # Messages API
 
+## content/1
+
+```erlang
+wok_message:content(wok_msg:wok_msg()) -> wok_message_handler:message().
+```
+```elixir
+Wok.Message.content(wok_msg:wok_msg()) -> wok_message_handler:message()
+```
+
+## content/2
+
+```erlang
+wok_message:content(wok_msg:wok_msg(), wok_message_handler:message()) -> wok_msg:wok_msg().
+```
+```elixir
+Wok.Message.content(wok_msg:wok_msg(), wok_message_handler:message()) -> wok_msg:wok_msg()
+```
+
+## uuid/1
+
+```erlang
+wok_message:uuid(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
+```
+```elixir
+Wok.Message.uuid(wok_msg:wok_msg() | wok_message_handler:message()) -> binary()
+```
+
+## from/1
+
+```erlang
+wok_message:from(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
+```
+```elixir
+Wok.Message.from(wok_msg:wok_msg() | wok_message_handler:message()) -> binary()
+```
+
+## to/1
+
+```erlang
+wok_message:to(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
+```
+```elixir
+Wok.Message.to(wok_msg:wok_msg() | wok_message_handler:message()) -> binary()
+```
+
+## headers/1
+
+```erlang
+wok_message:headers(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
+```
+```elixir
+Wok.Message.headers(wok_msg:wok_msg() | wok_message_handler:message()) -> binary()
+```
+
+## body/1
+
+```erlang
+wok_message:body(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
+```
+```elixir
+Wok.Message.body(wok_msg:wok_msg() | wok_message_handler:message()) -> binary()
+```
+
+## global_state/1
+
+```erlang
+wok_message:global_state(wok_msg:wok_msg()) -> any().
+```
+```elixir
+Wok.Message.global_state(wok_msg:wok_msg()) -> any()
+```
+
+## local_state/1
+
+```erlang
+wok_message:local_state(wok_msg:wok_msg()) -> any().
+```
+```elixir
+Wok.Message.local_state(wok_msg:wok_msg()) -> any()
+```
+
+## custom_data/1
+
+```erlang
+wok_message:custom_data(wok_msg:wok_msg()) -> any().
+```
+```elixir
+Wok.Message.custom_data(wok_msg:wok_msg()) -> any()
+```
+
+## custom_data/2
+
+```erlang
+wok_message:custom_data(wok_msg:wok_msg(), any()) -> wok_msg:wok_msg().
+```
+```elixir
+Wok.Message.custom_data(wok_msg:wok_msg(), any()) -> wok_msg:wok_msg()
+```
+
+## noreply/1
+
+```erlang
+wok_message:noreply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
+```
+```elixir
+Wok.Message.noreply(wok_msg:wok_msg()) -> wok_msg:wok_msg()
+```
+
+## reply/4
+
+```erlang
+wok_message:reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary()) -> wok_msg:wok_msg().
+```
+```elixir
+Wok.Message.reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary()) -> wok_msg:wok_msg()
+```
+
+## reply/5
+
+```erlang
+wok_message:reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary(), binary()) -> wok_msg:wok_msg().
+```
+```elixir
+Wok.Message.reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary(), binary()) -> wok_msg:wok_msg()
+```
+
 ## provide/2
+
+```erlang
+wok_message:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+                    Message :: binary()) -> {ok, term()} | {error, term()}.
+
+% DEPRECATED
+wok:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+            Message :: binary()) -> {ok, term()} | {error, term()}.
+```
+```elixir
+Wok.Message.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+                    message :: binary()) -> {:ok, term()} | {:error, term()}
+
+# DEPRECATED
+Wok.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+            message :: binary()) -> {:ok, term()} | {:error, term()}
+```
 
 ## provide/4
 
+```erlang
+wok_message:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+                    From :: binary(),
+                    To :: binary(),
+                    Body :: term()) -> {ok, term()} | {error, term()}.
+
+% DEPRECATED
+wok:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+            From :: binary(),
+            To :: binary(),
+            Body :: term()) -> {ok, term()} | {error, term()}.
+```
+```elixir
+Wok.Message.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+                    from :: binary(),
+                    to :: binary(),
+                    body :: term()) -> {:ok, term()} | {:error, term()}
+
+# DEPRECATED
+Wok.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+            from :: binary(),
+            to :: binary(),
+            body :: term()) -> {:ok, term()} | {:error, term()}
+```
+
 ## provide/5
+
+```erlang
+wok_message:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+                    From :: binary(),
+                    To :: binary(),
+                    Body :: term(),
+                    Options :: map()) -> {ok, term()} | {error, term()}.
+
+% DEPRECATED
+wok:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+            From :: binary(),
+            To :: binary(),
+            Body :: term(),
+            Options :: map()) -> {ok, term()} | {error, term()}.
+```
+```elixir
+Wok.Message.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+                    from :: binary(),
+                    to :: binary(),
+                    body :: term(),
+                    options :: map()) -> {:ok, term()} | {:error, term()}
+
+# DEPRECATED
+Wok.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+            from :: binary(),
+            to :: binary(),
+            body :: term(),
+            options :: map()) -> {:ok, term()} | {:error, term()}
+```
 
 # HTTP Request API
 
