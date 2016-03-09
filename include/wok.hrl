@@ -5,7 +5,7 @@
 -define(DEFAULT_REST_PORT, 8080).
 -define(DEFAULT_REST_IP, "0.0.0.0").
 -define(DEFAULT_REST_MAX_CONN, 100).
--define(DEFAULT_MESSAGE_HANDLER, wok_message).
+-define(DEFAULT_MESSAGE_HANDLER, wok_default_message_handler).
 -define(DEFAULT_LOCAL_QUEUE, <<"local_queue">>).
 
 -record(wok_msg_resp, {
