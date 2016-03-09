@@ -9,12 +9,12 @@ meck_middleware_one() ->
                   {ok, X}
               end),
   meck:expect(fake_middleware_one, incoming_message,
-              fun(M, S) ->
-                  {ok, M + 1, S}
+              fun(M) ->
+                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) + 1)}
               end),
   meck:expect(fake_middleware_one, outgoing_message,
-              fun(M, S) ->
-                  {ok, M + 2, S}
+              fun(M) ->
+                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) + 2)}
               end).
 
 unmeck_middleware_one() ->
@@ -27,12 +27,12 @@ meck_middleware_two() ->
                   {ok, X}
               end),
   meck:expect(fake_middleware_two, incoming_message,
-              fun(M, S) ->
-                  {ok, M * 2, S}
+              fun(M) ->
+                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) * 2)}
               end),
   meck:expect(fake_middleware_two, outgoing_message,
-              fun(M, S) ->
-                  {ok, M * 3, S}
+              fun(M) ->
+                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) *3)}
               end).
 
 unmeck_middleware_two() ->
@@ -45,12 +45,12 @@ meck_middleware_three() ->
                   {ok, X}
               end),
   meck:expect(fake_middleware_three, incoming_message,
-              fun(_, S) ->
-                  {stop, test, S}
+              fun(X) ->
+                  {stop, test, X}
               end),
   meck:expect(fake_middleware_three, outgoing_message,
-              fun(_, S) ->
-                  {stop, test, S}
+              fun(X) ->
+                  {stop, test, X}
               end).
 
 unmeck_middleware_three() ->
@@ -111,8 +111,14 @@ wok_middelware_inout_one_test_() ->
        {with, R,
         [fun(X) -> ?assertMatch({ok, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
-         fun(_) -> ?assertMatch({ok, 2}, wok_middlewares:incoming_message(1)) end,
-         fun(_) -> ?assertMatch({ok, 3}, wok_middlewares:outgoing_message(1)) end]
+         fun(_) ->
+             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
+             ?assertEqual(2, wok_msg:get_message(M))
+         end,
+         fun(_) ->
+             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
+             ?assertEqual(2, wok_msg:get_message(M))
+         end]
        }
    end}.
 
@@ -145,8 +151,14 @@ wok_middelware_inout_one_and_two_test_() ->
         [fun(X) -> ?assertMatch({ok, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_two)) end,
-         fun(_) -> ?assertMatch({ok, 4}, wok_middlewares:incoming_message(1)) end,
-         fun(_) -> ?assertMatch({ok, 5}, wok_middlewares:outgoing_message(1)) end]
+         fun(_) ->
+             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
+             ?assertEqual(4, wok_msg:get_message(M))
+         end,
+         fun(_) ->
+             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
+             ?assertEqual(4, wok_msg:get_message(M))
+         end]
        }
    end}.
 
@@ -179,8 +191,8 @@ wok_middelware_inout_stop_test_() ->
         [fun(X) -> ?assertMatch({ok, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_three)) end,
-         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:incoming_message(1)) end,
-         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:outgoing_message(1)) end]
+         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1))) end,
+         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:outgoing_message(wok_msg:set_message(wok_msg:new(), 1))) end]
        }
    end}.
 
