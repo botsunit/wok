@@ -6,6 +6,9 @@ defmodule Wok.Message do
 	def unquote(:"content")(arg1) do
 		:erlang.apply(:"wok_message", :"content", [arg1])
 	end
+	def unquote(:"content_has_map")(arg1) do
+		:erlang.apply(:"wok_message", :"content_has_map", [arg1])
+	end
 	def unquote(:"content")(arg1, arg2) do
 		:erlang.apply(:"wok_message", :"content", [arg1, arg2])
 	end

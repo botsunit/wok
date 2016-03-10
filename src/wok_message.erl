@@ -3,6 +3,7 @@
 -export([
          content/1
          , content/2
+         , content_has_map/1
          , uuid/1
          , from/1
          , to/1
@@ -23,6 +24,10 @@
 -spec content(wok_msg:wok_msg()) -> wok_message_handler:message().
 content(Msg) ->
   wok_msg:get_message(Msg).
+
+-spec content_has_map(wok_msg:wok_msg()) -> map().
+content_has_map(Msg) ->
+  wok_msg:get_message_has_map(Msg).
 
 -spec content(wok_msg:wok_msg(), wok_message_handler:message()) -> wok_msg:wok_msg().
 content(Msg, Message) ->
