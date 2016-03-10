@@ -53,7 +53,7 @@ add_access_control_allow_credentials(Headers) ->
   case lists:keyfind(<<"Access-Control-Allow-Credentials">>, 1, Headers) of
     false ->
       [{<<"Access-Control-Allow-Credentials">>,
-        doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Credentials'], <<"false">>)}|Headers];
+        doteki:get_as_binary([wok, rest, cors, 'Access-Control-Allow-Credentials'], <<"false">>)}|Headers];
     _ ->
       Headers
   end.
