@@ -6,8 +6,6 @@
 -export([init/2]).
 -export([websocket_handle/3, websocket_info/3]).
 
--include("../include/wok.hrl").
-
 routes() ->
   routes(doteki:get_env([wok, rest, routes], []) ++ wok_middlewares:routes()).
 

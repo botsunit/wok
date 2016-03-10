@@ -1,5 +1,4 @@
 -module(wok_request).
--include("../include/wok.hrl").
 
 -export([
   custom_data/1

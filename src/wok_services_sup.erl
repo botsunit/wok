@@ -2,6 +2,7 @@
 -module(wok_services_sup).
 -compile([{parse_transform, lager_transform}]).
 -behaviour(supervisor).
+-include_lib("wok_message_handler/include/wok_message_handler.hrl").
 -include("../include/wok.hrl").
 
 -export([start_link/0, start_child/1, terminate_child/1, workers/0, available_workers/0]).

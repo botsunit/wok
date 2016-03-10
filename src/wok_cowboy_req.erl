@@ -2,7 +2,6 @@
 -module(wok_cowboy_req).
 -behaviour(wok_req).
 
--include("../include/wok.hrl").
 -export([
   reply/1
   , set_cookie/4

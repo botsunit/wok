@@ -1,5 +1,4 @@
 -module(wok).
--include("../include/wok.hrl").
 
 -export([start/0]).
 -export([provide/5, provide/4, provide/2]).
