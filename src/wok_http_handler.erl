@@ -3,7 +3,7 @@
 -compile([{parse_transform, lager_transform}]).
 
 -export([routes/0, routes/1]).
--export([add_access_control_allow_origin/1, cors_headers/1]).
+-export([add_access_control_allow_origin/1, add_access_control_allow_credentials/1, cors_headers/1]).
 
 -define(ALLOWED_METHODS, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH']).
 
@@ -45,6 +45,15 @@ add_access_control_allow_origin(Headers) ->
     false ->
       [{<<"Access-Control-Allow-Origin">>,
         doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Origin'], <<"*">>)}|Headers];
+    _ ->
+      Headers
+  end.
+
+add_access_control_allow_credentials(Headers) ->
+  case lists:keyfind(<<"Access-Control-Allow-Credentials">>, 1, Headers) of
+    false ->
+      [{<<"Access-Control-Allow-Credentials">>,
+        doteki:get_env([wok, rest, cors, 'Access-Control-Allow-Credentials'], <<"false">>)}|Headers];
     _ ->
       Headers
   end.

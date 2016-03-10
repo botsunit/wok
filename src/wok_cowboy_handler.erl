@@ -153,5 +153,6 @@ terminate_req(WokReq, Middleware) ->
 set_response_headers(WokReq) ->
   Headers = wok_req:get_response_headers(WokReq),
   Headers2 = wok_http_handler:add_access_control_allow_origin(Headers),
-  wok_req:set_response_headers(WokReq, Headers2).
+  Headers3 = wok_http_handler:add_access_control_allow_credentials(Headers2),
+  wok_req:set_response_headers(WokReq, Headers3).
 

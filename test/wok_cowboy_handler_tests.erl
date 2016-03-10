@@ -156,5 +156,23 @@ wok_cowboy_handler_CORS_default_test_() ->
                      buclists:keyfind(<<"Access-Control-Allow-Headers">>, 1, CORS)),
         ?assertMatch(<<"*">>,
                      buclists:keyfind(<<"Access-Control-Allow-Origin">>, 1, CORS))
+    end,
+    fun() ->
+        CORS = wok_http_handler:add_access_control_allow_credentials(wok_http_handler:cors_headers(<<"/test">>)),
+        ?assertMatch(<<"DELETE, PUT, POST, GET, OPTIONS">>,
+                     buclists:keyfind(<<"Access-Control-Allow-Methods">>, 1, CORS)),
+        ?assertMatch(<<"1728000">>,
+                     buclists:keyfind(<<"Access-Control-Max-Age">>, 1, CORS)),
+        ?assertMatch(<<"Access-Control-Allow-Origin, ",
+                       "Authorization, ",
+                       "Origin, ",
+                       "x-requested-with, ",
+                       "Content-Type, ",
+                       "Content-Range, ",
+                       "Content-Disposition, ",
+                       "Content-Description">>,
+                     buclists:keyfind(<<"Access-Control-Allow-Headers">>, 1, CORS)),
+        ?assertMatch(<<"false">>,
+                     buclists:keyfind(<<"Access-Control-Allow-Credentials">>, 1, CORS))
     end]}.
 
