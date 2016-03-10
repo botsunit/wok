@@ -9,6 +9,15 @@ wok_message:content(wok_msg:wok_msg()) -> wok_message_handler:message().
 Wok.Message.content(wok_msg:wok_msg()) -> wok_message_handler:message()
 ```
 
+## content_has_map/1
+
+```erlang
+wok_message:content_has_map(wok_msg:wok_msg()) -> map().
+```
+```elixir
+Wok.Message.content_has_map(wok_msg:wok_msg()) -> map()
+```
+
 ## content/2
 
 ```erlang
