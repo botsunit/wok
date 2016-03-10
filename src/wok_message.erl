@@ -35,23 +35,23 @@ content(Msg, Message) ->
 
 -spec uuid(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
 uuid(Msg) ->
-  wok_message_handler:uuid(content(Msg)).
+  wok_msg:get_uuid(content(Msg)).
 
 -spec from(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
 from(Msg) ->
-  wok_message_handler:from(content(Msg)).
+  wok_msg:get_from(content(Msg)).
 
 -spec to(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
 to(Msg) ->
-  wok_message_handler:to(content(Msg)).
+  wok_msg:get_to(content(Msg)).
 
 -spec headers(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
 headers(Msg) ->
-  wok_message_handler:headers(content(Msg)).
+  wok_msg:get_headers(content(Msg)).
 
 -spec body(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
 body(Msg) ->
-  wok_message_handler:body(content(Msg)).
+  wok_msg:get_body(content(Msg)).
 
 -spec global_state(wok_msg:wok_msg()) -> any().
 global_state(Msg) ->
