@@ -16,7 +16,7 @@
 
 routes() ->
   lists:foldl(fun({Name, Opts}, Acc) ->
-                  Acc ++ update_routes(erlang:apply(Name, routes, []), Opts, Name, [])
+                  Acc ++ update_routes(bucs:apply(Name, routes, [], []), Opts, Name, [])
               end, [], doteki:get_env([wok, middlewares], [])).
 
 start_link() ->
