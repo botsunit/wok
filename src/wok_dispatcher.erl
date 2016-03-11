@@ -25,19 +25,23 @@ finish(Child, MessageTransfert) ->
 
 init(_Args) ->
   erlang:send_after(1000, self(), fetch),
-  {ok, get_service_handlers(#{})}.
+  {ok, #{services => wok_message_path:get_message_path_handlers(
+                       doteki:get_env([wok, messages, services],
+                                      doteki:get_env([wok, messages, controlers], [])))}}.
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({handle, MessageTransfert}, State) ->
+handle_cast({handle, MessageTransfert}, #{services := Services} = State) ->
   try
     case erlang:apply(doteki:get_env([wok, messages, handler],
                                      ?DEFAULT_MESSAGE_HANDLER),
                       parse, [wok_msg:get_message(MessageTransfert)]) of
       {ok, ParsedMessage, _} ->
         _ = consume(wok_msg:set_message(MessageTransfert, ParsedMessage),
-                    get_services(wok_msg:get_to(ParsedMessage), State),
+                    wok_message_path:get_message_handlers(
+                      wok_msg:get_to(ParsedMessage),
+                      Services),
                     State);
       {error, Reason} ->
         lager:error("Error parsing message: ~p", [Reason]);
@@ -135,41 +139,6 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
-
-get_service_handlers(State) ->
-  State#{services => lists:foldl(fun({ServiceName, Handler}, Services) ->
-                                     maps:put(ServiceName, Handler, Services)
-                                 end, #{}, doteki:get_env([wok, messages, services],
-                                                          doteki:get_env([wok, messages, controlers], [])))}.
-
-get_services(To, State) when is_binary(To) ->
-  get_services([To],State);
-get_services(Tos, #{services := Services}) when is_list(Tos) ->
-  lists:foldl(fun(To, Acc) ->
-                  lists:umerge(lists:sort(Acc),
-                               lists:sort(
-                                 get_services(
-                                   binary:split(To, <<"/">>, [global]),
-                                   maps:keys(Services), [])))
-              end, [], Tos).
-
-get_services(_, [], Result) ->
-  Result;
-get_services(To, [Service|Services], Result) ->
-  get_services(To, Services, service_match(To, binary:split(bucs:to_binary(Service), <<"/">>, [global]), Service, Result)).
-
-service_match(_, [], ServiceName, Result) ->
-  [ServiceName|Result];
-service_match([], X, _, Result) when X =/= [] ->
-  Result;
-service_match([X|_], [Y|_], _, Result) when X =/= Y,
-                                            X =/= <<"*">>,
-                                            Y =/= <<"*">> ->
-  Result;
-service_match([X|To], [Y|Service], ServiceName, Result) when X == Y;
-                                                             X == <<"*">>;
-                                                             Y == <<"*">> ->
-  service_match(To, Service, ServiceName, Result).
 
 consume(_, [], _) ->
   ok;
