@@ -25,7 +25,7 @@ reply(Req) ->
   cowboy_req:reply(wok_req:get_response_code(Req),
                    wok_req:get_response_headers(Req),
                    wok_req:get_response_body(Req),
-                   Req).
+                   wok_req:get_http_req(Req)).
 
 -spec set_cookie(wok_req:wok_req(),
                  iodata(),
