@@ -102,10 +102,19 @@ Wok.Message.custom_data(wok_msg:wok_msg()) -> any()
 ## custom_data/2
 
 ```erlang
-wok_message:custom_data(wok_msg:wok_msg(), any()) -> wok_msg:wok_msg().
+wok_message:custom_data(wok_msg:wok_msg(), atom()) -> any().
 ```
 ```elixir
-Wok.Message.custom_data(wok_msg:wok_msg(), any()) -> wok_msg:wok_msg()
+Wok.Message.custom_data(wok_msg:wok_msg(), atom()) -> any()
+```
+
+## custom_data/3
+
+```erlang
+wok_message:custom_data(wok_msg:wok_msg(), atom(), any()) -> {ok, wok_req:wok_req()} | {ok, any(), wok_req:wok_req()}.
+```
+```elixir
+Wok.Message.custom_data(wok_msg:wok_msg(), atom(), any()) -> {ok, wok_req:wok_req()} | {ok, any(), wok_req:wok_req()}
 ```
 
 ## noreply/1

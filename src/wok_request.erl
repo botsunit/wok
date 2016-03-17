@@ -3,6 +3,7 @@
 -export([
   custom_data/1
   , custom_data/2
+  , custom_data/3
   , client_ip/1
   , client_port/1
   , body/1
@@ -35,11 +36,29 @@ custom_data(Req) ->
   wok_req:get_custom_data(Req).
 
 % @doc
-% This function sets wok_req's custom data
+% Return the value for the <tt>Key</tt> in wok_req's custom data
 % @end
--spec custom_data(wok_req:wok_req(), term()) -> wok_req:wok_req().
-custom_data(Req, Data) ->
-  wok_req:set_custom_data(Req, Data).
+-spec custom_data(Req :: wok_req:wok_req(), Key :: atom()) -> any().
+custom_data(Req, Key) when is_atom(Key) ->
+  #{Key := Data} = wok_req:get_custom_data(Req),
+  Data.
+
+% @doc
+% Set the <tt>Value</tt> for the <tt>Key</tt> in wok_req's custom data.
+%
+% Return <tt>{ok, Req2}</tt> if the <tt>Key</tt> does not exist in custom data,
+% or <tt>{ok, OldData, Req2}</tt> if <tt>Key</tt> already exist in custom data.
+% @end
+-spec custom_data(Req :: wok_req:wok_req(), Key :: atom(), Value :: any()) ->
+  {ok, wok_req:wok_req()}
+  | {ok, wok_req:wok_req(), any()}.
+custom_data(Req, Key, Value) when is_atom(Key) ->
+  case wok_req:get_custom_data(Req) of
+    #{Key := Old} = CustomData ->
+      {ok, Old, wok_req:set_custom_data(Req, maps:put(Key, Value, CustomData))};
+    CustomData ->
+      {ok, wok_req:set_custom_data(Req, maps:put(Key, Value, CustomData))}
+  end.
 
 % @doc
 % @end
