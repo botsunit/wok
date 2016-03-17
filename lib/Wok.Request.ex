@@ -9,6 +9,9 @@ defmodule Wok.Request do
 	def unquote(:"custom_data")(arg1, arg2) do
 		:erlang.apply(:"wok_request", :"custom_data", [arg1, arg2])
 	end
+	def unquote(:"custom_data")(arg1, arg2, arg3) do
+		:erlang.apply(:"wok_request", :"custom_data", [arg1, arg2, arg3])
+	end
 	def unquote(:"client_ip")(arg1) do
 		:erlang.apply(:"wok_request", :"client_ip", [arg1])
 	end
