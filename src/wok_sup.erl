@@ -15,21 +15,36 @@ init([Static]) ->
   Childs = [?CHILD(wok_state, [Static], worker, 5000),
             ?CHILD(wok_middlewares, [], worker, 5000),
             ?CHILD(wok_plugins, [], worker, 5000)] ++
-           case doteki:get_env([wok, messages]) of
-             undefined ->
-               [];
-             _ ->
-               [?CHILD(wok_messages_sup, [], supervisor, infinity)]
-           end ++
-           case doteki:get_env([wok, rest]) of
-             undefined ->
-               [];
-             _ ->
-               [?CHILD(wok_rest_sup, [], supervisor, infinity)]
-           end,
+            case doteki:get_env([wok, messages]) of
+              undefined ->
+                [];
+              _ ->
+                [?CHILD(wok_messages_sup, [], supervisor, infinity)]
+            end ++
+            case doteki:get_env([wok, rest]) of
+              undefined ->
+                [];
+              _ ->
+                [?CHILD(wok_rest_sup, [], supervisor, infinity)]
+            end ++ custom_servers(),
   {ok, {
      {one_for_one, 5, 10},
      Childs
     }
   }.
+
+custom_servers() ->
+  case doteki:get_env([wok, start]) of
+    undefined ->
+      [];
+    Starts ->
+      lists:map(fun
+                  ({Module, Args, worker}) ->
+                    ?CHILD(Module, Args, worker, 5000);
+                  ({Module, Args, supervisor}) ->
+                    ?CHILD(Module, Args, supervisor, infinity);
+                  ({Module, Args}) ->
+                    ?CHILD(Module, Args, worker, 5000)
+                end, Starts)
+  end.
 
