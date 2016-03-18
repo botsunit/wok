@@ -26,7 +26,7 @@ init([Static]) ->
                 [];
               _ ->
                 [?CHILD(wok_rest_sup, [], supervisor, infinity)]
-            end ++ custom_servers(),
+            end ++ custom_servers() ++ middlewares_servers(),
   {ok, {
      {one_for_one, 5, 10},
      Childs
@@ -34,17 +34,25 @@ init([Static]) ->
   }.
 
 custom_servers() ->
-  case doteki:get_env([wok, start]) of
-    undefined ->
-      [];
-    Starts ->
-      lists:map(fun
-                  ({Module, Args, worker}) ->
-                    ?CHILD(Module, Args, worker, 5000);
-                  ({Module, Args, supervisor}) ->
-                    ?CHILD(Module, Args, supervisor, infinity);
-                  ({Module, Args}) ->
-                    ?CHILD(Module, Args, worker, 5000)
-                end, Starts)
-  end.
+  servers(doteki:get_env([wok, start], [])).
+
+middlewares_servers() ->
+  lists:foldl(fun({_, Options}, Acc) ->
+                  case lists:keyfind(start, 1, Options) of
+                    false ->
+                      Acc;
+                    {start, Servers} ->
+                      Acc ++ servers(Servers)
+                  end
+            end, [], doteki:get_env([wok, middlewares], [])).
+
+servers(Servers) ->
+  lists:map(fun
+              ({Module, Args, worker}) ->
+                ?CHILD(Module, Args, worker, 5000);
+              ({Module, Args, supervisor}) ->
+                ?CHILD(Module, Args, supervisor, infinity);
+              ({Module, Args}) ->
+                ?CHILD(Module, Args, worker, 5000)
+            end, Servers).
 
