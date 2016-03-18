@@ -70,12 +70,11 @@ render(Req, Code, Headers, View, Data) when is_integer(Code),
                                             (is_list(Headers) orelse is_map(Headers)),
                                             (is_atom(View) orelse is_list(View) orelse is_binary(View)),
                                             (is_list(Data) orelse is_map(Data)) ->
-  View1 = template_module(View),
-  Result = case erlang_template(View1) of
-             true ->
-               wok_erlang_template_helpers:render(Code, Headers, View1, Data);
-             Other -> % TODO : elixir template
-               {500, [], bucs:to_binary(Other)} % TODO
+  Result = case template_engine(View) of
+             {ok, TemplateEngine} ->
+               erlang:apply(TemplateEngine, render, [Code, Headers, View, Data]);
+             error ->
+               {500, [], <<"Template engine not found">>}
            end,
   set_response(Req, Result).
 
@@ -126,25 +125,17 @@ merge_headers(Req, Headers) ->
                                               Headers,
                                               wok_req:get_response_headers(Req))).
 
-% Private
+% private
 
-erlang_template(View) ->
-  case code:ensure_loaded(wok_erlang_template_helpers) of
-    {module, wok_erlang_template_helpers} ->
-      case code:ensure_loaded(View) of
-        {module, View} -> true;
-        _ -> missing_template
-      end;
-    _ -> missing_template_helpers
-  end.
+template_engine(View) when is_list(View) ->
+  [Ext|_] = lists:reverse(string:tokens(View, "._")),
+  Engine = bucs:to_atom("wok_" ++ Ext ++ "_engine"),
+  case code:ensure_loaded(Engine) of
+    {module, Engine} ->
+      {ok, Engine};
+    _ ->
+      error
+  end;
+template_engine(View) ->
+  template_engine(bucs:to_string(View)).
 
-template_module(Template) when is_atom(Template) ->
-  Template;
-template_module(Template) when is_list(Template);
-                               is_binary(Template) ->
-  bucs:pipecall([
-                 {fun bucs:to_list/1, [Template]},
-                 {fun re:replace/4, ["/", "_", [{return, list}, global]]},
-                 {fun re:replace/4, ["\\.", "_", [{return, list}, global]]},
-                 fun bucs:to_atom/1
-                ]).
