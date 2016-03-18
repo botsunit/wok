@@ -1,10 +1,9 @@
 0.2.0 (un released) :
   * Custom data is a map and can only be set by key
 
-  * Rewrite template engine
-    wok_erlang_templates is deprecated, use wok_tmpl_engine
+  * Rewrite template engine. wok_erlang_templates is deprecated, use wok_tmpl_engine
 
-  * Add possibility to start a server on wok start.
+  * Add possibility to start a server on wok start or with a middleware.
     
 0.1.1:
   * Assmume that routes/0 in middlewares is mandatory
