@@ -120,10 +120,12 @@ set_headers(Req, Headers) ->
   wok_req:set_response_headers(Req, Headers).
 
 merge_headers(Req, Headers) ->
-  wok_req:set_response_headers(Req,
-                               lists:keymerge(1,
-                                              Headers,
-                                              wok_req:get_response_headers(Req))).
+  wok_req:set_response_headers(
+    Req,
+    buclists:merge_keylists(
+      1,
+      Headers,
+      wok_req:get_response_headers(Req))).
 
 % private
 
