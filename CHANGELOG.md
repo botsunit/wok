@@ -4,6 +4,14 @@
   * Rewrite template engine. wok_erlang_templates is deprecated, use wok_tmpl_engine
 
   * Add possibility to start a server on wok start or with a middleware.
+
+  * Ussue #6 : Update wok_response:merge_headers/2
+
+  * wok_erlang_template is deprecated
+
+  * Add wok_tmpl_engine
+
+  * Add wok_i18n
     
 0.1.1:
   * Assmume that routes/0 in middlewares is mandatory
