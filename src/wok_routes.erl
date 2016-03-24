@@ -94,6 +94,9 @@ paths(Handler, Function) when is_atom(Handler),
                                        ({Verb, {Handler1, Function1}}, Acc2)
                                          when Handler1 == Handler,
                                               Function1 == Function -> [{Verb, Path}|Acc2];
+                                       ({Verb, {Handler1, Function1}, _}, Acc2)
+                                         when Handler1 == Handler,
+                                              Function1 == Function -> [{Verb, Path}|Acc2];
                                        (_, Acc2) -> Acc2
                                      end, [], Handlers);
                 (_, Acc) -> % Because of static handler
