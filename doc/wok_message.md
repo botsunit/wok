@@ -9,7 +9,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-1">content/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-2">content/2</a></td><td></td></tr><tr><td valign="top"><a href="#content_has_map-1">content_has_map/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td></td></tr><tr><td valign="top"><a href="#from-1">from/1</a></td><td></td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#noreply-1">noreply/1</a></td><td></td></tr><tr><td valign="top"><a href="#provide-2">provide/2</a></td><td>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-1">content/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-2">content/2</a></td><td></td></tr><tr><td valign="top"><a href="#content_has_map-1">content_has_map/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-3">custom_data/3</a></td><td></td></tr><tr><td valign="top"><a href="#from-1">from/1</a></td><td></td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#noreply-1">noreply/1</a></td><td></td></tr><tr><td valign="top"><a href="#provide-2">provide/2</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-4">provide/4</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-5">provide/5</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#reply-4">reply/4</a></td><td></td></tr><tr><td valign="top"><a href="#reply-5">reply/5</a></td><td></td></tr><tr><td valign="top"><a href="#to-1">to/1</a></td><td></td></tr><tr><td valign="top"><a href="#uuid-1">uuid/1</a></td><td></td></tr></table>
@@ -60,7 +60,7 @@ content_has_map(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&
 ### custom_data/1 ###
 
 <pre><code>
-custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; any()
+custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; #{}
 </code></pre>
 <br />
 
@@ -69,7 +69,16 @@ custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; 
 ### custom_data/2 ###
 
 <pre><code>
-custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Data::any()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Key::atom()) -&gt; any()
+</code></pre>
+<br />
+
+<a name="custom_data-3"></a>
+
+### custom_data/3 ###
+
+<pre><code>
+custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Key::atom(), Value::any()) -&gt; {ok, <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, any()} | {ok, <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>}
 </code></pre>
 <br />
 
