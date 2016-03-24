@@ -13,6 +13,7 @@
          , local_state/1
          , custom_data/1
          , custom_data/2
+         , custom_data/3
          , noreply/1
          , reply/4
          , reply/5
@@ -61,13 +62,24 @@ global_state(Msg) ->
 local_state(Msg) ->
   wok_msg:get_local_state(Msg).
 
--spec custom_data(wok_msg:wok_msg()) -> any().
+-spec custom_data(wok_msg:wok_msg()) -> map().
 custom_data(Msg) ->
-  wok_msg:set_custom_data(Msg).
+  wok_msg:get_custom_data(Msg).
 
--spec custom_data(wok_msg:wok_msg(), any()) -> wok_msg:wok_msg().
-custom_data(Msg, Data) ->
-  wok_msg:set_custom_data(Msg, Data).
+-spec custom_data(wok_msg:wok_msg(), atom()) -> any().
+custom_data(Msg, Key) when is_atom(Key) ->
+  #{Key := Data} = wok_msg:get_custom_data(Msg),
+  Data.
+
+-spec custom_data(wok_msg:wok_msg(), atom(), any()) -> {ok, wok_msg:wok_msg(), any()}
+                                                       | {ok, wok_msg:wok_msg()}.
+custom_data(Msg, Key, Value) when is_atom(Key) ->
+  case wok_msg:get_custom_data(Msg) of
+    #{Key := Old} = CustomData ->
+      {ok, Old, wok_msg:set_custom_data(Msg, maps:put(Key, Value, CustomData))};
+    CustomData ->
+      {ok, wok_msg:set_custom_data(Msg, maps:put(Key, Value, CustomData))}
+  end.
 
 -spec noreply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
 noreply(Msg) ->
