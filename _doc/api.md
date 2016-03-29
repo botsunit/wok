@@ -832,9 +832,24 @@ Wok.Response.redirect(Req, {:handler, :fun, %{id => 1, name => <<"John">>}})
 
 ## set_cookie/3
 
+Options : 
+
+* `max_age :: non_neg_integer()`
+* `domain :: binary()`
+* `path :: binary()`
+* `secure :: boolean()`
+* `http_only :: boolean()`
+
 ## set_cookie/4
 
-Otions = [{max_age, non_neg_integer()} | {domain, binary()} | {path, binary()} | {secure, boolean()} | {http_only, boolean()}]
+Options : 
+
+* `max_age :: non_neg_integer()`
+* `domain :: binary()`
+* `path :: binary()`
+* `secure :: boolean()`
+* `http_only :: boolean()`
+
 
 ## delete_cookie/2
 
