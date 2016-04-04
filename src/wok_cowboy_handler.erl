@@ -2,17 +2,13 @@
 -module(wok_cowboy_handler).
 -compile([{parse_transform, lager_transform}]).
 
--export([routes/0, routes/1]).
+-export([routes/0]).
 -export([init/2]).
 -export([websocket_handle/3, websocket_info/3]).
 
 routes() ->
-  routes(wok_middlewares:routes() ++ doteki:get_env([wok, rest, routes], [])).
-
-routes(Routes) ->
-  lager:debug("Routes : ~p", [Routes]),
-  {Routes1, Static} = wok_http_handler:routes(Routes),
-  {cowboy_router:compile([{'_', compile(Routes1)}]), Static}.
+  {Routes, Static} = wok_http_handler:routes(),
+  {cowboy_router:compile([{'_', compile(Routes)}]), Static}.
 
 init(Req, Opts) ->
   Path = cowboy_req:path(Req),

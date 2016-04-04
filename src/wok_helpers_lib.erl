@@ -24,5 +24,10 @@ static([Data]) ->
 
 route([Module, Function]) ->
   wok_routes:path(bucs:to_atom(Module),
-                  bucs:to_atom(Function)).
+                  bucs:to_atom(Function));
+route([Verb, Module, Function]) ->
+  wok_routes:path(
+    bucs:to_atom(Verb),
+    bucs:to_atom(Module),
+    bucs:to_atom(Function)).
 
