@@ -7,7 +7,7 @@
 -export([websocket_handle/3, websocket_info/3]).
 
 routes() ->
-  routes(doteki:get_env([wok, rest, routes], []) ++ wok_middlewares:routes()).
+  routes(wok_middlewares:routes() ++ doteki:get_env([wok, rest, routes], [])).
 
 routes(Routes) ->
   lager:debug("Routes : ~p", [Routes]),
