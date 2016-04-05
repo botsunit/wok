@@ -18,6 +18,7 @@
   , post_values/1
   , get_values/1
   , binding_values/1
+  , get_file/1
 ]).
 
 -spec reply(wok_req:wok_req()) -> term().
@@ -100,4 +101,32 @@ get_values(Req) ->
                                            | {error, wok_req:wok_req()}.
 binding_values(Req) ->
   {ok, cowboy_req:bindings(wok_req:get_http_req(Req)), Req}.
+
+-spec get_file(wok_req:wok_req()) -> {ok, binary(), binary(), binary(), wok_req:wok_req()}
+                                     | {no_file, wok_req:wok_req()}.
+get_file(Req) ->
+  case cowboy_req:part(wok_req:get_http_req(Req)) of
+    {ok, Headers, CowboyReq2} ->
+      {Data, CowboyReq3} = get_file_data(CowboyReq2),
+      case cow_multipart:form_data(Headers) of
+        {file, _, Filename, ContentType, _} ->
+          {ok, Filename, ContentType, Data, wok_req:set_http_req(Req, CowboyReq3)};
+        _ ->
+          {no_file, wok_req:set_http_req(Req, CowboyReq3)}
+      end;
+    {done, CowboyReq2} ->
+      {no_file, wok_req:set_http_req(Req, CowboyReq2)}
+  end.
+
+get_file_data(CowboyReq) ->
+  get_file_data(CowboyReq, <<>>).
+
+get_file_data(CowboyReq, Acc) ->
+  case cowboy_req:part_body(CowboyReq) of
+    {ok, Data, CowboyReq2} ->
+      {<<Acc/binary, Data/binary>>, CowboyReq2};
+    {more, Data, CowboyReq2} ->
+      get_file_data(CowboyReq2, <<Acc/binary, Data/binary>>)
+  end.
+
 

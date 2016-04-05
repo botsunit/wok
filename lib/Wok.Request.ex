@@ -78,4 +78,7 @@ defmodule Wok.Request do
 	def unquote(:"handler")(arg1) do
 		:erlang.apply(:"wok_request", :"handler", [arg1])
 	end
+	def unquote(:"file")(arg1) do
+		:erlang.apply(:"wok_request", :"file", [arg1])
+	end
 end

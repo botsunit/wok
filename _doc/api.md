@@ -548,6 +548,26 @@ wok_request:global_state(Req :: wok_req:wok_req(), State :: any()) -> wok_req:wo
 Wok.Request.global_state(req :: wok_req:wok_req(), state :: any()) -> wok_req:wok_req().
 ```
 
+## file/1
+
+Return uploaded file informations and data.
+
+```erlang
+wok_request:file(Req :: wok_req:wok_req()) -> {ok, Filename :: binary(), 
+                                                   ContentType :: binary(), 
+                                                   Data :: binary(), 
+                                                   wok_req:wok_req()}
+                                              | {no_file, wok_req:wok_req()}.
+```
+
+```erlang
+Wok.Request.file(req :: wok_req:wok_req()) -> {:ok, filename :: binary(), 
+                                                    content_type :: binary(), 
+                                                    data :: binary(), 
+                                                    wok_req:wok_req()}
+                                              | {:no_file, wok_req:wok_req()}
+```
+
 # HTTP Response API
 
 ## render/2

@@ -26,6 +26,7 @@
   , global_state/1
   , global_state/2
   , handler/1
+  , file/1
 ]).
 
 % @doc
@@ -227,6 +228,13 @@ global_state(WokReq, GlobalState) ->
 -spec handler(wok_req:wok_req()) -> pid().
 handler(WokReq) ->
   wok_req:get_handler(WokReq).
+
+% @doc
+% @end
+-spec file(wok_req:wok_req()) -> {ok, binary(), binary(), binary(), wok_req:wok_req()}
+                                 | {no_file, wok_req:wok_req()}.
+file(WokReq) ->
+  wok_req:get_file(WokReq).
 
 % Private
 
