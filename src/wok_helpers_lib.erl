@@ -1,5 +1,6 @@
 % @hidden
 -module(wok_helpers_lib).
+-compile([{parse_transform, lager_transform}]).
 
 % Mandatory
 -export([filters/0, tags/0]).
@@ -29,5 +30,11 @@ route([Verb, Module, Function]) ->
   wok_routes:path(
     bucs:to_atom(Verb),
     bucs:to_atom(Module),
-    bucs:to_atom(Function)).
+    bucs:to_atom(Function));
+route([Verb, Module, Function|Params]) ->
+  wok_routes:path(
+    bucs:to_atom(Verb),
+    bucs:to_atom(Module),
+    bucs:to_atom(Function),
+    maps:from_list(Params)).
 
