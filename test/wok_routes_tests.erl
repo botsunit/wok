@@ -38,32 +38,39 @@ routes_test_() ->
    fun(_) -> unmeck_rest_handler() end,
    [fun() ->
         ?assertMatch(
-          {
-            [{
-            "/api/users/:id", [
-              {'PATCH', {fake_rest_handler, update}},
-              {'PUT', {fake_rest_handler, update}},
-              {'GET', {fake_rest_handler, show}}
-            ]},{
-            "/api/users", [
-              {'POST', {fake_rest_handler, create}},
-              {'GET', {fake_rest_handler, index}}
-            ]},{
-            "/api/get", [
-              {'GET', {fake_rest_handler, get}}
-            ]},{
-            "/about", [
-              {'GET', {fake_rest_handler, about}}
-            ]},{
-            "/chat/:id/private/:idroom", [
-              {'POST', {fake_rest_handler, chat}}
-            ]},{
-            "/public/[...]", cowboy_static,
+           {
+            [
+             {
+              "/public/[...]", cowboy_static,
               {dir,StaticPath,
-                [{mimetypes,cow_mimetypes,all},{default_file,"index.html"}]}
-            }
-            ], #{static_path := StaticPath, static_route := "/public"}
-          },
+               [{mimetypes,cow_mimetypes,all},{default_file,"index.html"}]}
+             },
+             {
+              "/chat/:id/private/:idroom", [
+                                            {'POST', {fake_rest_handler, chat}}
+                                           ]},
+             {
+              "/api/users/:id", [
+                                 {'PATCH', {fake_rest_handler, update}},
+                                 {'PUT', {fake_rest_handler, update}},
+                                 {'GET', {fake_rest_handler, show}}
+                                ]},
+             {
+              "/api/users", [
+                             {'POST', {fake_rest_handler, create}},
+                             {'GET', {fake_rest_handler, index}}
+                            ]},
+             {
+              "/api/get", [
+                           {'GET', {fake_rest_handler, get}}
+                          ]},
+             {
+              "/about", [
+                         {'GET', {fake_rest_handler, about}}
+                        ]}
+            ],
+            #{static_path := StaticPath, static_route := "/public"}
+           },
            wok_http_handler:routes()
         )
     end

@@ -8,6 +8,9 @@
 -define(ALLOWED_METHODS, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH']).
 
 routes() ->
+  routes(wok_middlewares:routes() ++ doteki:get_env([wok, rest, routes], [])).
+
+routes(Routes) ->
   routes(
     lists:sort(fun
                  ({_,A,_,_}, {_,B,_,_}) ->
@@ -19,11 +22,9 @@ routes() ->
                  ({_,A,_}, {_,B,_}) ->
                    A > B
                end,
-               wok_middlewares:routes() ++ doteki:get_env([wok, rest, routes], []))).
-
-routes(Routes) ->
-  routes(Routes, {[], #{static_path => "",
-                        static_route => ""}}).
+               Routes),
+    {[], #{static_path => "",
+           static_route => ""}}).
 
 cors_headers(Path) ->
   [
