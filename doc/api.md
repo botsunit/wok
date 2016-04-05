@@ -560,7 +560,7 @@ wok_request:file(Req :: wok_req:wok_req()) -> {ok, Filename :: binary(),
                                               | {no_file, wok_req:wok_req()}.
 ```
 
-```erlang
+```elixir
 Wok.Request.file(req :: wok_req:wok_req()) -> {:ok, filename :: binary(), 
                                                     content_type :: binary(), 
                                                     data :: binary(), 
