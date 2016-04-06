@@ -12,7 +12,7 @@ digraph wok_deps {
   wok_message_handler[label="wok_message_handler\n(0.1.1)", style="filled", fillcolor="red"];
   wok_producer[label="wok_producer\n(0.1.1)", style="filled", fillcolor="red"];
   pipette[label="pipette\n(master)", style="filled", fillcolor="red"];
-  kafe[label="kafe\n(master)", style="filled", fillcolor="red"];
+  kafe[label="kafe\n(1.0.2)", style="filled", fillcolor="red"];
   cowboy[label="cowboy\n(2.0.0-pre.3)"];
   cowboy_default_static_file[label="cowboy_default_static_file\n(master)", style="filled", fillcolor="red"];
   bucs[label="bucs\n(master)", style="filled", fillcolor="red"];
