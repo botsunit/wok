@@ -23,6 +23,8 @@
 
   * [wok_http_adapter 0.0.3]: Remove old cowboy references
 
+  * Kafe 1.0.2
+
 0.2.0:
   * Custom data is a map and can only be set by key
 
