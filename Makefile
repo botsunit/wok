@@ -1,5 +1,7 @@
 PROJECT = wok
 
+.PHONY = images/wok.deps.png images/wok.call.png
+
 DEP_PLUGINS = mix.mk
 BUILD_DEPS = mix.mk
 ELIXIR_VERSION = ~> 1.2
@@ -54,10 +56,10 @@ docs:: edoc images/wok.call.png images/wok.deps.png _doc/doc.yml
 	@${CP} images/*.png doc/images
 	@${CP} _doc/* doc
 
-wok.call.png: images/wok.call.gv
+images/wok.call.png: images/wok.call.gv
 	@dot -T png -o images/wok.call.png images/wok.call.gv
 
-wok.deps.png: images/wok.deps.gv
+images/wok.deps.png: images/wok.deps.gv
 	@dot -T png -o images/wok.deps.png images/wok.deps.gv
 
 dev: deps app

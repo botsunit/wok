@@ -18,7 +18,7 @@ digraph wok_deps {
   bucs[label="bucs\n(master)"];
   doteki[label="doteki\n(master)"];
   uuid[label="erlang-uuid\n(master)"];
-  mix_mk[label="mix.mk\(master)"];
+  mix_mk[label="mix.mk\n(master)"];
   edown[label="edown\n(master)"];
   meck[label="meck\n(master)"];
   wok_tests[label="wok_tests\n(0.0.5)"];
