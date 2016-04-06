@@ -27,6 +27,7 @@
   , global_state/2
   , handler/1
   , file/1
+  , file/3
 ]).
 
 % @doc
@@ -235,6 +236,15 @@ handler(WokReq) ->
                                  | {no_file, wok_req:wok_req()}.
 file(WokReq) ->
   wok_req:get_file(WokReq).
+
+% @doc
+% @end
+-type get_file_callback() :: fun((binary(), binary(), binary(), term()) ->{ok, term()} | {error, term(), term()}).
+-spec file(wok_req:wok_req(), get_file_callback(), term()) -> {ok, term(), wok_req:wok_req()}
+                                                              | {error, term(), term(), wok_req:wok_req()}
+                                                              | {no_file, term(), wok_req:wok_req()}.
+file(WokReq, Fun, Acc) ->
+  wok_req:get_file(WokReq, Fun, Acc).
 
 % Private
 
