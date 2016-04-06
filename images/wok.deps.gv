@@ -1,0 +1,108 @@
+digraph wok_deps {
+  node[shape=box];
+  graph[
+    overlap=false,
+    splines=spline;
+    rankdir=LR;
+  ]
+
+  wok[label="wok\n(0.2.1)"];
+  lager[label="lager\n(master)"];
+  wok_http_adapter[label="wok_http_adapter\n(0.0.3)"];
+  wok_message_handler[label="wok_message_handler\n(0.1.1)"];
+  wok_producer[label="wok_producer\n(0.1.1)"];
+  pipette[label="pipette\n(master)"];
+  kafe[label="kafe\n(master)"];
+  cowboy[label="cowboy\n(2.0.0-pre.3)"];
+  cowboy_default_static_file[label="cowboy_default_static_file\n(master)"];
+  bucs[label="bucs\n(master)"];
+  doteki[label="doteki\n(master)"];
+  uuid[label="erlang-uuid\n(master)"];
+  mix_mk[label="mix.mk\(master)"];
+  edown[label="edown\n(master)"];
+  meck[label="meck\n(master)"];
+  wok_tests[label="wok_tests\n(0.0.5)"];
+  goldrush[label="goldrush\n(0.1.8)"];
+  cowlib[label="cowlib\n(master)"];
+  ranch[label="ranch\n(1.1.0)"];
+  gun[label="gun\n(master)"];
+  ct_helper[label="ct_helper\n(master)"];
+  hackney[label="hackney\n(>= 0.12.0)"];
+  horse[label="horse\n(master)"];
+  triq[label="triq\n(master)"];
+
+  wok -> lager;
+  wok -> wok_http_adapter;
+  wok -> wok_message_handler;
+  wok -> wok_producer;
+  wok -> pipette;
+  wok -> kafe;
+  wok -> cowboy;
+  wok -> cowboy_default_static_file;
+  wok -> bucs;
+  wok -> doteki;
+  wok -> uuid;
+  wok-> mix_mk[style=dotted];
+  wok-> edown[style=dotted];
+  wok-> wok_tests[style=dotted];
+  wok-> meck[style=dotted];
+
+  lager -> goldrush;
+
+  wok_http_adapter -> mix_mk[style=dotted];
+
+  wok_message_handler -> bucs;
+  wok_message_handler -> doteki;
+  wok_message_handler -> mix_mk[style=dotted];
+
+  wok_producer -> wok_message_handler;
+  wok_producer -> kafe;
+  wok_producer -> bucs;
+  wok_producer -> doteki;
+  wok_producer -> uuid;
+  wok_producer -> edown[style=dotted];
+  wok_producer -> meck[style=dotted];
+  wok_producer -> mix_mk[style=dotted];
+
+  pipette -> lager;
+  pipette -> bucs;
+  pipette -> doteki;
+  pipette -> uuid;
+  pipette -> edown[style=dotted];
+  pipette -> mix_mk[style=dotted];
+
+  kafe -> lager;
+  kafe -> bucs;
+  kafe -> doteki;
+  kafe -> edown[style=dotted];
+
+  cowboy -> cowlib;
+  cowboy -> ranch;
+  cowboy -> ct_helper[style=dotted];
+  cowboy -> gun[style=dotted];
+
+  cowboy_default_static_file -> bucs;
+  cowboy_default_static_file -> cowboy[style=dotted];
+
+  bucs -> edown[style=dotted];
+
+  doteki -> bucs;
+  doteki -> edown[style=dotted];
+
+  wok_tests -> bucs;
+  wok_tests -> wok_http_adapter;
+  wok_tests -> wok_message_handler;
+  wok_tests -> doteki;
+  wok_tests -> hackney;
+  wok_tests -> edown[style=dotted];
+  wok_tests -> meck[style=dotted];
+
+  cowlib -> horse;
+  cowlib -> triq;
+
+  ranch -> ct_helper[style=dotted];
+
+  gun -> cowlib;
+  gun -> ranch;
+  gun -> ct_helper[style=dotted];
+}

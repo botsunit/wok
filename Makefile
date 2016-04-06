@@ -49,13 +49,16 @@ EUNIT_OPTS = verbose, {report, {eunit_surefire, [{dir, "test"}]}}
 
 include erlang.mk
 
-docs:: edoc images/wok.call.png _doc/doc.yml
+docs:: edoc images/wok.call.png images/wok.deps.png _doc/doc.yml
 	@${MKDIR_P} doc/images
 	@${CP} images/*.png doc/images
 	@${CP} _doc/* doc
 
 wok.call.png: images/wok.call.gv
 	@dot -T png -o images/wok.call.png images/wok.call.gv
+
+wok.deps.png: images/wok.deps.gv
+	@dot -T png -o images/wok.deps.png images/wok.deps.gv
 
 dev: deps app
 	@erl -pa ebin include deps/*/ebin deps/*/include -config config/${PROJECT}.config
