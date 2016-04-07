@@ -109,8 +109,9 @@ binding_values(Req) ->
 get_file(Req) ->
   get_file(Req, fun(_, _, Data, Acc) -> <<Acc/binary, Data/binary>> end, <<>>).
 
-%-spec get_file(wok_req:wok_req(), binary() | list() | pid() ) -> {:ok}
-
+-spec get_file(wok_req:wok_req(), get_file_callback() | list() | pid()) -> {ok, list() | pid() | term(), wok_req:wok_req()}
+                                                                            | {error, term(), woq_req:wok_req()}
+                                                                            | {no_file, wok_req:wok_req()}.
 get_file(Req, FileName) when is_list(FileName) ->
   {ok, FilePid} = file:open(FileName, [append]),
   Return = case get_file(Req,FilePid) of
@@ -126,11 +127,14 @@ get_file(Req, FilePid) when is_pid(FilePid) ->
   case get_file(Req, AppendToFileFn, <<>>) of
     {ok, _, _, ok, Req2} -> {ok, FilePid, Req2};
     Error -> Error
-  end.
+  end;
+get_file(Req, Function) when is_function(Function) ->
+  get_file(Req, Function, <<>>).
 
 -type get_file_callback() :: fun((binary(), binary(), binary(), term()) ->{ok, term()} | {error, term(), term()}).
 -spec get_file(wok_req:wok_req(), get_file_callback(), any()) -> {ok, binary(), binary(), binary(), wok_req:wok_req()}
-                                                          | {no_file, wok_req:wok_req()}.
+                                                                 | {no_file, wok_req:wok_req()}.
+
 get_file(Req, Function, Acc) ->
   case cowboy_req:part(wok_req:get_http_req(Req)) of
     {ok, Headers, CowboyReq2} ->
