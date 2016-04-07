@@ -27,6 +27,7 @@
   , global_state/2
   , handler/1
   , file/1
+  , file/2
   , file/3
 ]).
 
@@ -236,6 +237,13 @@ handler(WokReq) ->
                                  | {no_file, wok_req:wok_req()}.
 file(WokReq) ->
   wok_req:get_file(WokReq).
+
+% @doc
+% @end
+-spec file(wok_req:wok_req(), list() | pid()) -> {ok, list() | pid(), wok_req:wok_req()}.
+
+file(WokReq, FileNameOrPid) ->
+  wok_req:get_file(WokReq, FileNameOrPid).
 
 % @doc
 % @end
