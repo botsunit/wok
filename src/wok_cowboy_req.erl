@@ -107,41 +107,49 @@ binding_values(Req) ->
 -spec get_file(wok_req:wok_req()) -> {ok, binary(), binary(), binary(), wok_req:wok_req()}
                                      | {no_file, wok_req:wok_req()}.
 get_file(Req) ->
-  get_file(Req, fun(_, _, Data, Acc) -> <<Acc/binary, Data/binary>> end, <<>>).
+  get_file(Req, fun(_, _, Data, Acc) -> {ok, <<Acc/binary, Data/binary>>} end, <<>>).
 
 -spec get_file(wok_req:wok_req(), get_file_callback() | list() | pid()) -> {ok, list() | pid() | term(), wok_req:wok_req()}
                                                                             | {error, term(), woq_req:wok_req()}
                                                                             | {no_file, wok_req:wok_req()}.
 get_file(Req, FileName) when is_list(FileName) ->
-  {ok, FilePid} = file:open(FileName, [append]),
-  Return = case get_file(Req,FilePid) of
-    {ok, FilePid, Req2} -> {ok, FileName, Req2};
-    Error -> Error
-  end,
-  file:close(FilePid),
-  Return;
+  case file:open(FileName, [append]) of
+    {ok, FilePid} ->
+      case get_file(Req,FilePid) of
+        {ok, FilePid, Req2} ->
+          case file:close(FilePid) of
+            ok -> {ok, FileName, Req2};
+            {error, Reason} -> {error, Reason}
+          end;
+        {error, Reason} -> {error, Reason}
+      end;
+    {error, Reason}  -> {error, Reason}
+  end;
 get_file(Req, FilePid) when is_pid(FilePid) ->
   AppendToFileFn = fun(_, _, Data, _) ->
-    file:write(FilePid, Data)
+    file:write(FilePid, Data),
+    {ok, Data}
   end,
   case get_file(Req, AppendToFileFn, <<>>) of
-    {ok, _, _, ok, Req2} -> {ok, FilePid, Req2};
-    Error -> Error
+    {ok, _, _, _, Req2} -> {ok, FilePid, Req2};
+    {error, Reason} -> {error, Reason}
   end;
 get_file(Req, Function) when is_function(Function) ->
   get_file(Req, Function, <<>>).
 
 -type get_file_callback() :: fun((binary(), binary(), binary(), term()) ->{ok, term()} | {error, term(), term()}).
 -spec get_file(wok_req:wok_req(), get_file_callback(), any()) -> {ok, binary(), binary(), binary(), wok_req:wok_req()}
-                                                                 | {no_file, wok_req:wok_req()}.
+                                                                 | {no_file, any(), wok_req:wok_req()}.
 
 get_file(Req, Function, Acc) ->
   case cowboy_req:part(wok_req:get_http_req(Req)) of
     {ok, Headers, CowboyReq2} ->
       case cow_multipart:form_data(Headers) of
         {file, _, Filename, ContentType, _} ->
-          {Data, CowboyReq3} = get_file_data(CowboyReq2, Filename, ContentType, Function, Acc),
-          {ok, Filename, ContentType, Data, wok_req:set_http_req(Req, CowboyReq3)};
+          case get_file_data(CowboyReq2, Filename, ContentType, Function, Acc) of
+            {Acc2, CowboyReq3} -> {ok, Filename, ContentType, Acc2, wok_req:set_http_req(Req, CowboyReq3)};
+            {error, Reason, Acc2} -> {error, Reason, Acc2}
+          end;
         _ ->
           {no_file, wok_req:set_http_req(Req, CowboyReq2)}
       end;
@@ -150,9 +158,9 @@ get_file(Req, Function, Acc) ->
   end.
 
 get_file_data(CowboyReq, Filename, ContentType, Function, Acc) ->
-  case cowboy_req:part_body(CowboyReq) of
-    {ok, Data, CowboyReq2} ->
-      {Function(Filename, ContentType, Data, Acc), CowboyReq2};
-    {more, Data, CowboyReq2} ->
-      get_file_data(CowboyReq2, Filename, ContentType, Function, Function(Filename, ContentType, Data, Acc))
+  {Status, Data, CowboyReq2} = cowboy_req:part_body(CowboyReq),
+  case Function(Filename, ContentType, Data, Acc) of
+    {ok, Acc2} when Status =:= ok -> {Acc2, CowboyReq2};
+    {ok, Acc2} when Status =:= more -> get_file_data(CowboyReq2, Filename, ContentType, Function, Acc2);
+    {error, Reason, Acc2} -> {error, Reason, Acc2}
   end.

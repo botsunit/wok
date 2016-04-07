@@ -60,7 +60,7 @@ wok_file_upload_test_() ->
               ?assertMatch({ok, <<"dummy_filename">>, <<"text/plain">>, <<"hello world">>, _}, wok_cowboy_req:get_file(Req))
             end,
             fun(Req) ->
-              Function = fun(_, _, Data, Acc) -> <<Acc/binary, Data/binary>> end,
+              Function = fun(_, _, Data, Acc) -> {ok, <<Acc/binary, Data/binary>>} end,
               ?assertMatch({ok, <<"dummy_filename">>, <<"text/plain">>, <<"YOLOhello world">>, _}, wok_cowboy_req:get_file(Req, Function, <<"YOLO">>))
             end,
             fun(Req) ->
