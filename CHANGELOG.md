@@ -1,3 +1,6 @@
+0.2.2:
+  * Add wok_request:file/2 and wok_request:file/3
+
 0.2.1:
   * Add wok_request:file/1
 
