@@ -1,8 +1,23 @@
 
 
 # Module wok_request #
+* [Data Types](#types)
 * [Function Index](#index)
 * [Function Details](#functions)
+
+<a name="types"></a>
+
+## Data Types ##
+
+
+
+
+### <a name="type-get_file_callback">get_file_callback()</a> ###
+
+
+<pre><code>
+get_file_callback() = fun((binary(), binary(), binary(), any()) -&gt; {ok, any()} | {error, term(), any()})
+</code></pre>
 
 <a name="index"></a>
 
@@ -12,7 +27,7 @@
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#body_length-1">body_length/1</a></td><td></td></tr><tr><td valign="top"><a href="#client_ip-1">client_ip/1</a></td><td></td></tr><tr><td valign="top"><a href="#client_port-1">client_port/1</a></td><td></td></tr><tr><td valign="top"><a href="#cookie-2">cookie/2</a></td><td></td></tr><tr><td valign="top"><a href="#cookies-1">cookies/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td>
 This function returns wok_req's custom data.</td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td>
 Return the value for the <tt>Key</tt> in wok_req's custom data.</td></tr><tr><td valign="top"><a href="#custom_data-3">custom_data/3</a></td><td>
-Set the <tt>Value</tt> for the <tt>Key</tt> in wok_req's custom data.</td></tr><tr><td valign="top"><a href="#file-1">file/1</a></td><td></td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td>
+Set the <tt>Value</tt> for the <tt>Key</tt> in wok_req's custom data.</td></tr><tr><td valign="top"><a href="#file-1">file/1</a></td><td></td></tr><tr><td valign="top"><a href="#file-2">file/2</a></td><td></td></tr><tr><td valign="top"><a href="#file-3">file/3</a></td><td></td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td>
 This function get global_state of wok req.</td></tr><tr><td valign="top"><a href="#global_state-2">global_state/2</a></td><td>
 This function set global_state of wok req.</td></tr><tr><td valign="top"><a href="#handler-1">handler/1</a></td><td>
 Get the handler reference.</td></tr><tr><td valign="top"><a href="#has_body-1">has_body/1</a></td><td></td></tr><tr><td valign="top"><a href="#header-2">header/2</a></td><td>Equivalent to <a href="#header-3"><tt>header(Req, Name, undefined)</tt></a>.</td></tr><tr><td valign="top"><a href="#header-3">header/3</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
@@ -120,6 +135,24 @@ or `{ok, OldData, Req2}` if `Key` already exist in custom data.
 
 <pre><code>
 file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; {ok, binary(), binary(), binary(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+</code></pre>
+<br />
+
+<a name="file-2"></a>
+
+### file/2 ###
+
+<pre><code>
+file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, FileNameOrPid::<a href="file.md#type-filename_all">file:filename_all()</a> | pid() | <a href="#type-get_file_callback">get_file_callback()</a>) -&gt; {ok, <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {ok, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+</code></pre>
+<br />
+
+<a name="file-3"></a>
+
+### file/3 ###
+
+<pre><code>
+file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Fun::<a href="#type-get_file_callback">get_file_callback()</a>, Acc::any()) -&gt; {ok, any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
 </code></pre>
 <br />
 

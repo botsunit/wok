@@ -31,7 +31,7 @@ TEST_DEPS = meck wok_tests tempfile
 
 dep_meck = git https://github.com/eproxus/meck.git master
 dep_wok_tests = git git@gitlab.botsunit.com:msaas/wok_tests.git master
-dep_tempfile = git git@github.com:botsunit/tempfile.git master
+dep_tempfile = git https://github.com/botsunit/tempfile.git master
 
 CP = cp
 CP_R = cp -r
