@@ -246,10 +246,10 @@ file(WokReq) ->
 % @doc
 % @end
 -spec file(wok_req:wok_req(), file:filename_all() | pid() | get_file_callback()) ->
-  {ok, file:filename_all() | pid(), wok_req:wok_req()}
-  | {ok, wok_req:wok_req()}
-  | {error, term(), file:filename_all() | pid(), wok_req:wok_req()}
-  | {error, term(), wok_req:wok_req()}
+  {ok, binary(), binary(), file:filename_all() | pid(), wok_req:wok_req()}
+  | {ok, binary(), binary(), wok_req:wok_req()}
+  | {error, term(), binary() | undefined, binary() | undefined, file:filename_all() | pid(), wok_req:wok_req()}
+  | {error, term(), binary() | undefined, binary() | undefined, wok_req:wok_req()}
   | {no_file, file:filename_all() | pid(), wok_req:wok_req()}
   | {no_file, wok_req:wok_req()}.
 file(WokReq, FileNameOrPid) ->
@@ -257,9 +257,10 @@ file(WokReq, FileNameOrPid) ->
 
 % @doc
 % @end
--spec file(wok_req:wok_req(), get_file_callback(), any()) -> {ok, any(), wok_req:wok_req()}
-                                                             | {error, term(), any(), wok_req:wok_req()}
-                                                             | {no_file, any(), wok_req:wok_req()}.
+-spec file(wok_req:wok_req(), get_file_callback(), any()) ->
+  {ok, binary(), binary(), any(), wok_req:wok_req()}
+  | {error, term(), binary() | undefined, binary() | undefined, any(), wok_req:wok_req()}
+  | {no_file, any(), wok_req:wok_req()}.
 file(WokReq, Fun, Acc) ->
   wok_req:get_file(WokReq, Fun, Acc).
 

@@ -65,14 +65,14 @@ wok_file_upload_test_() ->
             end,
             fun(Req) ->
               TempFileName = tempfile:name("prefix_"),
-              {ok, TempFileName, _} = wok_cowboy_req:get_file(Req, TempFileName),
+              {ok, <<"dummy_filename">>, <<"text/plain">>, TempFileName, _} = wok_cowboy_req:get_file(Req, TempFileName),
               {ok, FileData} = file:read_file(TempFileName),
               ?assertMatch(<<"hello world">>, FileData)
             end,
             fun(Req) ->
                 TempFileName = tempfile:name("prefix_"),
                 {ok, FilePid} = file:open(TempFileName, [append]),
-                {ok, FilePid, _} = wok_cowboy_req:get_file(Req, FilePid),
+                {ok, <<"dummy_filename">>, <<"text/plain">>, FilePid, _} = wok_cowboy_req:get_file(Req, FilePid),
                 file:close(FilePid),
                 {ok, FileData} = file:read_file(TempFileName),
                 ?assertMatch(<<"hello world">>, FileData)

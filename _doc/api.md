@@ -578,26 +578,26 @@ get_file_callback() = fun((Filename :: binary(), ContentType ::  binary(), Data 
                         | {error, Reason :: term(), Accumulator :: any()}).
 
 wok_request:file(wok_req:wok_req(), FilePidOrFun :: file:filename_all() | pid() | get_file_callback()) ->
-  {ok, FileOrPid :: file:filename_all() | pid(), wok_req:wok_req()}
-  | {ok, wok_req:wok_req()}
-  | {error, Reason :: term(), FileOrPid :: file:filename_all() | pid(), wok_req:wok_req()}
-  | {error, Reason :: term(), wok_req:wok_req()}
+  {ok, binary(), binary(), FileOrPid :: file:filename_all() | pid(), wok_req:wok_req()}
+  | {ok, binary(), binary(), wok_req:wok_req()}
+  | {error, Reason :: term(), binary() | undefined, binary() | undefined, FileOrPid :: file:filename_all() | pid(), wok_req:wok_req()}
+  | {error, Reason :: term(), binary() | undefined, binary() | undefined, wok_req:wok_req()}
   | {no_file, FileOrPid :: file:filename_all() | pid(), wok_req:wok_req()}
   | {no_file, wok_req:wok_req()}.
 ```
 
 ```elixir
 get_file_callback() = fn((filename :: binary(), content_type ::  binary(), data :: binary(), accumulator :: any()) ->
-                        {ok, accumulator :: any()} 
-                        | {error, reason :: term(), accumulator :: any()})
+                        {:ok, accumulator :: any()} 
+                        | {:error, reason :: term(), accumulator :: any()})
 
 Wok.Request.file(wok_req:wok_req(), file_pid_or_fun :: file:filename_all() | pid() | get_file_callback()) ->
-  {ok, file_or_pid :: file:filename_all() | pid(), wok_req:wok_req()}
-  | {ok, wok_req:wok_req()}
-  | {error, reason :: term(), file_or_pid :: file:filename_all() | pid(), wok_req:wok_req()}
-  | {error, reason :: term(), wok_req:wok_req()}
-  | {no_file, file_or_pid :: file:filename_all() | pid(), wok_req:wok_req()}
-  | {no_file, wok_req:wok_req()}
+  {:ok, binary(), binary(), file_or_pid :: file:filename_all() | pid(), wok_req:wok_req()}
+  | {:ok, binary(), binary(), wok_req:wok_req()}
+  | {:error, reason :: term(), binary() | :undefined, binary() | :undefined, file_or_pid :: file:filename_all() | pid(), wok_req:wok_req()}
+  | {:error, reason :: term(), binary() | :undefined, binary() | :undefined, wok_req:wok_req()}
+  | {:no_file, file_or_pid :: file:filename_all() | pid(), wok_req:wok_req()}
+  | {:no_file, wok_req:wok_req()}
 ```
 ## file/3
 
@@ -609,20 +609,20 @@ get_file_callback() = fun((Filename :: binary(), ContentType ::  binary(), Data 
                         | {error, Reason :: term(), Accumulator :: any()})
 
 wok_request:file(wok_req:wok_req(), get_file_callback(), Accumulator :: any()) -> 
-  {ok, Accumulator :: any(), wok_req:wok_req()}
-  | {error, Reason :: term(), Accumulator :: any(), wok_req:wok_req()}
+  {ok, binary(), binary(), Accumulator :: any(), wok_req:wok_req()}
+  | {error, Reason :: term(), binary(), binary(), Accumulator :: any(), wok_req:wok_req()}
   | {no_file, Accumulator :: any(), wok_req:wok_req()}.
 ```
 
 ```elixir
 get_file_callback() = fn((filename :: binary(), content_type ::  binary(), data :: binary(), accumulator :: any()) ->
-                        {ok, accumulator :: any()} 
-                        | {error, reason :: term(), accumulator :: any()})
+                        {:ok, accumulator :: any()} 
+                        | {:error, reason :: term(), accumulator :: any()})
 
 Wok.Request.file(wok_req:wok_req(), get_file_callback(), accumulator :: any()) -> 
-  {ok, accumulator :: any(), wok_req:wok_req()}
-  | {error, reason :: term(), accumulator :: any(), wok_req:wok_req()}
-  | {no_file, accumulator :: any(), wok_req:wok_req()}.
+  {:ok, binary(), binary(), accumulator :: any(), wok_req:wok_req()}
+  | {:error, reason :: term(), binary(), binary(), accumulator :: any(), wok_req:wok_req()}
+  | {:no_file, accumulator :: any(), wok_req:wok_req()}.
 ```
 
 # HTTP Response API

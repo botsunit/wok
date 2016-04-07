@@ -143,7 +143,7 @@ file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>) -&gt; {ok,
 ### file/2 ###
 
 <pre><code>
-file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, FileNameOrPid::<a href="file.md#type-filename_all">file:filename_all()</a> | pid() | <a href="#type-get_file_callback">get_file_callback()</a>) -&gt; {ok, <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {ok, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, FileNameOrPid::<a href="file.md#type-filename_all">file:filename_all()</a> | pid() | <a href="#type-get_file_callback">get_file_callback()</a>) -&gt; {ok, binary(), binary(), <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {ok, binary(), binary(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), binary() | undefined, binary() | undefined, <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), binary() | undefined, binary() | undefined, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, <a href="file.md#type-filename_all">file:filename_all()</a> | pid(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
 </code></pre>
 <br />
 
@@ -152,7 +152,7 @@ file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, FileNameOr
 ### file/3 ###
 
 <pre><code>
-file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Fun::<a href="#type-get_file_callback">get_file_callback()</a>, Acc::any()) -&gt; {ok, any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
+file(WokReq::<a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>, Fun::<a href="#type-get_file_callback">get_file_callback()</a>, Acc::any()) -&gt; {ok, binary(), binary(), any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {error, term(), binary() | undefined, binary() | undefined, any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>} | {no_file, any(), <a href="wok_req.md#type-wok_req">wok_req:wok_req()</a>}
 </code></pre>
 <br />
 
