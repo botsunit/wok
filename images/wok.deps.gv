@@ -6,7 +6,7 @@ digraph wok_deps {
     rankdir=LR;
   ]
 
-  wok[label="wok\n(0.2.1)", fontcolor="white", style="filled", fillcolor="black"];
+  wok[label="wok\n(0.2.2)", fontcolor="white", style="filled", fillcolor="black"];
   lager[label="lager\n(master)"];
   wok_http_adapter[label="wok_http_adapter\n(0.0.3)", style="filled", fillcolor="red"];
   wok_message_handler[label="wok_message_handler\n(0.1.1)", style="filled", fillcolor="red"];
