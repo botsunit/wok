@@ -2,22 +2,11 @@ digraph wok {
   node[shape=box];
   graph[
     overlap=false,
-    splines=ortho
+    splines=true
   ]
 
-  wok[shape=oval, label="wok (*)"];
-  wok_app[label="wok_app (*)"];
-  wok_sup[label="wok_sup (*)"];
-  wok_cowboy_handler[label="wok_cowboy_handler (*)"];
-  wok_middlewares[label="wok_middlewares (*)"];
-  wok_dispatcher[label="wok_dispatcher (*)"];
-  wok_services_sup[label="wok_services_sup (*)"];
-  wok_topics_sup[label="wok_topics_sup (*)"];
-  wok_topic[label="wok_topic (*)"];
-  wok_state[label="wok_state (*)"];
+  wok[shape=oval];
   cowboy[shape=oval];
-  __wok_config__[shape=circle, label="*"];
-  wok_topic[label = "<topic :: wok_topic>"];
 
   wok -> wok_app;
 
@@ -27,7 +16,6 @@ digraph wok {
   wok_app -> wok_middlewares;
 
   wok_sup -> wok_messages_sup [style=dotted];
-  wok_sup -> wok_rest_sup [style=dotted];
   wok_sup -> wok_plugins [style=dotted];
   wok_sup -> wok_middlewares [style=dotted];
   wok_sup -> wok_state [style=dotted];
@@ -36,7 +24,7 @@ digraph wok {
 
   cowboy -> wok_cowboy_handler [style=dashed];
 
-  wok_cowboy_handler -> "<handler :: wok_http_handler>";
+  wok_cowboy_handler -> "<wok_http_handler>";
   wok_cowboy_handler -> wok_middlewares;
   wok_cowboy_handler -> wok_state;
 
@@ -44,28 +32,19 @@ digraph wok {
 
   wok_messages_sup -> wok_dispatcher [style=dotted];
   wok_messages_sup -> wok_services_sup [style=dotted];
-  wok_messages_sup -> wok_topics_sup [style=dotted];
-  wok_messages_sup -> wok_topics_manager [style=dotted];
-
-  wok_topics_manager -> wok_topics_sup;
-  wok_topics_manager -> wok_topic;
+  wok_messages_sup -> wok_topics [style=dotted];
 
   wok_dispatcher -> wok_services_sup;
   wok_dispatcher -> wok_middlewares;
+  wok_dispatcher -> "<wok_message_handler>";
 
   wok_services_sup -> wok_service [style=dashed, headlabel="*", taillabel="0"];
 
-  wok_topics_sup -> wok_topic [style=dashed, headlabel="*", taillabel="*"];
-
-  wok_topic -> wok_dispatcher;
+  wok_topics -> wok_dispatcher;
 
   wok_service -> wok_dispatcher;
-  wok_service -> "<handler :: wok_message_handler>";
-  wok_service -> "<handler :: wok_provider_handler>";
-  wok_service -> wok_state
+  wok_service -> "<wok_consumer_handler>";
+  wok_service -> wok_state;
 
-
-  "<handler :: wok_provider_handler>" -> wok_message_handler;
-
-  __wok_config__ -> wok_config;
+  wok_state -> "<wok_initializer>";
 }
