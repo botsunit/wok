@@ -17,7 +17,7 @@ defmodule Wok.Mixfile do
 	defp deps do
 		[
 			{:lager, ~r/.*/, git: "https://github.com/basho/lager.git", branch: "master"},
-			{:wok_http_adapter, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", branch: "master"},
+			{:wok_http_adapter, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", branch: "rewrite-http-params"},
 			{:wok_message_handler, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"},
 			{:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", branch: "master"},
 			{:pipette, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
@@ -27,6 +27,7 @@ defmodule Wok.Mixfile do
 			{:bucs, ~r/.*/, git: "https://github.com/botsunit/bucs.git", branch: "master"},
 			{:doteki, ~r/.*/, git: "https://github.com/botsunit/doteki.git", branch: "master"},
 			{:uuid, ~r/.*/, git: "https://github.com/avtobiff/erlang-uuid.git", branch: "master"},
+			{:tempfile, ~r/.*/, git: "https://github.com/botsunit/tempfile.git", branch: "master"},
 		]
 	end
 end

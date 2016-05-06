@@ -2,26 +2,28 @@
 -module(wok_cowboy_req).
 -behaviour(wok_req).
 
+% API
 -export([
-  reply/1
-  , set_cookie/4
-  , get_cookies/1
-  , client_ip/1
-  , client_port/1
-  , body/1
-  , has_body/1
-  , body_length/1
-  , method/1
-  , path/1
-  , header/3
-  , headers/1
-  , post_values/1
-  , get_values/1
-  , binding_values/1
-  , get_file/1
-  , get_file/2
-  , get_file/3
-]).
+         reply/1
+         , set_cookie/4
+         , get_cookies/1
+         , client_ip/1
+         , client_port/1
+         , body/1
+         , has_body/1
+         , body_length/1
+         , method/1
+         , path/1
+         , header/3
+         , headers/1
+        ]).
+
+% internal use
+-export([
+         post_values/1
+         , get_values/1
+         , binding_values/1
+        ]).
 
 -spec reply(wok_req:wok_req()) -> term().
 reply(Req) ->
@@ -86,109 +88,76 @@ header(Req, Name, Default) ->
 headers(Req) ->
   cowboy_req:headers(wok_req:get_http_req(Req)).
 
--spec post_values(wok_req:wok_req()) -> {ok, [{binary(), binary() | true}], wok_req:wok_req()}
-                                        | {error, wok_req:wok_req()}.
-post_values(Req) ->
-  case cowboy_req:body_qs(wok_req:get_http_req(Req)) of
-    {ok, List, CowboyReq} -> {ok, List, wok_req:set_http_req(Req, CowboyReq)};
-    {_, CowboyReq} -> {error, wok_req:set_http_req(Req, CowboyReq)}
-  end.
+% internal use
 
--spec get_values(wok_req:wok_req()) -> {ok, [{binary(), binary() | true}], wok_req:wok_req()}
-                                       | {error, wok_req:wok_req()}.
-get_values(Req) ->
-  {ok, cowboy_req:parse_qs(wok_req:get_http_req(Req)), Req}.
-
--spec binding_values(wok_req:wok_req()) -> {ok, [{binary(), binary() | true}], wok_req:wok_req()}
-                                           | {error, wok_req:wok_req()}.
-binding_values(Req) ->
-  {ok, cowboy_req:bindings(wok_req:get_http_req(Req)), Req}.
-
--spec get_file(wok_req:wok_req()) -> {ok, binary(), binary(), binary(), wok_req:wok_req()}
-                                     | {no_file, wok_req:wok_req()}.
-get_file(Req) ->
-  get_file(Req, fun(_, _, Data, Acc) -> {ok, <<Acc/binary, Data/binary>>} end, <<>>).
-
--spec get_file(wok_req:wok_req(), wok_request:get_file_callback() | list() | pid()) ->
-  {ok, binary(), binary(), file:filename_all() | pid(), wok_req:wok_req()}
-  | {ok, binary(), binary(), wok_req:wok_req()}
-  | {error, term(), binary() | undefined, binary() | undefined, file:filename_all() | pid(), woq_req:wok_req()}
-  | {error, term(), binary() | undefined, binary() | undefined, woq_req:wok_req()}
-  | {no_file, file:filename_all() | pid(), wok_req:wok_req()}
-  | {no_file, wok_req:wok_req()}.
-get_file(Req, FileName) when is_list(FileName) orelse is_binary(FileName) ->
-  case file:open(FileName, [append]) of
-    {ok, FilePid} ->
-      case get_file(Req, FilePid) of
-        {ok, OriginalFilename, ContentType, FilePid2, Req2} ->
-          case file:close(FilePid2) of
-            ok ->
-              {ok, OriginalFilename, ContentType, FileName, Req2};
-            {error, Reason} ->
-              {error, Reason, OriginalFilename, ContentType, FileName, Req2}
-          end;
-        {error, Reason, OriginalFilename, ContentType, FilePid2, Req2} ->
-          _ = file:close(FilePid2),
-          {error, Reason, OriginalFilename, ContentType, FileName, Req2};
-        {no_file, FilePid2, Req2} ->
-          _ = file:close(FilePid2),
-          {no_file, FileName, Req2}
+-spec post_values(cowboy_req:req()) -> {ok,
+                                        [{binary(), binary() | true}], % DATA
+                                        [{binary(), binary(), binary()}], % FILES
+                                        binary() | undefined,
+                                        cowboy_req:req()}
+                                       | {error, cowboy_req:req()}.
+post_values(CowboyReq) ->
+  case header(CowboyReq, <<"content-type">>, undefined) of
+    <<"multipart/form-data", _/binary>> ->
+      {CowboyReq2, Datas, Files, TempFilePath} = get_request_parts(cowboy_req:part(CowboyReq), [], [], undefined),
+      {ok, Datas, Files, TempFilePath, CowboyReq2};
+    <<"application/x-www-form-urlencoded">> ->
+      case cowboy_req:body_qs(CowboyReq) of
+        {ok, Datas, CowboyReq2} -> {ok, Datas, [], undefined, CowboyReq2};
+        {_, CowboyReq2} -> {error, CowboyReq2}
       end;
-    {error, Reason} ->
-      {error, Reason, undefined, undefined, FileName, Req}
-  end;
-get_file(Req, FilePid) when is_pid(FilePid) ->
-  AppendToFileFn = fun(_, _, Data, Acc) ->
-    case file:write(Acc, Data) of
-      ok ->
-        {ok, Acc};
-      {error, Reason} ->
-        {error, Reason, Acc}
-    end
-  end,
-  case get_file(Req, AppendToFileFn, FilePid) of
-    {ok, OriginalFilename, ContentType, FilePid2, Req2} ->
-      {ok, OriginalFilename, ContentType, FilePid2, Req2};
-    Other ->
-      Other
-  end;
-get_file(Req, Function) when is_function(Function) ->
-  case get_file(Req, Function, <<>>) of
-    {ok, OriginalFilename, ContentType, _, Req2} ->
-      {ok, OriginalFilename, ContentType, Req2};
-    {error, Reason, OriginalFilename, ContentType, _, Req2} ->
-      {error, Reason, OriginalFilename, ContentType, Req2};
-    {no_file, _, Req2} ->
-      {no_file, Req2}
+    _ ->
+      {ok, [], [], undefined, CowboyReq}
   end.
 
--spec get_file(wok_req:wok_req(), wok_request:get_file_callback(), any()) ->
-      {ok, binary(), binary(), any(), wok_req:wok_req()}
-      | {error, term(), binary(), binary(), any(), wok_req:wok_req()}
-      | {no_file, any(), wok_req:wok_req()}.
+-spec get_values(cowboy_req:req()) -> {ok, [{binary(), binary() | true}], cowboy_req:req()}
+                                      | {error, cowboy_req:req()}.
+get_values(CowboyReq) ->
+  {ok, cowboy_req:parse_qs(CowboyReq), CowboyReq}.
 
-get_file(Req, Function, Acc) ->
-  case cowboy_req:part(wok_req:get_http_req(Req)) of
-    {ok, Headers, CowboyReq2} ->
-      case cow_multipart:form_data(Headers) of
-        {file, _, Filename, ContentType, _} ->
-          case get_file_data(CowboyReq2, Filename, ContentType, Function, Acc) of
-            {ok, Acc2, CowboyReq3} ->
-              {ok, Filename, ContentType, Acc2, wok_req:set_http_req(Req, CowboyReq3)};
-            {error, Reason, Acc2, CowboyReq3} ->
-              {error, Filename, ContentType, Reason, Acc2, wok_req:set_http_req(Req, CowboyReq3)}
-          end;
-        _ ->
-          {no_file, Acc, wok_req:set_http_req(Req, CowboyReq2)}
-      end;
-    {done, CowboyReq2} ->
-      {no_file, Acc, wok_req:set_http_req(Req, CowboyReq2)}
+-spec binding_values(cowboy_req:req()) -> {ok, [{binary(), binary() | true}], cowboy_req:req()}
+                                          | {error, cowboy_req:req()}.
+binding_values(CowboyReq) ->
+  {ok, cowboy_req:bindings(CowboyReq), CowboyReq}.
+
+get_request_parts({done, CowboyReq}, Datas, Files, TempFilePath) ->
+  {CowboyReq, Datas, Files, TempFilePath};
+get_request_parts({ok, Headers, CowboyReq}, Datas, Files, TempFilePath) ->
+  case cow_multipart:form_data(Headers) of
+    {data, FieldName} ->
+      {Value, CowboyReq2} = get_part_body(CowboyReq, <<>>),
+      get_request_parts(cowboy_req:part(CowboyReq2), [{FieldName, Value}|Datas], Files, TempFilePath);
+    {file, FieldName, Filename, Type, _} ->
+      {File, TempFilePath2, CowboyReq2} = get_part_file(CowboyReq, Filename, TempFilePath),
+      get_request_parts(cowboy_req:part(CowboyReq2), Datas, [{FieldName, Type, File}|Files], TempFilePath2)
   end.
 
-get_file_data(CowboyReq, Filename, ContentType, Function, Acc) ->
+get_part_body(CowboyReq, Acc) when is_binary(Acc) ->
+  case cowboy_req:part_body(CowboyReq) of
+    {ok, Data, CowboyReq2} ->
+      {<<Acc/binary, Data/binary>>, CowboyReq2};
+    {more, Data, CowboyReq2} ->
+      get_part_body(CowboyReq2, <<Acc/binary, Data/binary>>)
+  end;
+get_part_body(CowboyReq, IO) when is_pid(IO) ->
   {Status, Data, CowboyReq2} = cowboy_req:part_body(CowboyReq),
-  case Function(Filename, ContentType, Data, Acc) of
-    {ok, Acc2} when Status =:= ok -> {ok, Acc2, CowboyReq2};
-    {ok, Acc2} when Status =:= more -> get_file_data(CowboyReq2, Filename, ContentType, Function, Acc2);
-    {error, Reason, Acc2} -> {error, Reason, Acc2, CowboyReq2}
+  ok = file:write(IO, Data), % TODO: return error
+  if
+    Status == more ->
+      get_part_body(CowboyReq2, IO);
+    true ->
+      CowboyReq2
   end.
+
+get_part_file(CowboyReq, Filename, TempFilePath) ->
+  TempFilePath2 = case TempFilePath of
+                    undefined -> bucs:to_binary(tempdir:name());
+                    _ -> TempFilePath
+                  end,
+  TempFile = <<TempFilePath2/binary, Filename/binary>>,
+  ok = filelib:ensure_dir(TempFile), % TODO: return error
+  {ok, IO} = file:open(TempFile, [write, binary]), % TODO: return error
+  CowboyReq2 = get_part_body(CowboyReq, IO),
+  ok = file:close(IO), % TODO: return error
+  {TempFile, TempFilePath2, CowboyReq2}.
+

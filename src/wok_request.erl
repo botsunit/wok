@@ -26,9 +26,8 @@
   , global_state/1
   , global_state/2
   , handler/1
-  , file/1
+  , files/1
   , file/2
-  , file/3
 ]).
 
 -export_type([get_file_callback/0]).
@@ -238,51 +237,39 @@ handler(WokReq) ->
 
 % @doc
 % @end
--spec file(wok_req:wok_req()) -> {ok, binary(), binary(), binary(), wok_req:wok_req()}
-                                 | {no_file, wok_req:wok_req()}.
-file(WokReq) ->
-  wok_req:get_file(WokReq).
-
-% @doc
-% @end
--spec file(wok_req:wok_req(), file:filename_all() | pid() | get_file_callback()) ->
-  {ok, binary(), binary(), file:filename_all() | pid(), wok_req:wok_req()}
-  | {ok, binary(), binary(), wok_req:wok_req()}
-  | {error, term(), binary() | undefined, binary() | undefined, file:filename_all() | pid(), wok_req:wok_req()}
-  | {error, term(), binary() | undefined, binary() | undefined, wok_req:wok_req()}
-  | {no_file, file:filename_all() | pid(), wok_req:wok_req()}
+-spec file(wok_req:wok_req(), binary()) ->
+  {ok, binary(), file:filename_all(), wok_req:wok_req()}
   | {no_file, wok_req:wok_req()}.
-file(WokReq, FileNameOrPid) ->
-  wok_req:get_file(WokReq, FileNameOrPid).
+file(WokReq, Field) ->
+  case lists:keyfind(bucs:to_binary(Field), 1, wok_req:get_files(WokReq)) of
+    {_, Type, File} ->
+      {ok, Type, File, WokReq};
+    _ ->
+      {no_file, WokReq}
+  end.
+
 
 % @doc
 % @end
--spec file(wok_req:wok_req(), get_file_callback(), any()) ->
-  {ok, binary(), binary(), any(), wok_req:wok_req()}
-  | {error, term(), binary() | undefined, binary() | undefined, any(), wok_req:wok_req()}
-  | {no_file, any(), wok_req:wok_req()}.
-file(WokReq, Fun, Acc) ->
-  wok_req:get_file(WokReq, Fun, Acc).
+-spec files(wok_req:wok_req()) -> {ok, [{binary(), binary(), file:filename_all()}], wok_req:wok_req()}
+                                  | {no_file, wok_req:wok_req()}.
+files(WokReq) ->
+  case wok_req:get_files(WokReq) of
+    [] -> {no_file, WokReq};
+    Files -> {ok, Files, WokReq}
+  end.
+
 
 % Private
 
 post_vals(Req) ->
-  case wok_req:post_values(Req) of
-    {ok, List, Req1} -> {ok, merge_params_array(List), Req1};
-    Other -> Other
-  end.
+  {ok, merge_params_array(wok_req:get_post_values(Req)), Req}.
 
 get_vals(Req) ->
-  case wok_req:get_values(Req) of
-    {ok, List, Req1} -> {ok, merge_params_array(List), Req1};
-    Other -> Other
-  end.
+  {ok, merge_params_array(wok_req:get_get_values(Req)), Req}.
 
 binding_vals(Req) ->
-  case wok_req:binding_values(Req) of
-    {ok, List, Req1} -> {ok, merge_params_array(List), Req1};
-    Other -> Other
-  end.
+  {ok, merge_params_array(wok_req:get_bind_values(Req)), Req}.
 
 merge_params_array(Params) ->
   lists:foldl(fun({KeyRaw, Value}, Acc) ->

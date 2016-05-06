@@ -9,10 +9,10 @@ ELIXIR_BINDINGS = wok wok_request wok_response wok_routes wok_message
 
 dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
 
-DEPS = lager wok_http_adapter wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid
+DEPS = lager wok_http_adapter wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid tempfile
 
 dep_lager = git https://github.com/basho/lager.git master
-dep_wok_http_adapter = git git@gitlab.botsunit.com:msaas/wok_http_adapter.git master
+dep_wok_http_adapter = git git@gitlab.botsunit.com:msaas/wok_http_adapter.git rewrite-http-params
 dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
 dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
 dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
@@ -22,6 +22,7 @@ dep_cowboy = git https://github.com/ninenines/cowboy.git 2.0.0-pre.3
 dep_bucs = git https://github.com/botsunit/bucs.git master
 dep_doteki = git https://github.com/botsunit/doteki.git master
 dep_uuid = git https://github.com/avtobiff/erlang-uuid.git master
+dep_tempfile = git https://github.com/botsunit/tempfile.git master
 
 DOC_DEPS = edown
 

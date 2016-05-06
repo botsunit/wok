@@ -135,13 +135,13 @@ compile(Routes) ->
             end, Routes).
 
 init_req(Req) ->
-  WokReq = wok_req:set_http_req(wok_req:new(wok_cowboy_req), Req),
-  WokReq0 = wok_req:set_handler(WokReq, self()),
-  wok_req:set_global_state(WokReq0, wok_state:state()).
+  WokReq0 = wok_req:new(wok_cowboy_req, Req),
+  WokReq1 = wok_req:set_handler(WokReq0, self()),
+  wok_req:set_global_state(WokReq1, wok_state:state()).
 
 terminate_req(WokReq) ->
   _ = wok_state:state(wok_req:get_global_state(WokReq)),
-  WokReq.
+  wok_req:terminate(WokReq).
 
 terminate_req(WokReq, Middleware) ->
   WokReq1 = terminate_req(WokReq),
