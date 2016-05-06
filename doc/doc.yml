@@ -10,7 +10,7 @@ toc:
   - plugins
   - configuration
   - api
-  - web_sockets
+  - web_socket
 
 language_tabs:
   - erlang

@@ -25,7 +25,11 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 
 2. Create your services and routes.
 
+<<<<<<< df46599d119911df8d24b96bc920fd1194b4eedb
 3. Reference your services and routes in the `config` file (see [Configuration](https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/README.md#conf))
+=======
+3. Reference your services and routes in the `config` file (see [Configuration](https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/README.md#conf))
+>>>>>>> Move doc to the right place
 
 3. Start your service :
 
@@ -50,9 +54,15 @@ application:ensure_all_started(wok).
 
 ### Configuration ###
 
+<<<<<<< df46599d119911df8d24b96bc920fd1194b4eedb
 * `messages :: list()` : [Messages configuration](https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/README.md#messages_conf)
 
 * `rest :: list()` : [REST configuration](https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/README.md#rest_conf)
+=======
+* `messages :: list()` : [Messages configuration](https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/README.md#messages_conf)
+
+* `rest :: list()` : [REST configuration](https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/README.md#rest_conf)
+>>>>>>> Move doc to the right place
 
 <a name="messages_conf"></a>
 
@@ -60,7 +70,11 @@ application:ensure_all_started(wok).
 
 * `handler :: atom()` : handler used to create and parse messages. See [wok_message_handler](https://gitlab.botsunit.com/msaas/wok_message_handler) for more informations.
 
+<<<<<<< df46599d119911df8d24b96bc920fd1194b4eedb
 * `services :: list()` : [Services configuration](https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/README.md#services_conf)
+=======
+* `services :: list()` : [Services configuration](https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/README.md#services_conf)
+>>>>>>> Move doc to the right place
 
 * `consumer_group :: binary()` : Name of the Kafka' consumer group
 
@@ -70,7 +84,11 @@ application:ensure_all_started(wok).
 
 * `max_services_fork :: integer()` : Maximum number of messages in parallel
 
+<<<<<<< df46599d119911df8d24b96bc920fd1194b4eedb
 * `topics :: list()` : [Topics configuration](https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/README.md#topic_conf)
+=======
+* `topics :: list()` : [Topics configuration](https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/README.md#topic_conf)
+>>>>>>> Move doc to the right place
 
 <a name="rest_conf"></a>
 
@@ -82,7 +100,11 @@ application:ensure_all_started(wok).
 
 * `max_conn :: integer()` : Max number of  connexions (default: `100`)
 
+<<<<<<< df46599d119911df8d24b96bc920fd1194b4eedb
 * `routes :: list()` : [Routes configuration](https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/README.md#routes_conf)
+=======
+* `routes :: list()` : [Routes configuration](https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/README.md#routes_conf)
+>>>>>>> Move doc to the right place
 
 <a name="services_conf"></a>
 
@@ -155,9 +177,17 @@ Proprietary and confidential
 
 
 <table width="100%" border="0" summary="list of modules">
+<<<<<<< df46599d119911df8d24b96bc920fd1194b4eedb
 <tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/wok.md" class="module">wok</a></td></tr>
 <tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/wok_message.md" class="module">wok_message</a></td></tr>
 <tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/wok_request.md" class="module">wok_request</a></td></tr>
 <tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/wok_response.md" class="module">wok_response</a></td></tr>
 <tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/kafka-0.9/doc/wok_routes.md" class="module">wok_routes</a></td></tr></table>
+=======
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/wok.md" class="module">wok</a></td></tr>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/wok_message.md" class="module">wok_message</a></td></tr>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/wok_request.md" class="module">wok_request</a></td></tr>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/wok_response.md" class="module">wok_response</a></td></tr>
+<tr><td><a href="https://gitlab.botsunit.com/msaas/wok/tree/rewrite-http-params/doc/wok_routes.md" class="module">wok_routes</a></td></tr></table>
+>>>>>>> Move doc to the right place
 

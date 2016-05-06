@@ -28,11 +28,10 @@ DOC_DEPS = edown
 
 dep_edown = git https://github.com/botsunit/edown.git master
 
-TEST_DEPS = meck wok_tests tempfile
+TEST_DEPS = meck wok_tests
 
 dep_meck = git https://github.com/eproxus/meck.git master
 dep_wok_tests = git git@gitlab.botsunit.com:msaas/wok_tests.git master
-dep_tempfile = git https://github.com/botsunit/tempfile.git master
 
 CP = cp
 CP_R = cp -r
