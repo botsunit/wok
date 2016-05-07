@@ -19,7 +19,7 @@ defmodule Wok.Mixfile do
 			{:lager, ~r/.*/, git: "https://github.com/basho/lager.git", branch: "master"},
 			{:wok_http_adapter, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", branch: "rewrite-http-params"},
 			{:wok_message_handler, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"},
-			{:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", branch: "master"},
+			{:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", branch: "kafka-0.9"},
 			{:pipette, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
 			{:kafe, ~r/.*/, git: "https://github.com/botsunit/kafe.git", branch: "master"},
 			{:cowboy, ~r/.*/, git: "https://github.com/ninenines/cowboy.git", tag: "2.0.0-pre.3"},
