@@ -154,7 +154,7 @@ get_part_file(CowboyReq, Filename, TempFilePath) ->
                     undefined -> bucs:to_binary(tempdir:name());
                     _ -> TempFilePath
                   end,
-  TempFile = <<TempFilePath2/binary, Filename/binary>>,
+  TempFile = bucs:to_binary(filename:join(TempFilePath2, Filename)),
   ok = filelib:ensure_dir(TempFile), % TODO: return error
   {ok, IO} = file:open(TempFile, [write, binary]), % TODO: return error
   CowboyReq2 = get_part_body(CowboyReq, IO),
