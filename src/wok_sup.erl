@@ -20,12 +20,6 @@ init([Static]) ->
                 [];
               _ ->
                 [?CHILD(wok_messages_sup, [], supervisor, infinity)]
-% TODO -- REMOVE --            end ++
-% TODO -- REMOVE --            case doteki:get_env([wok, rest]) of
-% TODO -- REMOVE --              undefined ->
-% TODO -- REMOVE --                [];
-% TODO -- REMOVE --              _ ->
-% TODO -- REMOVE --                [?CHILD(wok_rest_sup, [], supervisor, infinity)]
             end ++ custom_servers() ++ middlewares_servers(),
   {ok, {
      {one_for_one, 5, 10},

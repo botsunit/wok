@@ -1,8 +1,13 @@
 -module(wok).
 
 -export([start/0]).
--export([provide/5, provide/4, provide/2]).
 -export([state/0, state/1]).
+
+-export([provide/5, provide/4, provide/2]).
+
+-deprecated([{provide, 2, next_major_release},
+             {provide, 4, next_major_release},
+             {provide, 5, next_major_release}]).
 
 % @hidden
 start() ->
