@@ -97,7 +97,7 @@ headers(Req) ->
                                         cowboy_req:req()}
                                        | {error, cowboy_req:req()}.
 post_values(CowboyReq) ->
-  case header(CowboyReq, <<"content-type">>, undefined) of
+  case cowboy_req:header(<<"content-type">>, CowboyReq) of
     <<"multipart/form-data", _/binary>> ->
       {CowboyReq2, Datas, Files, TempFilePath} = get_request_parts(cowboy_req:part(CowboyReq), [], [], undefined),
       {ok, Datas, Files, TempFilePath, CowboyReq2};
