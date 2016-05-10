@@ -8,43 +8,45 @@ digraph wok {
   wok[shape=oval];
   cowboy[shape=oval];
 
-  wok -> wok_app;
+  wok -> wok_app[style=dashed];
 
-  wok_app -> wok_sup;
   wok_app -> cowboy [style=dashed];
+  wok_app -> wok_sup;
   wok_app -> wok_cowboy_handler;
-  wok_app -> wok_middlewares;
-
-  wok_sup -> wok_messages_sup [style=dotted];
-  wok_sup -> wok_plugins [style=dotted];
-  wok_sup -> wok_middlewares [style=dotted];
-  wok_sup -> wok_state [style=dotted];
-
-  wok_plugins -> "<plugin>";
 
   cowboy -> wok_cowboy_handler [style=dashed];
 
-  wok_cowboy_handler -> "<wok_http_handler>";
+  wok_cowboy_handler -> wok_http_handler;
   wok_cowboy_handler -> wok_middlewares;
   wok_cowboy_handler -> wok_state;
 
+  wok_sup -> wok_state [style=dotted];
+  wok_sup -> wok_middlewares [style=dotted];
+  wok_sup -> wok_plugins [style=dotted];
+  wok_sup -> wok_messages_sup [style=dotted];
+  wok_sup -> "<custom server>" [style=dotted];
+  wok_sup -> "<middleware>" [style=dotted];
+
+  wok_state-> "<initializer>";
+
   wok_middlewares -> "<middleware>";
+  wok_middlewares -> wok_request;
+
+  wok_plugins -> "<plugin>";
 
   wok_messages_sup -> wok_dispatcher [style=dotted];
   wok_messages_sup -> wok_services_sup [style=dotted];
   wok_messages_sup -> wok_topics [style=dotted];
 
-  wok_dispatcher -> wok_services_sup;
   wok_dispatcher -> wok_middlewares;
+  wok_dispatcher -> wok_message;
+  wok_dispatcher -> wok_services_sup;
   wok_dispatcher -> "<wok_message_handler>";
 
-  wok_services_sup -> wok_service [style=dashed, headlabel="*", taillabel="0"];
+  wok_services_sup -> wok_service [style=dotted, headlabel="*", taillabel="0"];
 
   wok_topics -> wok_dispatcher;
 
   wok_service -> wok_dispatcher;
   wok_service -> "<wok_consumer_handler>";
-  wok_service -> wok_state;
-
-  wok_state -> "<wok_initializer>";
 }
