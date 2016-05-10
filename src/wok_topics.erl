@@ -10,6 +10,10 @@
          terminate/2, code_change/3]).
 -export([consume/5]).
 
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
+
 start_link() ->
   gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
@@ -195,3 +199,48 @@ hexstring(<<X:256/big-unsigned-integer>>) ->
 hexstring(<<X:512/big-unsigned-integer>>) ->
   lists:flatten(io_lib:format("~128.16.0b", [X])).
 
+-ifdef(TEST).
+start_groups_test() ->
+  FakePID = c:pid(0,0,0),
+  meck:new(kafe),
+  meck:expect(kafe, topics, 0, #{<<"test">> => #{0 => broker0, 1 => broker1, 2 => broker2}}),
+  meck:expect(kafe, start_consumer, 3, {ok, FakePID}),
+  meck:new(pipette),
+  meck:expect(pipette, ready, 1, true),
+
+  ?assertMatch([{<<"test">>,
+                 one_for_all,
+                 local_queue,
+                 _,
+                 [],
+                 FakePID,
+                 _}],
+               start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, [])),
+  ?assertMatch(
+     [{<<"test">>,one_for_one,local_queue_test_2,
+       _,
+       [{partition,2}],
+       FakePID,_},
+      {<<"test">>,one_for_one,local_queue_test_1,
+       _,
+       [{partition,1}],
+       FakePID,_},
+      {<<"test">>,one_for_one,local_queue_test_0,
+       _,
+       [{partition,0}],
+       FakePID,_}],
+     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, [])),
+  ?assertMatch(
+     [{<<"test">>,one_for_one,local_queue_test_2,
+       _,
+       [{partition,2}],
+       FakePID,_},
+      {<<"test">>,one_for_one,local_queue_test_0,
+       _,
+       [{partition,0}],
+       FakePID,_}],
+     start_groups([{<<"test">>, {one_for_one, [0, 2]}, []}], <<"CG_PREFIX">>, [])),
+
+  meck:unload(pipette),
+  meck:unload(kafe).
+-endif.
