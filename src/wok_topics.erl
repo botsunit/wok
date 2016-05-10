@@ -99,6 +99,17 @@ start_groups([{Name, one_for_all, Options}|Rest], Prefix, Acc) ->
 start_groups([{Name, one_for_one, Options}|Rest], Prefix, Acc) ->
   case kafe:topics() of
     #{Name := Topic} ->
+      start_groups(
+        [{Name,
+          {one_for_one, maps:keys(Topic)},
+          Options}|Rest], Prefix, Acc);
+    _ ->
+      lager:error("Topic ~p does not exist in Kafka", [Name]),
+      start_groups(Rest, Prefix, [{Name, one_for_one, Options}|Acc])
+  end;
+start_groups([{Name, {one_for_one, Partitions}, Options}|Rest], Prefix, Acc) when is_list(Partitions) ->
+  case kafe:topics() of
+    #{Name := Topic} ->
       LocalQueue = bucs:to_atom(
                      doteki:get_env([wok, messages, local_queue_name],
                                     ?DEFAULT_LOCAL_QUEUE)),
@@ -107,13 +118,14 @@ start_groups([{Name, one_for_one, Options}|Rest], Prefix, Acc) ->
                                          Name/binary, "_",
                                          (bucs:to_binary(P))/binary>>)
                       end,
+      TopicPartitions = maps:keys(Topic),
       start_groups(
         [{Name,
           one_for_one,
           LocalQueueFun(P),
           service_name(LocalQueueFun(P)),
           lists:keystore(partition, 1, Options, {partition, P})}
-         || P <- maps:keys(Topic)] ++ Rest, Prefix, Acc);
+         || P <- Partitions, lists:member(P, TopicPartitions)] ++ Rest, Prefix, Acc);
     _ ->
       lager:error("Topic ~p does not exist in Kafka", [Name]),
       start_groups(Rest, Prefix, [{Name, one_for_one, Options}|Acc])
