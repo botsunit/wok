@@ -4,7 +4,7 @@ zookeeper:
     - "2181:2181"
 
 kafka1:
-  image: botsunit/kafka
+  image: wurstmeister/kafka
   ports:
     - "9092:9092"
   links:
@@ -17,7 +17,7 @@ kafka1:
     - /var/run/docker.sock:/var/run/docker.sock
 
 kafka2:
-  image: botsunit/kafka
+  image: wurstmeister/kafka
   ports:
     - "9093:9092"
   links:
@@ -30,7 +30,7 @@ kafka2:
     - /var/run/docker.sock:/var/run/docker.sock
 
 kafka3:
-  image: botsunit/kafka
+  image: wurstmeister/kafka
   ports:
     - "9094:9092"
   links:
