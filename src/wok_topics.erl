@@ -200,7 +200,7 @@ hexstring(<<X:512/big-unsigned-integer>>) ->
   lists:flatten(io_lib:format("~128.16.0b", [X])).
 
 -ifdef(TEST).
-start_groups_test() ->
+start_groups_ok_test() ->
   FakePID = c:pid(0,0,0),
   meck:new(kafe),
   meck:expect(kafe, topics, 0, #{<<"test">> => #{0 => broker0, 1 => broker1, 2 => broker2}}),
@@ -243,4 +243,88 @@ start_groups_test() ->
 
   meck:unload(pipette),
   meck:unload(kafe).
+
+start_groups_missing_queue_test() ->
+  FakePID = c:pid(0,0,0),
+  meck:new(kafe),
+  meck:expect(kafe, topics, 0, #{<<"test">> => #{0 => broker0, 1 => broker1, 2 => broker2}}),
+  meck:expect(kafe, start_consumer, 3, {ok, FakePID}),
+  meck:new(pipette),
+  meck:expect(pipette, ready, 1, missing_queue),
+  meck:expect(pipette, new_queue, 1, {ok, fake}),
+
+  ?assertMatch([{<<"test">>,
+                 one_for_all,
+                 local_queue,
+                 _,
+                 []}],
+               start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, [])),
+  ?assertMatch(
+     [{<<"test">>,one_for_one,local_queue_test_2,
+       _,
+       [{partition,2}]},
+      {<<"test">>,one_for_one,local_queue_test_1,
+       _,
+       [{partition,1}]},
+      {<<"test">>,one_for_one,local_queue_test_0,
+       _,
+       [{partition,0}]}],
+     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, [])),
+  ?assertMatch(
+     [{<<"test">>,one_for_one,local_queue_test_2,
+       _,
+       [{partition,2}]},
+      {<<"test">>,one_for_one,local_queue_test_0,
+       _,
+       [{partition,0}]}],
+     start_groups([{<<"test">>, {one_for_one, [0, 2]}, []}], <<"CG_PREFIX">>, [])),
+
+  meck:unload(pipette),
+  meck:unload(kafe).
+
+start_groups_false_test() ->
+  FakePID = c:pid(0,0,0),
+  meck:new(kafe),
+  meck:expect(kafe, topics, 0, #{<<"test">> => #{0 => broker0, 1 => broker1, 2 => broker2}}),
+  meck:expect(kafe, start_consumer, 3, {ok, FakePID}),
+  meck:new(pipette),
+  meck:expect(pipette, ready, 1, false),
+
+  ?assertMatch([{<<"test">>,
+                 one_for_all,
+                 local_queue,
+                 _,
+                 []}],
+               start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, [])),
+  ?assertMatch(
+     [{<<"test">>,one_for_one,local_queue_test_2,
+       _,
+       [{partition,2}]},
+      {<<"test">>,one_for_one,local_queue_test_1,
+       _,
+       [{partition,1}]},
+      {<<"test">>,one_for_one,local_queue_test_0,
+       _,
+       [{partition,0}]}],
+     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, [])),
+  ?assertMatch(
+     [{<<"test">>,one_for_one,local_queue_test_2,
+       _,
+       [{partition,2}]},
+      {<<"test">>,one_for_one,local_queue_test_0,
+       _,
+       [{partition,0}]}],
+     start_groups([{<<"test">>, {one_for_one, [0, 2]}, []}], <<"CG_PREFIX">>, [])),
+
+  meck:unload(pipette),
+  meck:unload(kafe).
+
+group_options_test() ->
+  ?assertMatch(#{fetch_interval := 1000,
+                 fetch_size := 2000,
+                 other_option := other_value},
+               group_options([{fetch_frequency, 1000},
+                              {max_messages, 2000},
+                              {partition, 1},
+                              {other_option, other_value}])).
 -endif.
