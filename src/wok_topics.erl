@@ -123,7 +123,9 @@ start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], 
       end;
     false ->
       start_groups(Rest, CGPrefix, LQPrefix, [{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Acc])
-  end.
+  end;
+start_groups([{_, _, _, _, _, _, _} = G|Rest], CGPrefix, LQPrefix, Acc) ->
+  start_groups(Rest, CGPrefix, LQPrefix, [G|Acc]).
 
 local_queues(ConsumeMethod, Prefix, Topic, Partitions) ->
   lists:foldl(fun(P, Acc) ->
