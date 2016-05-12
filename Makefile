@@ -12,7 +12,7 @@ dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
 DEPS = lager wok_http_adapter wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid tempfile
 
 dep_lager = git https://github.com/basho/lager.git master
-dep_wok_http_adapter = git git@gitlab.botsunit.com:msaas/wok_http_adapter.git rewrite-http-params
+dep_wok_http_adapter = git git@gitlab.botsunit.com:msaas/wok_http_adapter.git master
 dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
 dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
 dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
@@ -31,7 +31,7 @@ dep_edown = git https://github.com/botsunit/edown.git master
 TEST_DEPS = meck wok_tests
 
 dep_meck = git https://github.com/eproxus/meck.git master
-dep_wok_tests = git git@gitlab.botsunit.com:msaas/wok_tests.git rewrite-http-params
+dep_wok_tests = git git@gitlab.botsunit.com:msaas/wok_tests.git master
 
 CP = cp
 CP_R = cp -r
