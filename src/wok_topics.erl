@@ -23,9 +23,13 @@ init(_) ->
       lager:error("Missing consumer group in configuration"),
       {stop, missing_consumer_group};
     ConsumerGroup ->
+      LocalQueue = bucs:to_atom(
+                     doteki:get_env([wok, messages, local_queue_name],
+                                    ?DEFAULT_LOCAL_QUEUE)),
       erlang:send_after(1000, self(), manage),
       {ok, #{consumer_group_prefix => ConsumerGroup,
-             topics => start_groups(doteki:get_env([wok, messages, topics], []), ConsumerGroup, [])}}
+             local_queue => LocalQueue,
+             topics => start_groups(doteki:get_env([wok, messages, topics], []), ConsumerGroup, LocalQueue, [])}}
   end.
 
 handle_call(_Request, _From, State) ->
@@ -33,23 +37,23 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({consume, Topic, Partition, _Offset, Key, Value}, #{topics := Topics} = State) ->
   case lists:keyfind(Topic, 1, Topics) of
-    {Topic, ConsumeMethod, LocalQueue, ServiceName, _, _, _} ->
+    {Topic, ConsumeMethod, LocalQueues, ServiceNames, _, _, _} ->
       _ = wok_dispatcher:handle(#message_transfert{
                                    key = Key,
                                    message = wok_msg:set_message(wok_msg:new(), Value),
                                    topic = Topic,
                                    partition = Partition,
-                                   local_queue = LocalQueue,
-                                   service_name = ServiceName,
+                                   local_queue = maps:get(Partition, LocalQueues),
+                                   service_name = maps:get(Partition, ServiceNames),
                                    consume_method = ConsumeMethod});
-    {Topic, ConsumeMethod, LocalQueue, ServiceName, _} ->
+    {Topic, ConsumeMethod, LocalQueues, ServiceNames, _} ->
       _ = wok_dispatcher:handle(#message_transfert{
                                    key = Key,
                                    message = wok_msg:set_message(wok_msg:new(), Value),
                                    topic = Topic,
                                    partition = Partition,
-                                   local_queue = LocalQueue,
-                                   service_name = ServiceName,
+                                   local_queue = maps:get(Partition, LocalQueues),
+                                   service_name = maps:get(Partition, ServiceNames),
                                    consume_method = ConsumeMethod});
     _ ->
       lager:error("Unregistrered topic ~p", [Topic])
@@ -59,10 +63,11 @@ handle_cast(_Msg, State) ->
   {noreply, State}.
 
 handle_info(manage, #{consumer_group_prefix := ConsumerGroup,
+                      local_queue := LocalQueue,
                       topics := Topics} = State) ->
   erlang:send_after(1000, self(), manage),
   {noreply, State#{
-              topics => start_groups(Topics, ConsumerGroup, [])}};
+              topics => start_groups(Topics, ConsumerGroup, LocalQueue, [])}};
 handle_info({'DOWN', MRef, _, _, _}, #{topics := Topics} = State) ->
   _ = erlang:demonitor(MRef),
   {noreply,
@@ -81,95 +86,81 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
-start_groups([], _, Acc) ->
+start_groups([], _, _, Acc) ->
   Acc;
-start_groups([{Name, Options}|Rest], Prefix, Acc) ->
-  start_groups([{Name, one_for_all, Options}|Rest], Prefix, Acc);
-start_groups([{Name, one_for_all, Options}|Rest], Prefix, Acc) ->
+start_groups([{Topic, Options}|Rest], CGPrefix, LQPrefix, Acc) ->
+  start_groups([{Topic, one_for_all, Options}|Rest], CGPrefix, LQPrefix, Acc);
+start_groups([{Topic, ConsumeMethod, Options}|Rest], CGPrefix, LQPrefix, Acc) when ConsumeMethod == one_for_all;
+                                                                                   ConsumeMethod == one_for_one ->
   case kafe:topics() of
-    #{Name := _} ->
-      LocalQueue = bucs:to_atom(
-                     doteki:get_env([wok, messages, local_queue_name],
-                                    ?DEFAULT_LOCAL_QUEUE)),
-      start_groups([{Name,
-                     one_for_all,
-                     bucs:to_atom(LocalQueue),
-                     service_name(LocalQueue),
-                     Options}|Rest], Prefix, Acc);
+    #{Topic := Partitions} ->
+      LocalQueues = local_queues(ConsumeMethod, LQPrefix, Topic, maps:keys(Partitions)),
+      ServiceNames = service_names(LocalQueues),
+      start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], CGPrefix, LQPrefix, Acc);
     _ ->
-      lager:error("Topic ~p does not exist in Kafka", [Name]),
-      start_groups(Rest, Prefix, [{Name, one_for_all, Options}|Acc])
+      lager:error("Topic ~p does not exist in Kafka !", [Topic]),
+      erlang:exit(missing_topic)
   end;
-start_groups([{Name, one_for_one, Options}|Rest], Prefix, Acc) ->
-  case kafe:topics() of
-    #{Name := Topic} ->
-      start_groups(
-        [{Name,
-          {one_for_one, maps:keys(Topic)},
-          Options}|Rest], Prefix, Acc);
-    _ ->
-      lager:error("Topic ~p does not exist in Kafka", [Name]),
-      start_groups(Rest, Prefix, [{Name, one_for_one, Options}|Acc])
-  end;
-start_groups([{Name, {one_for_one, Partitions}, Options}|Rest], Prefix, Acc) when is_list(Partitions) ->
-  case kafe:topics() of
-    #{Name := Topic} ->
-      LocalQueue = bucs:to_atom(
-                     doteki:get_env([wok, messages, local_queue_name],
-                                    ?DEFAULT_LOCAL_QUEUE)),
-      LocalQueueFun = fun(P) ->
-                          bucs:to_atom(<<(bucs:to_binary(LocalQueue))/binary, "_",
-                                         Name/binary, "_",
-                                         (bucs:to_binary(P))/binary>>)
-                      end,
-      TopicPartitions = maps:keys(Topic),
-      start_groups(
-        [{Name,
-          one_for_one,
-          LocalQueueFun(P),
-          service_name(LocalQueueFun(P)),
-          lists:keystore(partition, 1, Options, {partition, P})}
-         || P <- Partitions, lists:member(P, TopicPartitions)] ++ Rest, Prefix, Acc);
-    _ ->
-      lager:error("Topic ~p does not exist in Kafka", [Name]),
-      start_groups(Rest, Prefix, [{Name, one_for_one, Options}|Acc])
-  end;
-start_groups([{Name, ConsumeMethod, LocalQueue, ServiceName, Options}|Rest], Prefix, Acc) ->
-  case pipette:ready(LocalQueue) of
+start_groups([{Topic, Other, _}|_], _, _, _) ->
+  lager:error("Invalid consumer method ~p for tomic ~p !", [Other, Topic]),
+  exit(invalid_consumer_method);
+start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], CGPrefix, LQPrefix, Acc) ->
+  case local_queues_ready(LocalQueues) of
     true ->
-      {ConsumerGroup,
-       Topics} = case lists:keyfind(partition, 1, Options) of
-                   {partition, P} ->
-                     {<<Prefix/binary, "_", Name/binary, "_", (bucs:to_binary(P))/binary>>,
-                      [{Name, [P]}]};
-                   false ->
-                     {<<Prefix/binary, "_", Name/binary>>,
-                      [Name]}
-                 end,
-      case kafe:start_consumer(ConsumerGroup, fun ?MODULE:consume/5, group_options([{topics, Topics}|Options])) of
+      ConsumerGroup = <<CGPrefix/binary, "_", Topic/binary>>,
+      case kafe:start_consumer(ConsumerGroup,
+                               fun ?MODULE:consume/5,
+                               group_options([{topics, [Topic]}|Options])) of
         {ok, PID} ->
           MRef = erlang:monitor(process, PID),
-          lager:debug("Start consumer ~p for ~p", [ConsumerGroup, Topics]),
-          start_groups(Rest, Prefix, [{Name, ConsumeMethod, LocalQueue, ServiceName, Options, PID, MRef}|Acc]);
-        {error, Reason} ->
-          lager:error("Can't start group for topic ~p: ~p", [Name, Reason]),
-          start_groups(Rest, Prefix, [{Name, ConsumeMethod, LocalQueue, ServiceName, Options}|Acc])
-      end;
-    missing_queue ->
-      case pipette:new_queue(LocalQueue) of
-        {ok, _} ->
-          lager:info("Local queue ~p created", [LocalQueue]),
-          start_groups(Rest, Prefix, [{Name, ConsumeMethod, LocalQueue, ServiceName, Options}|Acc]);
-        {error, Reason} ->
-          lager:error("Faild to create local queue ~p: ~p", [LocalQueue, Reason]),
-          exit(Reason)
+          lager:debug("Start consumer ~p for topic ~p (~p)", [ConsumerGroup, Topic, ConsumeMethod]),
+          start_groups(Rest, CGPrefix, LQPrefix,
+                       [{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options, PID, MRef}|Acc]);
+        {error, Error} ->
+          lager:error("Can't start consumer ~p for topic ~p (~p) : ~p", [ConsumerGroup, Topic, ConsumeMethod, Error]),
+          start_groups(Rest, CGPrefix, LQPrefix,
+                       [{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Acc])
       end;
     false ->
-      lager:debug("Missing local queue: ~p", [LocalQueue]),
-      start_groups(Rest, Prefix, [{Name, ConsumeMethod, LocalQueue, ServiceName, Options}|Acc])
-  end;
-start_groups([{_, _, _, _, _, _, _} = Topic|Rest], Prefix, Acc) ->
-  start_groups(Rest, Prefix, [Topic|Acc]).
+      start_groups(Rest, CGPrefix, LQPrefix, [{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Acc])
+  end.
+
+local_queues(ConsumeMethod, Prefix, Topic, Partitions) ->
+  lists:foldl(fun(P, Acc) ->
+                  maps:put(P, local_queue(ConsumeMethod, Prefix, Topic, P),Acc)
+              end, #{}, Partitions).
+
+local_queue(one_for_one, Prefix, Topic, Partition) ->
+  bucs:to_atom(<<(bucs:to_binary(Prefix))/binary, "_",
+                 (bucs:to_binary(Topic))/binary, "_",
+                 (bucs:to_binary(Partition))/binary>>);
+local_queue(one_for_all, Prefix, Topic, _) ->
+  bucs:to_atom(<<(bucs:to_binary(Prefix))/binary, "_",
+                 (bucs:to_binary(Topic))/binary>>).
+
+service_names(Names) ->
+  maps:map(fun(_, N) ->
+               bucs:to_atom(hexstring(crypto:hash(sha256, bucs:to_binary(N))))
+           end, Names).
+
+local_queues_ready(Queues) ->
+  maps:fold(fun(_, Q, Acc) ->
+                case pipette:ready(Q) of
+                  missing_queue ->
+                    case pipette:new_queue(Q) of
+                      {ok, _} ->
+                        Acc and false;
+                      {error, Error} ->
+                        lager:error("Faild to create local queue ~p: ~p", [Q, Error]),
+                        exit(Error)
+                    end;
+                  Other ->
+                    Acc and Other
+                end
+            end, true, Queues).
+
+
+
 
 group_options(Options) ->
   group_options(Options, #{}).
@@ -179,16 +170,11 @@ group_options([{fetch_frequency, Value}|Rest], Acc) ->
   group_options(Rest, Acc#{fetch_interval => Value});
 group_options([{max_messages, Value}|Rest], Acc) ->
   group_options(Rest, Acc#{fetch_size => Value});
-group_options([{partition, _}|Rest], Acc) ->
-  group_options(Rest, Acc);
 group_options([{Key, Value}|Rest], Acc) ->
   group_options(Rest, maps:put(Key, Value, Acc)).
 
 consume(Topic, Partition, Offset, Key, Value) ->
   gen_server:cast(?MODULE, {consume, Topic, Partition, Offset, Key, Value}).
-
-service_name(Name) ->
-  bucs:to_atom(hexstring(crypto:hash(sha256, bucs:to_binary(Name)))).
 
 hexstring(<<X:128/big-unsigned-integer>>) ->
   lists:flatten(io_lib:format("~32.16.0b", [X]));
@@ -208,38 +194,32 @@ start_groups_ok_test() ->
   meck:new(pipette),
   meck:expect(pipette, ready, 1, true),
 
-  ?assertMatch([{<<"test">>,
-                 one_for_all,
-                 local_queue,
-                 _,
-                 [],
-                 FakePID,
-                 _}],
-               start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, [])),
   ?assertMatch(
-     [{<<"test">>,one_for_one,local_queue_test_2,
-       _,
-       [{partition,2}],
-       FakePID,_},
-      {<<"test">>,one_for_one,local_queue_test_1,
-       _,
-       [{partition,1}],
-       FakePID,_},
-      {<<"test">>,one_for_one,local_queue_test_0,
-       _,
-       [{partition,0}],
-       FakePID,_}],
-     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, [])),
+     [{<<"test">>,
+       one_for_all,
+       #{0 := local_queue_test,
+         1 := local_queue_test,
+         2 := local_queue_test},
+       #{0 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507',
+         1 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507',
+         2 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507'},
+       [],
+       FakePID,
+       _}],
+     start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, local_queue, [])),
   ?assertMatch(
-     [{<<"test">>,one_for_one,local_queue_test_2,
-       _,
-       [{partition,2}],
-       FakePID,_},
-      {<<"test">>,one_for_one,local_queue_test_0,
-       _,
-       [{partition,0}],
-       FakePID,_}],
-     start_groups([{<<"test">>, {one_for_one, [0, 2]}, []}], <<"CG_PREFIX">>, [])),
+     [{<<"test">>,
+       one_for_one,
+       #{0 := local_queue_test_0,
+         1 := local_queue_test_1,
+         2 := local_queue_test_2},
+       #{0 := 'edaa1f6ed74e45b0e1d36e4f89df3033c47955178e02c72e067f1e7ea5bcc6ab',
+         1 := '5cb5ec96970784cd66f190024e947f38a1d18f4c5ac144de63ef7115ba6fbdb1',
+         2 := 'e62ec3f5b429459d2d52ca20e6449e2f09d4785a4a013a244a4d4888a9852b03'},
+       [],
+       FakePID,
+       _}],
+     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, local_queue, [])),
 
   meck:unload(pipette),
   meck:unload(kafe).
@@ -253,31 +233,28 @@ start_groups_missing_queue_test() ->
   meck:expect(pipette, ready, 1, missing_queue),
   meck:expect(pipette, new_queue, 1, {ok, fake}),
 
-  ?assertMatch([{<<"test">>,
-                 one_for_all,
-                 local_queue,
-                 _,
-                 []}],
-               start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, [])),
   ?assertMatch(
-     [{<<"test">>,one_for_one,local_queue_test_2,
-       _,
-       [{partition,2}]},
-      {<<"test">>,one_for_one,local_queue_test_1,
-       _,
-       [{partition,1}]},
-      {<<"test">>,one_for_one,local_queue_test_0,
-       _,
-       [{partition,0}]}],
-     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, [])),
+     [{<<"test">>,
+       one_for_all,
+       #{0 := local_queue_test,
+         1 := local_queue_test,
+         2 := local_queue_test},
+       #{0 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507',
+         1 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507',
+         2 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507'},
+       []}],
+     start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, local_queue, [])),
   ?assertMatch(
-     [{<<"test">>,one_for_one,local_queue_test_2,
-       _,
-       [{partition,2}]},
-      {<<"test">>,one_for_one,local_queue_test_0,
-       _,
-       [{partition,0}]}],
-     start_groups([{<<"test">>, {one_for_one, [0, 2]}, []}], <<"CG_PREFIX">>, [])),
+     [{<<"test">>,
+       one_for_one,
+       #{0 := local_queue_test_0,
+         1 := local_queue_test_1,
+         2 := local_queue_test_2},
+       #{0 := 'edaa1f6ed74e45b0e1d36e4f89df3033c47955178e02c72e067f1e7ea5bcc6ab',
+         1 := '5cb5ec96970784cd66f190024e947f38a1d18f4c5ac144de63ef7115ba6fbdb1',
+         2 := 'e62ec3f5b429459d2d52ca20e6449e2f09d4785a4a013a244a4d4888a9852b03'},
+       []}],
+     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, local_queue, [])),
 
   meck:unload(pipette),
   meck:unload(kafe).
@@ -290,31 +267,28 @@ start_groups_false_test() ->
   meck:new(pipette),
   meck:expect(pipette, ready, 1, false),
 
-  ?assertMatch([{<<"test">>,
-                 one_for_all,
-                 local_queue,
-                 _,
-                 []}],
-               start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, [])),
   ?assertMatch(
-     [{<<"test">>,one_for_one,local_queue_test_2,
-       _,
-       [{partition,2}]},
-      {<<"test">>,one_for_one,local_queue_test_1,
-       _,
-       [{partition,1}]},
-      {<<"test">>,one_for_one,local_queue_test_0,
-       _,
-       [{partition,0}]}],
-     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, [])),
+     [{<<"test">>,
+       one_for_all,
+       #{0 := local_queue_test,
+         1 := local_queue_test,
+         2 := local_queue_test},
+       #{0 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507',
+         1 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507',
+         2 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507'},
+      []}],
+     start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, local_queue, [])),
   ?assertMatch(
-     [{<<"test">>,one_for_one,local_queue_test_2,
-       _,
-       [{partition,2}]},
-      {<<"test">>,one_for_one,local_queue_test_0,
-       _,
-       [{partition,0}]}],
-     start_groups([{<<"test">>, {one_for_one, [0, 2]}, []}], <<"CG_PREFIX">>, [])),
+     [{<<"test">>,
+       one_for_one,
+       #{0 := local_queue_test_0,
+         1 := local_queue_test_1,
+         2 := local_queue_test_2},
+       #{0 := 'edaa1f6ed74e45b0e1d36e4f89df3033c47955178e02c72e067f1e7ea5bcc6ab',
+         1 := '5cb5ec96970784cd66f190024e947f38a1d18f4c5ac144de63ef7115ba6fbdb1',
+         2 := 'e62ec3f5b429459d2d52ca20e6449e2f09d4785a4a013a244a4d4888a9852b03'},
+       []}],
+     start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, local_queue, [])),
 
   meck:unload(pipette),
   meck:unload(kafe).
@@ -325,6 +299,5 @@ group_options_test() ->
                  other_option := other_value},
                group_options([{fetch_frequency, 1000},
                               {max_messages, 2000},
-                              {partition, 1},
                               {other_option, other_value}])).
 -endif.
