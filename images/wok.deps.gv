@@ -83,6 +83,7 @@ digraph wok_deps {
   kafe -> bucs;
   kafe -> doteki;
   kafe -> edown[style=dotted];
+  kafe -> meck[style=dotted];
 
   cowboy -> cowlib;
   cowboy -> ranch;
