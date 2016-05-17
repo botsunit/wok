@@ -8,7 +8,7 @@
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
--export([consume/5]).
+-export([consume/6]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -109,7 +109,7 @@ start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], 
     true ->
       ConsumerGroup = <<CGPrefix/binary, "_", Topic/binary>>,
       case kafe:start_consumer(ConsumerGroup,
-                               fun ?MODULE:consume/5,
+                               fun ?MODULE:consume/6,
                                group_options([{topics, [Topic]}|Options])) of
         {ok, PID} ->
           MRef = erlang:monitor(process, PID),
@@ -175,7 +175,7 @@ group_options([{max_messages, Value}|Rest], Acc) ->
 group_options([{Key, Value}|Rest], Acc) ->
   group_options(Rest, maps:put(Key, Value, Acc)).
 
-consume(Topic, Partition, Offset, Key, Value) ->
+consume(_CommitID, Topic, Partition, Offset, Key, Value) ->
   gen_server:cast(?MODULE, {consume, Topic, Partition, Offset, Key, Value}).
 
 hexstring(<<X:128/big-unsigned-integer>>) ->
