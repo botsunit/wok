@@ -11,18 +11,18 @@ dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
 
 DEPS = lager wok_http_adapter wok_message_handler wok_producer pipette kafe cowboy cowboy_default_static_file bucs doteki uuid tempfile
 
-dep_lager = git https://github.com/basho/lager.git master
+dep_lager = git https://github.com/basho/lager.git 3.2.0
 dep_wok_http_adapter = git git@gitlab.botsunit.com:msaas/wok_http_adapter.git master
 dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
 dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
-dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git master
-dep_kafe = git https://github.com/botsunit/kafe.git master
+dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git 0.0.1
+dep_kafe = git https://github.com/botsunit/kafe.git 1.2.1
 dep_cowboy_default_static_file = git https://github.com/botsunit/cowboy_default_static_file.git master
 dep_cowboy = git https://github.com/ninenines/cowboy.git 2.0.0-pre.3
-dep_bucs = git https://github.com/botsunit/bucs.git master
-dep_doteki = git https://github.com/botsunit/doteki.git master
-dep_uuid = git https://github.com/avtobiff/erlang-uuid.git master
-dep_tempfile = git https://github.com/botsunit/tempfile.git master
+dep_bucs = git https://github.com/botsunit/bucs.git 0.0.1
+dep_doteki = git https://github.com/botsunit/doteki.git 0.0.1
+dep_uuid = git https://github.com/avtobiff/erlang-uuid.git v0.5.0
+dep_tempfile = git https://github.com/botsunit/tempfile.git 1.0.1
 
 DOC_DEPS = edown
 
