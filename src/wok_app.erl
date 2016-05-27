@@ -19,7 +19,7 @@ start_rest() ->
   case doteki:get_env([wok, rest]) of
     undefined ->
       lager:debug("No REST configuration."),
-      undefined;
+      #{};
     _ ->
       _ = application:ensure_all_started(cowboy),
       Port = doteki:get_env([wok, rest, port], ?DEFAULT_REST_PORT),
