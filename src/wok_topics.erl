@@ -8,7 +8,7 @@
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
--export([consume/6]).
+-export([consume/6, stop_fetching/1]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -35,7 +35,7 @@ init(_) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({consume, Topic, Partition, _Offset, Key, Value}, #{topics := Topics} = State) ->
+handle_cast({consume, CommitID, Topic, Partition, _Offset, Key, Value}, #{topics := Topics} = State) ->
   case lists:keyfind(Topic, 1, Topics) of
     {Topic, ConsumeMethod, LocalQueues, ServiceNames, _, _, _} ->
       _ = wok_dispatcher:handle(#message_transfert{
@@ -45,7 +45,8 @@ handle_cast({consume, Topic, Partition, _Offset, Key, Value}, #{topics := Topics
                                    partition = Partition,
                                    local_queue = maps:get(Partition, LocalQueues),
                                    service_name = maps:get(Partition, ServiceNames),
-                                   consume_method = ConsumeMethod});
+                                   consume_method = ConsumeMethod,
+                                   commit_id = CommitID});
     {Topic, ConsumeMethod, LocalQueues, ServiceNames, _} ->
       _ = wok_dispatcher:handle(#message_transfert{
                                    key = Key,
@@ -54,7 +55,8 @@ handle_cast({consume, Topic, Partition, _Offset, Key, Value}, #{topics := Topics
                                    partition = Partition,
                                    local_queue = maps:get(Partition, LocalQueues),
                                    service_name = maps:get(Partition, ServiceNames),
-                                   consume_method = ConsumeMethod});
+                                   consume_method = ConsumeMethod,
+                                   commit_id = CommitID});
     _ ->
       lager:error("Unregistrered topic ~p", [Topic])
   end,
@@ -99,7 +101,7 @@ start_groups([{Topic, ConsumeMethod, Options}|Rest], CGPrefix, LQPrefix, Acc) wh
       start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], CGPrefix, LQPrefix, Acc);
     _ ->
       lager:error("Topic ~p does not exist in Kafka !", [Topic]),
-      erlang:exit(missing_topic)
+      init:stop()
   end;
 start_groups([{Topic, Other, _}|_], _, _, _) ->
   lager:error("Invalid consumer method ~p for tomic ~p !", [Other, Topic]),
@@ -110,7 +112,10 @@ start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], 
       ConsumerGroup = <<CGPrefix/binary, "_", Topic/binary>>,
       case kafe:start_consumer(ConsumerGroup,
                                fun ?MODULE:consume/6,
-                               group_options([{topics, [Topic]}|Options])) of
+                               group_options([{autocommit, false},
+                                              {allow_unordered_commit, ConsumeMethod == one_for_all},
+                                              {on_stop_fetching, fun ?MODULE:stop_fetching/1},
+                                              {topics, [Topic]}|Options])) of
         {ok, PID} ->
           MRef = erlang:monitor(process, PID),
           lager:debug("Start consumer ~p for topic ~p (~p)", [ConsumerGroup, Topic, ConsumeMethod]),
@@ -161,9 +166,6 @@ local_queues_ready(Queues) ->
                 end
             end, true, Queues).
 
-
-
-
 group_options(Options) ->
   group_options(Options, #{}).
 group_options([], Acc) ->
@@ -175,8 +177,11 @@ group_options([{max_messages, Value}|Rest], Acc) ->
 group_options([{Key, Value}|Rest], Acc) ->
   group_options(Rest, maps:put(Key, Value, Acc)).
 
-consume(_CommitID, Topic, Partition, Offset, Key, Value) ->
-  gen_server:cast(?MODULE, {consume, Topic, Partition, Offset, Key, Value}).
+consume(CommitID, Topic, Partition, Offset, Key, Value) ->
+  gen_server:cast(?MODULE, {consume, CommitID, Topic, Partition, Offset, Key, Value}).
+
+stop_fetching(GroupID) ->
+  lager:info("STOP FETCHING ~p !!!!", [GroupID]).
 
 hexstring(<<X:128/big-unsigned-integer>>) ->
   lists:flatten(io_lib:format("~32.16.0b", [X]));

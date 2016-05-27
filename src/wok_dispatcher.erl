@@ -54,7 +54,8 @@ handle_cast({handle, MessageTransfert}, #{services := Services} = State) ->
   end,
   {noreply, State};
 handle_cast({terminate, Child, #message_transfert{message = Message,
-                                                  local_queue = LocalQueue} = MessageTransfert}, State) ->
+                                                  local_queue = LocalQueue,
+                                                  commit_id = CommitID} = MessageTransfert}, State) ->
   case wok_msg:get_response(MessageTransfert) of
     noreply ->
       ok;
@@ -68,7 +69,9 @@ handle_cast({terminate, Child, #message_transfert{message = Message,
                 {ok, _} ->
                   lager:debug("Message provided");
                 E ->
-                  lager:error("Faild to provide message : ~p", [E]) % TODO: Queue message and retry later
+                  lager:error("Faild to provide message : ~p", [E]),
+                  _ = pipette:clean_all(),
+                  init:stop()
               end;
             noreply ->
               ok
@@ -77,8 +80,17 @@ handle_cast({terminate, Child, #message_transfert{message = Message,
           lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason])
       end;
     R ->
-      lager:error("Invalid response : ~p", [R]),
-      ignore
+      lager:error("Message controler faild : ~p", [R]),
+      _ = pipette:clean_all(),
+      init:stop()
+  end,
+  case kafe_consumer:commit(CommitID, #{retry => 3}) of
+    {error, Reason1} ->
+      lager:debug("Commit faild : ~p", [Reason1]),
+      _ = pipette:clean_all(),
+      init:stop();
+    _ ->
+      ok
   end,
   _ = case wok_services_sup:terminate_child(Child) of
         ok ->
@@ -140,8 +152,16 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
-consume(_, [], _) ->
-  ok;
+consume(#message_transfert{commit_id = CommitID}, [], _) ->
+  lager:debug("No service for message : commit ~p", [CommitID]),
+  case kafe_consumer:commit(CommitID, #{retry => 3}) of
+    {error, Reason1} ->
+      lager:debug("Commit faild : ~p", [Reason1]),
+      _ = pipette:clean_all(),
+      init:stop();
+    _ ->
+      ok
+  end;
 consume(#message_transfert{message = ParsedMessage,
                            local_queue = LocalQueue} = MessageTransfert,
         Services, #{services := ServicesActions}) ->

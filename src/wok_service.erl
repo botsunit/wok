@@ -26,7 +26,11 @@ handle_call(_Request, _From, Message) ->
 handle_cast(serve, #message_transfert{message = Message,
                                       action = {Module, Function}} = State) ->
   lager:debug("Serve message ~p", [Message]),
-  Message1 = erlang:apply(Module, Function, [Message]),
+  Message1 = try
+               erlang:apply(Module, Function, [Message])
+             catch
+               E:R -> {exception, {E, R}}
+             end,
   State1 = State#message_transfert{message = Message1},
   _ = wok_dispatcher:finish(self(), State1),
   {noreply, State1};
