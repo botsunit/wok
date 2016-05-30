@@ -37,7 +37,7 @@ handle_call(_Request, _From, State) ->
 
 handle_cast({consume, CommitID, Topic, Partition, _Offset, Key, Value}, #{topics := Topics} = State) ->
   case lists:keyfind(Topic, 1, Topics) of
-    {Topic, ConsumeMethod, LocalQueues, ServiceNames, _, _, _} ->
+    {Topic, ConsumeMethod, LocalQueues, ServiceNames, _, _, _, _} ->
       _ = wok_dispatcher:handle(#message_transfert{
                                    key = Key,
                                    message = wok_msg:set_message(wok_msg:new(), Value),
@@ -74,7 +74,7 @@ handle_info({'DOWN', MRef, _, _, _}, #{topics := Topics} = State) ->
   _ = erlang:demonitor(MRef),
   {noreply,
    State#{topics => case lists:keyfind(MRef, 7, Topics) of
-                      {Name, ConsumeMethod, LocalQueue, ServiceName, Options, _, MRef} ->
+                      {Name, ConsumeMethod, LocalQueue, ServiceName, Options, _, _, MRef} ->
                         lists:keyreplace(MRef, 7, Topics, {Name, ConsumeMethod, LocalQueue, ServiceName, Options});
                       false ->
                         Topics
@@ -120,7 +120,7 @@ start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], 
           MRef = erlang:monitor(process, PID),
           lager:debug("Start consumer ~p for topic ~p (~p)", [ConsumerGroup, Topic, ConsumeMethod]),
           start_groups(Rest, CGPrefix, LQPrefix,
-                       [{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options, PID, MRef}|Acc]);
+                       [{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options, ConsumerGroup, PID, MRef}|Acc]);
         {error, Error} ->
           lager:error("Can't start consumer ~p for topic ~p (~p) : ~p", [ConsumerGroup, Topic, ConsumeMethod, Error]),
           start_groups(Rest, CGPrefix, LQPrefix,
@@ -129,7 +129,7 @@ start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], 
     false ->
       start_groups(Rest, CGPrefix, LQPrefix, [{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Acc])
   end;
-start_groups([{_, _, _, _, _, _, _} = G|Rest], CGPrefix, LQPrefix, Acc) ->
+start_groups([{_, _, _, _, _, _, _, _} = G|Rest], CGPrefix, LQPrefix, Acc) ->
   start_groups(Rest, CGPrefix, LQPrefix, [G|Acc]).
 
 local_queues(ConsumeMethod, Prefix, Topic, Partitions) ->
@@ -211,6 +211,7 @@ start_groups_ok_test() ->
          1 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507',
          2 := 'c84bacbef763e77dced0eb267ae9cdf879ae71abeac8f9d7f81695180d047507'},
        [],
+       <<"CG_PREFIX_test">>,
        FakePID,
        _}],
      start_groups([{<<"test">>, []}], <<"CG_PREFIX">>, local_queue, [])),
@@ -224,6 +225,7 @@ start_groups_ok_test() ->
          1 := '5cb5ec96970784cd66f190024e947f38a1d18f4c5ac144de63ef7115ba6fbdb1',
          2 := 'e62ec3f5b429459d2d52ca20e6449e2f09d4785a4a013a244a4d4888a9852b03'},
        [],
+       <<"CG_PREFIX_test">>,
        FakePID,
        _}],
      start_groups([{<<"test">>, one_for_one, []}], <<"CG_PREFIX">>, local_queue, [])),

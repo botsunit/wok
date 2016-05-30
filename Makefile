@@ -68,6 +68,8 @@ dev: deps app
 
 release: app mix.all
 
+KAFKA_ADVERTISED_HOST_NAME = $(shell ip addr list docker0 |grep "inet " |cut -d' ' -f6|cut -d/ -f1)
+
 define docker_compose_yml
 version: "2"
 

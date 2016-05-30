@@ -17,4 +17,5 @@ xrefr
 test/TEST-*.xml
 _build/
 mix.lock
+docker-compose.yml
 
