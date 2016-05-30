@@ -8,7 +8,7 @@
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
--export([consume/6, stop_fetching/1]).
+-export([consume/6, stop_fetching/1, start_fetching/1]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -60,6 +60,27 @@ handle_cast({consume, CommitID, Topic, Partition, _Offset, Key, Value}, #{topics
     _ ->
       lager:error("Unregistrered topic ~p", [Topic])
   end,
+  {noreply, State};
+handle_cast({stop_fetching, GroupID}, #{topics := Topics} = State) ->
+  lager:debug("Stop fetching ~p", [GroupID]),
+  _ = kafe_consumer:remove_commits(GroupID),
+  case lists:keyfind(GroupID, 6, Topics) of
+    {_, _, LocalQueues, _, _, GroupID, _, _} ->
+      [lager:debug("Clean queue ~p: ~p", [Q, pipette:clean(Q)])
+       || Q <- lists:usort(maps:values(LocalQueues))];
+    _ ->
+      lager:debug("Can't find local queues for group ~p", [GroupID])
+  end,
+  {noreply, State};
+handle_cast({start_fetching, GroupID}, #{topics := Topics} = State) ->
+  case lists:keyfind(GroupID, 6, Topics) of
+    {_, _, LocalQueues, _, _, GroupID, _, _} ->
+      [lager:debug("Create queue ~p: ~p", [Q, pipette:new_queue(Q)])
+       || Q <- lists:usort(maps:values(LocalQueues))];
+    _ ->
+      lager:debug("Can't find local queues for group ~p", [GroupID])
+  end,
+  lager:debug("Start fetching for group ~p", [GroupID]),
   {noreply, State};
 handle_cast(_Msg, State) ->
   {noreply, State}.
@@ -113,8 +134,9 @@ start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], 
       case kafe:start_consumer(ConsumerGroup,
                                fun ?MODULE:consume/6,
                                group_options([{autocommit, false},
-                                              {allow_unordered_commit, ConsumeMethod == one_for_all},
+                                              {allow_unordered_commit, true}, % ConsumeMethod == one_for_all},
                                               {on_stop_fetching, fun ?MODULE:stop_fetching/1},
+                                              {on_start_fetching, fun ?MODULE:start_fetching/1},
                                               {topics, [Topic]}|Options])) of
         {ok, PID} ->
           MRef = erlang:monitor(process, PID),
@@ -181,7 +203,10 @@ consume(CommitID, Topic, Partition, Offset, Key, Value) ->
   gen_server:cast(?MODULE, {consume, CommitID, Topic, Partition, Offset, Key, Value}).
 
 stop_fetching(GroupID) ->
-  lager:info("STOP FETCHING ~p !!!!", [GroupID]).
+  gen_server:cast(?MODULE, {stop_fetching, GroupID}).
+
+start_fetching(GroupID) ->
+  gen_server:cast(?MODULE, {start_fetching, GroupID}).
 
 hexstring(<<X:128/big-unsigned-integer>>) ->
   lists:flatten(io_lib:format("~32.16.0b", [X]));

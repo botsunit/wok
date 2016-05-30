@@ -139,7 +139,15 @@ handle_info(fetch, State) ->
                ok
            end || _ <- lists:seq(1, doteki:get_env([wok, messages, max_services_fork], ?DEFAULT_MAX_SERVICES_FORK))];
         false ->
-          erlang:send_after(1000, self(), fetch)
+          erlang:send_after(1000, self(), fetch);
+        missing_queue ->
+          case pipette:new_queue(LocalQueue) of
+            {ok, _} ->
+              false;
+            {error, Error} ->
+              lager:error("Faild to create local queue ~p: ~p", [LocalQueue, Error]),
+              init:stop()
+          end
       end
   end,
   {noreply, State};

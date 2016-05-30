@@ -44,7 +44,7 @@ start_messages() ->
     undefined ->
       ok;
     _ ->
-      _ = start_local_queue(),
+      _ = pipette:clean_all(),
       _ = application:ensure_all_started(kafe),
       ok
   end.
@@ -62,20 +62,5 @@ check_message_handler() ->
           lager:error("Can't load handler ~p", [Handler]),
           exit(What)
       end
-  end.
-
-start_local_queue() ->
-  LocalQueue = bucs:to_atom(doteki:get_env([wok, messages, local_queue_name], ?DEFAULT_LOCAL_QUEUE)),
-  case pipette:queue(LocalQueue) of
-    missing_queue ->
-      case pipette:new_queue(LocalQueue) of
-        {ok, _} ->
-          lager:info("Local queue ~p created", [LocalQueue]);
-        {error, Reason} ->
-          lager:error("Faild to create local queue ~p: ~p", [LocalQueue, Reason]),
-          exit(Reason)
-      end;
-    _ ->
-      lager:info("Local queue ~p started", [LocalQueue])
   end.
 
