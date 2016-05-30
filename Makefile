@@ -16,7 +16,7 @@ dep_wok_http_adapter = git git@gitlab.botsunit.com:msaas/wok_http_adapter.git ma
 dep_wok_message_handler = git git@gitlab.botsunit.com:msaas/wok_message_handler.git master
 dep_wok_producer = git git@gitlab.botsunit.com:msaas/wok_producer.git master
 dep_pipette = git git@gitlab.botsunit.com:msaas/pipette.git 0.0.1
-dep_kafe = git https://github.com/botsunit/kafe.git 1.2.1
+dep_kafe = git https://github.com/botsunit/kafe.git 1.2.2
 dep_cowboy_default_static_file = git https://github.com/botsunit/cowboy_default_static_file.git master
 dep_cowboy = git https://github.com/ninenines/cowboy.git 2.0.0-pre.3
 dep_bucs = git https://github.com/botsunit/bucs.git 0.0.1
@@ -67,4 +67,76 @@ dev: deps app
 	@erl -pa ebin include deps/*/ebin deps/*/include -config config/${PROJECT}.config
 
 release: app mix.all
+
+define docker_compose_yml
+version: "2"
+
+services:
+  zookeeper:
+    image: dockerkafka/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka1:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    links:
+      - zookeeper:zk
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zk
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: $(KAFKA_ADVERTISED_HOST_NAME)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  kafka2:
+    image: wurstmeister/kafka
+    ports:
+      - "9093:9092"
+    links:
+      - zookeeper:zk
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zk
+      KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_HOST_NAME: $(KAFKA_ADVERTISED_HOST_NAME)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  kafka3:
+    image: wurstmeister/kafka
+    ports:
+      - "9094:9092"
+    links:
+      - zookeeper:zk
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zk
+      KAFKA_BROKER_ID: 3
+      KAFKA_ADVERTISED_HOST_NAME: $(KAFKA_ADVERTISED_HOST_NAME)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  tools:
+    image: confluent/tools
+    depends_on:
+      - zookeeper
+      - kafka1
+      - kafka2
+      - kafka3
+endef
+
+docker-compose.yml:
+	$(call render_template,docker_compose_yml,docker-compose.yml)
+
+docker-start: docker-stop
+	@docker-compose up -d
+	@sleep 1
+	@docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic test
+	@docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic repl
+	@docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic public
+	@docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic service
+
+docker-stop: docker-compose.yml
+	@docker-compose kill
+	@docker-compose rm --all -vf
 
