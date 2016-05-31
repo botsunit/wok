@@ -6,15 +6,17 @@ digraph wok_deps {
     rankdir=LR;
   ]
 
-  wok[label="wok\n(0.2.2)", fontcolor="white", style="filled", fillcolor="black"];
+  wok[label="wok\n(0.3.0)", fontcolor="white", style="filled", fillcolor="black"];
   lager[label="lager\n(3.2.0)"];
-  wok_http_adapter[label="wok_http_adapter\n(0.0.3)", style="filled", fillcolor="red"];
-  wok_message_handler[label="wok_message_handler\n(0.1.1)", style="filled", fillcolor="red"];
-  wok_producer[label="wok_producer\n(0.1.1)", style="filled", fillcolor="red"];
+  wok_http_adapter[label="wok_http_adapter\n(0.0.4)", fontcolor="white", style="filled", fillcolor="black"];
+  wok_message_handler[label="wok_message_handler\n(0.2.0)", fontcolor="white", style="filled", fillcolor="black"];
+  wok_producer[label="wok_producer\n(0.2.0)", fontcolor="white", style="filled", fillcolor="black"];
   pipette[label="pipette\n(0.0.1)", style="filled", fillcolor="red"];
-  kafe[label="kafe\n(1.2.1)", style="filled", fillcolor="red"];
+  kafe[label="kafe\n(1.3.0)", style="filled", fillcolor="red"];
+  poolgirl[label="poolgirl\n(0.0.1)", style="filled", fillcolor="red"];
+  bristow[label="bristow\n(0.0.1)", style="filled", fillcolor="red"];
   cowboy[label="cowboy\n(2.0.0-pre.3)"];
-  cowboy_default_static_file[label="cowboy_default_static_file\n(master)", style="filled", fillcolor="red"];
+  cowboy_default_static_file[label="cowboy_default_static_file\n(1.1.0)", style="filled", fillcolor="red"];
   tempfile[label="tempfile\n(1.0.1)", style="filled", fillcolor="red"];
   bucs[label="bucs\n(0.0.1)", style="filled", fillcolor="red"];
   doteki[label="doteki\n(0.0.1)", style="filled", fillcolor="red"];
@@ -22,7 +24,7 @@ digraph wok_deps {
   mix_mk[label="mix.mk\n(master)", style="filled", fillcolor="red"];
   edown[label="edown\n(master)"];
   meck[label="meck\n(master)"];
-  wok_tests[label="wok_tests\n(0.0.5)", fontcolor="white", style="filled", fillcolor="black"];
+  wok_tests[label="wok_tests\n(0.1.0)", fontcolor="white", style="filled", fillcolor="black"];
   goldrush[label="goldrush\n(0.1.8)"];
   cowlib[label="cowlib\n(master)"];
   ranch[label="ranch\n(1.1.0)"];
@@ -31,13 +33,13 @@ digraph wok_deps {
   hackney[label="hackney\n(>= 0.12.0)"];
   horse[label="horse\n(master)"];
   triq[label="triq\n(master)"];
-  wok_mail[label="wok_mail\n(0.0.2)", fontcolor="white", style="filled", fillcolor="black"];
-  gen_smtp[label="gen_smtp\n(master)"];
-  wok_i18n[label="wok_i18n\n(0.0.2)", fontcolor="white", style="filled", fillcolor="black"];
+  wok_mail[label="wok_mail\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
+  gen_smtp[label="gen_smtp\n(0.10.0)"];
+  wok_i18n[label="wok_i18n\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
   hexpm_mk[label="hexpm.mk\n(master)", style="filled", fillcolor="red"];
   jsx[label="jsx\n(~> 2.6.0)"];
-  whisk[label="whisk\n(master)", style="filled", fillcolor="red"];
-  wok_tmpl_engine[label="wok_tmpl_engine\n(0.0.2)", fontcolor="white", style="filled", fillcolor="black"];
+  whisk[label="whisk\n(0.0.1)", style="filled", fillcolor="red"];
+  wok_tmpl_engine[label="wok_tmpl_engine\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
   erlydtl[label="erlydtl\n(master)"];
 
   wok -> lager;
@@ -62,7 +64,7 @@ digraph wok_deps {
   wok_http_adapter -> mix_mk[style=dotted];
 
   wok_message_handler -> bucs;
-  wok_message_handler -> doteki;
+  wok_message_handler -> doteki[style=dotted];
   wok_message_handler -> mix_mk[style=dotted];
 
   wok_producer -> wok_message_handler;
@@ -84,8 +86,11 @@ digraph wok_deps {
   kafe -> lager;
   kafe -> bucs;
   kafe -> doteki;
+  kafe -> poolgirl;
+  kafe -> bristow;
   kafe -> edown[style=dotted];
   kafe -> meck[style=dotted];
+  kafe -> mix_mk[style=dotted];
 
   cowboy -> cowlib;
   cowboy -> ranch;
@@ -120,6 +125,7 @@ digraph wok_deps {
   wok_mail -> bucs;
   wok_mail -> doteki;
   wok_mail -> gen_smtp;
+  wok_mail -> edown[style=dotted];
   wok_mail -> mix_mk[style=dotted];
 
   wok_i18n -> whisk;
@@ -132,6 +138,7 @@ digraph wok_deps {
   wok_i18n -> bucs[style=dotted];
   wok_i18n -> uuid[style=dotted];
   wok_i18n -> edown[style=dotted];
+  wok_i18n -> wok;
 
   wok_tmpl_engine -> erlydtl;
   wok_tmpl_engine -> bucs;
