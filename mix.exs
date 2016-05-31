@@ -3,7 +3,7 @@ defmodule Wok.Mixfile do
 
   def project do
     [app: :wok,
-     version: "0.3.0-rc.1",
+     version: "0.3.0-rc.2",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
