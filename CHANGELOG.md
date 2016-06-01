@@ -1,20 +1,12 @@
 0.3.0:
   * Fix version for bucs (0.0.1), doteki (0.0.1), lager (3.2.0), tempfile (1.0.1), erlang-uuid (v0.5.0), whisk (0.0.1), gen_smtp (0.10.0)
-
   * Issue #23 : Allow to start Wok without REST
-
-  * Issues #ç, #10, #18, #19, #20 : Add Kafka 0.9 and 0.10 support
-
+  * Issues #9, #10, #18, #19, #20 : Add Kafka 0.9 and 0.10 support
   * Issue #16 : change one_for_one 
-
   * [wok_producer 0.2.0] : Kafka 0.9/0.10 support
-
   * [wok_tests 0.1.0] : Add file upload support
-
   * [wok_http_adapter 0.0.4] : Rewrite HTTP params parser
-
   * [wok_mail 0.0.3] : Make wok_smtp_mailer:send always return an ok/error tuple
-
   * [wok_mail 0.0.3] : Handle empty Cc/Bcc lists
 
 0.2.2:
