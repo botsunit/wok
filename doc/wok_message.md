@@ -24,7 +24,7 @@ Send a message.</td></tr><tr><td valign="top"><a href="#reply-4">reply/4</a></td
 ### body/1 ###
 
 <pre><code>
-body(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
+body(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
 </code></pre>
 <br />
 
@@ -33,7 +33,7 @@ body(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="wok
 ### content/1 ###
 
 <pre><code>
-content(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; <a href="wok_message_handler.md#type-message">wok_message_handler:message()</a>
+content(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>
 </code></pre>
 <br />
 
@@ -42,7 +42,7 @@ content(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; <a h
 ### content/2 ###
 
 <pre><code>
-content(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Message::<a href="wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+content(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Message::<a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
 </code></pre>
 <br />
 
@@ -87,7 +87,7 @@ custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Key::a
 ### from/1 ###
 
 <pre><code>
-from(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
+from(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
 </code></pre>
 <br />
 
@@ -105,7 +105,7 @@ global_state(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt;
 ### headers/1 ###
 
 <pre><code>
-headers(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
+headers(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
 </code></pre>
 <br />
 
@@ -183,7 +183,7 @@ reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binar
 ### to/1 ###
 
 <pre><code>
-to(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
+to(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
 </code></pre>
 <br />
 
@@ -192,7 +192,7 @@ to(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="wok_m
 ### uuid/1 ###
 
 <pre><code>
-uuid(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
+uuid(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; binary()
 </code></pre>
 <br />
 

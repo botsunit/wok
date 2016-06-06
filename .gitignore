@@ -14,8 +14,7 @@ queues
 .erlang.mk
 wok.d
 xrefr
-test/TEST-*.xml
+test/eunit/
 _build/
-mix.lock
 docker-compose.yml
 

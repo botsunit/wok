@@ -1,3 +1,4 @@
+% @hidden
 -module(wok).
 
 -export([start/0]).
