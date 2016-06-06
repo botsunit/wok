@@ -6,15 +6,6 @@ defmodule Wok do
 	def unquote(:"start")() do
 		:erlang.apply(:"wok", :"start", [])
 	end
-	def unquote(:"provide")(arg1, arg2, arg3, arg4) do
-		:erlang.apply(:"wok", :"provide", [arg1, arg2, arg3, arg4])
-	end
-	def unquote(:"provide")(arg1, arg2, arg3, arg4, arg5) do
-		:erlang.apply(:"wok", :"provide", [arg1, arg2, arg3, arg4, arg5])
-	end
-	def unquote(:"provide")(arg1, arg2) do
-		:erlang.apply(:"wok", :"provide", [arg1, arg2])
-	end
 	def unquote(:"state")() do
 		:erlang.apply(:"wok", :"state", [])
 	end
