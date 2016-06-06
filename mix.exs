@@ -3,7 +3,7 @@ defmodule Wok.Mixfile do
 
   def project do
     [app: :wok,
-     version: "0.3.0-rc.2",
+     version: "0.3.0",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -18,8 +18,8 @@ defmodule Wok.Mixfile do
     [ 
       {:lager, ~r/.*/, git: "https://github.com/basho/lager.git", tag: "3.2.0"},  
       {:wok_http_adapter, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", tag: "0.0.4"},  
-      {:wok_message_handler, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", tag: "0.2.0"},  
-      {:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", tag: "0.2.0"},  
+      {:wok_message_handler, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", tag: "0.2.1"},  
+      {:wok_producer, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", tag: "0.2.1"},  
       {:pipette, ~r/.*/, git: "git@gitlab.botsunit.com:msaas/pipette.git", tag: "0.0.1"},  
       {:kafe, ~r/.*/, git: "https://github.com/botsunit/kafe.git", tag: "1.3.0"},  
       {:cowboy, ~r/.*/, git: "https://github.com/ninenines/cowboy.git", tag: "2.0.0-pre.3"},  
