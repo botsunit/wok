@@ -36,7 +36,6 @@ digraph wok_deps {
   wok_mail[label="wok_mail\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
   gen_smtp[label="gen_smtp\n(0.10.0)"];
   wok_i18n[label="wok_i18n\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
-  hexpm_mk[label="hexpm.mk\n(master)", style="filled", fillcolor="red"];
   jsx[label="jsx\n(~> 2.6.0)"];
   whisk[label="whisk\n(0.0.1)", style="filled", fillcolor="red"];
   wok_tmpl_engine[label="wok_tmpl_engine\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
@@ -136,7 +135,6 @@ digraph wok_deps {
   wok_i18n -> wok_tmpl_engine;
   wok_i18n -> jsx;
   wok_i18n -> rebar3_elixir[style=dotted];
-  wok_i18n -> hexpm_mk[style=dotted];
   wok_i18n -> lager[style=dotted];
   wok_i18n -> doteki[style=dotted];
   wok_i18n -> bucs[style=dotted];
