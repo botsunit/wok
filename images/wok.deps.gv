@@ -40,7 +40,11 @@ digraph wok_deps {
   jsx[label="jsx\n(~> 2.6.0)"];
   whisk[label="whisk\n(0.0.1)", style="filled", fillcolor="red"];
   wok_tmpl_engine[label="wok_tmpl_engine\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
-  erlydtl[label="erlydtl\n(master)"];
+  erlydtl[label="erlydtl\n(~> 0.11.0)"];
+  edd[label="edd\n(0.0.1)", style="filled", fillcolor="red"];
+  basic_auth_middleware[label="basic_auth_middleware\n(0.0.1)", fontcolor="white", style="filled", fillcolor="black"];
+  middleware_session[label="middleware_session\n(0.0.4)", fontcolor="white", style="filled", fillcolor="black"];
+  heartbeat_middleware[label="heartbeat_middleware\n(0.0.1)", fontcolor="white", style="filled", fillcolor="black"];
 
   wok -> lager;
   wok -> wok_http_adapter;

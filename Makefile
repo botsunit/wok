@@ -1,6 +1,6 @@
 include bu.mk
 
-.PHONY: doc docker-compose.yml
+.PHONY: doc docker-compose.yml images/wok.deps.png images/wok.call.png
 REBAR = ./rebar3
 
 compile:
@@ -9,11 +9,17 @@ compile:
 tests:
 	$(verbose) $(REBAR) eunit
 
-doc:
+doc: images/wok.call.png images/wok.deps.png _doc/doc.yml
 	$(verbose) $(REBAR) as doc edoc
 	$(verbose) ${MKDIR_P} doc/images
 	$(verbose) ${CP} images/*.png doc/images
 	$(verbose) ${CP} _doc/* doc
+
+images/wok.call.png: images/wok.call.gv
+	@dot -T png -o images/wok.call.png images/wok.call.gv
+
+images/wok.deps.png: images/wok.deps.gv
+	@dot -T png -o images/wok.deps.png images/wok.deps.gv
 
 elixir:
 	$(verbose) $(REBAR) elixir generate_mix
