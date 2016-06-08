@@ -85,18 +85,25 @@ custom_data(Msg, Key, Value) when is_atom(Key) ->
 noreply(Msg) ->
   wok_msg:set_noreply(Msg).
 
--spec reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary()) -> wok_msg:wok_msg().
+-spec reply(Msg :: wok_msg:wok_msg(),
+            Topic :: binary() | {binary(), integer()} | {binary(), binary()},
+            To :: binary(),
+            Body :: term()) -> wok_msg:wok_msg().
 reply(Msg, Topic, To, Body) ->
   wok_msg:set_response(Msg, Topic, undefined, To, Body).
 
--spec reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary(), binary()) -> wok_msg:wok_msg().
+-spec reply(Msg :: wok_msg:wok_msg(),
+            Topic :: binary() | {binary(), integer()} | {binary(), binary()},
+            From :: binary(),
+            To :: binary(),
+            Body :: term()) -> wok_msg:wok_msg().
 reply(Msg, Topic, From, To, Body) ->
   wok_msg:set_response(Msg, Topic, From, To, Body).
 
 % @doc
 % Send a message
 % @end
--spec provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+-spec provide(Topic :: binary() | {binary(), integer()} | {binary(), binary()},
               From :: binary(),
               To :: binary(),
               Body :: term()) -> {ok, term()} | {error, term()}.
@@ -106,18 +113,18 @@ provide(Topic, From, To, Body) ->
 % @doc
 % Send a message
 % @end
--spec provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+-spec provide(Topic :: binary() | {binary(), integer()} | {binary(), binary()},
               From :: binary(),
               To :: binary(),
               Body :: term(),
-              Options :: map()) -> {ok, term()} | {error, term()}.
+              Options :: list()) -> {ok, term()} | {error, term()}.
 provide(Topic, From, To, Body, Options) ->
   wok_producer:provide(Topic,  From, To, Body, Options).
 
 % @doc
 % Send a message
 % @end
--spec provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+-spec provide(Topic :: binary() | {binary(), integer()} | {binary(), binary()},
               Message :: binary()) -> {ok, term()} | {error, term()}.
 provide(Topic, Message) ->
   wok_producer:provide(Topic, Message).

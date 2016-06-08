@@ -131,96 +131,102 @@ Wok.Message.noreply(wok_msg:wok_msg()) -> wok_msg:wok_msg()
 ## reply/4
 
 ```erlang
-wok_message:reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary()) -> wok_msg:wok_msg().
+wok_message:reply(wok_msg:wok_msg(), 
+                  Topic :: binary() | {binary(), integer()} | {binary(), binary()}, 
+                  To :: binary(), 
+                  Body :: term()) -> wok_msg:wok_msg().
 ```
 ```elixir
-Wok.Message.reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary()) -> wok_msg:wok_msg()
+Wok.Message.reply(wok_msg:wok_msg(), 
+                  topic :: binary() | {binary(), integer()} | {binary(), binary()}, 
+                  to :: binary(), 
+                  body :: binary()) -> wok_msg:wok_msg()
 ```
 
 ## reply/5
 
 ```erlang
-wok_message:reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary(), binary()) -> wok_msg:wok_msg().
+wok_message:reply(wok_msg:wok_msg(), 
+                  Topic :: binary() | {binary(), integer()} | {binary(), binary()}, 
+                  From :: binary(), 
+                  To :: binary(), 
+                  Body :: term()) -> wok_msg:wok_msg().
 ```
 ```elixir
-Wok.Message.reply(wok_msg:wok_msg(), binary() | {binary(), integer()}, binary(), binary(), binary()) -> wok_msg:wok_msg()
+Wok.Message.reply(wok_msg:wok_msg(), 
+                  topic :: binary() | {binary(), integer()} | {binary(), binary()}, 
+                  from :: binary(), 
+                  to :: binary(), 
+                  body :: term()) -> wok_msg:wok_msg()
 ```
 
 ## provide/2
 
+Send a message in the queue.
+
 ```erlang
-wok_message:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+wok_message:provide(Topic :: binary() | {binary(), integer()} | {binary(), binary()},
                     Message :: binary()) -> {ok, term()} | {error, term()}.
 
-% DEPRECATED
-wok:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
-            Message :: binary()) -> {ok, term()} | {error, term()}.
-```
 ```elixir
-Wok.Message.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
-                    message :: binary()) -> {:ok, term()} | {:error, term()}
-
-# DEPRECATED
-Wok.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
-            message :: binary()) -> {:ok, term()} | {:error, term()}
+Wok.Message.provide(topic :: binary() | {binary(), integer()} | {binary(), binary()},
+                    message :: term()) -> {:ok, term()} | {:error, term()}
 ```
 
 ## provide/4
 
+Send a message in the queue.
+
+**Types:**
+
+* **Topic**: The topic used to send the message. This parameter can be a simple binary representing the topic name, a tuple where the first parameter is the topic name and the second is an integer specifying the partition number or a tuple where the first parameter is the tomic name and the second one is a key use to calculate the partition.
+* **From**: The message sender.
+* **To**: The message receiver.
+* **Body**: The message body.
+
 ```erlang
-wok_message:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+wok_message:provide(Topic :: binary() | {binary(), integer()} | {binary(), binary()},
                     From :: binary(),
                     To :: binary(),
                     Body :: term()) -> {ok, term()} | {error, term()}.
-
-% DEPRECATED
-wok:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
-            From :: binary(),
-            To :: binary(),
-            Body :: term()) -> {ok, term()} | {error, term()}.
 ```
 ```elixir
-Wok.Message.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+Wok.Message.provide(topic :: binary() | {binary(), integer()} | {binary(), binary()},
                     from :: binary(),
                     to :: binary(),
                     body :: term()) -> {:ok, term()} | {:error, term()}
-
-# DEPRECATED
-Wok.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
-            from :: binary(),
-            to :: binary(),
-            body :: term()) -> {:ok, term()} | {:error, term()}
 ```
 
 ## provide/5
 
+Send a message in the queue.
+
+**Types:**
+
+* **Topic**: The topic used to send the message. This parameter can be a simple binary representing the topic name, a tuple where the first parameter is the topic name and the second is an integer specifying the partition number or a tuple where the first parameter is the tomic name and the second one is a key use to calculate the partition.
+* **From**: The message sender.
+* **To**: The message receiver.
+* **Body**: The message body.
+* **Options** : Options to pass to the message handler.
+
+If you use the default message handler, the availables options are :
+
+* `{wok_version, integer()}` : The handler version (optional, default: 1). **Do not change this value**.
+* `{headers, map()}` : The message headers (optional).
+
 ```erlang
-wok_message:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+wok_message:provide(Topic :: binary() | {binary(), integer()} | {binary(), binary()},
                     From :: binary(),
                     To :: binary(),
                     Body :: term(),
-                    Options :: map()) -> {ok, term()} | {error, term()}.
-
-% DEPRECATED
-wok:provide(Topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
-            From :: binary(),
-            To :: binary(),
-            Body :: term(),
-            Options :: map()) -> {ok, term()} | {error, term()}.
+                    Options :: list()) -> {ok, term()} | {error, term()}.
 ```
 ```elixir
-Wok.Message.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
+Wok.Message.provide(topic :: binary() | {binary(), integer()} | {binary(), binary()},
                     from :: binary(),
                     to :: binary(),
                     body :: term(),
-                    options :: map()) -> {:ok, term()} | {:error, term()}
-
-# DEPRECATED
-Wok.provide(topic :: binary() | list() | atom() | {binary() | list() | atom(), integer()},
-            from :: binary(),
-            to :: binary(),
-            body :: term(),
-            options :: map()) -> {:ok, term()} | {:error, term()}
+                    options :: list()) -> {:ok, term()} | {:error, term()}
 ```
 
 # HTTP Request API

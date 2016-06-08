@@ -132,7 +132,7 @@ noreply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; <a h
 ### provide/2 ###
 
 <pre><code>
-provide(Topic::binary() | list() | atom() | {binary() | list() | atom(), integer()}, Message::binary()) -&gt; {ok, term()} | {error, term()}
+provide(Topic::binary() | {binary(), integer()} | {binary(), binary()}, Message::binary()) -&gt; {ok, term()} | {error, term()}
 </code></pre>
 <br />
 
@@ -143,7 +143,7 @@ Send a message
 ### provide/4 ###
 
 <pre><code>
-provide(Topic::binary() | list() | atom() | {binary() | list() | atom(), integer()}, From::binary(), To::binary(), Body::term()) -&gt; {ok, term()} | {error, term()}
+provide(Topic::binary() | {binary(), integer()} | {binary(), binary()}, From::binary(), To::binary(), Body::term()) -&gt; {ok, term()} | {error, term()}
 </code></pre>
 <br />
 
@@ -154,7 +154,7 @@ Send a message
 ### provide/5 ###
 
 <pre><code>
-provide(Topic::binary() | list() | atom() | {binary() | list() | atom(), integer()}, From::binary(), To::binary(), Body::term(), Options::#{}) -&gt; {ok, term()} | {error, term()}
+provide(Topic::binary() | {binary(), integer()} | {binary(), binary()}, From::binary(), To::binary(), Body::term(), Options::list()) -&gt; {ok, term()} | {error, term()}
 </code></pre>
 <br />
 
@@ -165,7 +165,7 @@ Send a message
 ### reply/4 ###
 
 <pre><code>
-reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {binary(), integer()}, To::binary(), Body::binary()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {binary(), integer()} | {binary(), binary()}, To::binary(), Body::term()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
 </code></pre>
 <br />
 
@@ -174,7 +174,7 @@ reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binar
 ### reply/5 ###
 
 <pre><code>
-reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {binary(), integer()}, From::binary(), To::binary(), Body::binary()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {binary(), integer()} | {binary(), binary()}, From::binary(), To::binary(), Body::term()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
 </code></pre>
 <br />
 
