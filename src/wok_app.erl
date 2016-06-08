@@ -54,13 +54,16 @@ check_message_handler() ->
     undefined ->
       lager:info("No message handler!");
     _ ->
-      Handler = doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER),
+      Handler = case doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER) of
+                  {Module, _} -> Module;
+                  Module -> Module
+                end,
       case code:ensure_loaded(Handler) of
         {module, Handler} ->
           lager:info("Message handler ~p loaded", [Handler]);
-        {error, What} ->
-          lager:error("Can't load handler ~p", [Handler]),
-          exit(What)
+        {error, Reason} ->
+          lager:error("Can't load handler ~p: ~p", [Handler, Reason]),
+          init:stop()
       end
   end.
 

@@ -27,16 +27,19 @@ init(_Args) ->
   erlang:send_after(1000, self(), fetch),
   {ok, #{services => wok_message_path:get_message_path_handlers(
                        doteki:get_env([wok, messages, services],
-                                      doteki:get_env([wok, messages, controlers], [])))}}.
+                                      doteki:get_env([wok, messages, controllers],
+                                                     doteki:get_env([wok, messages, controlers], []))))}}. % BW compatibility :/
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
 handle_cast({handle, MessageTransfert}, #{services := Services} = State) ->
   try
-    case erlang:apply(doteki:get_env([wok, messages, handler],
-                                     ?DEFAULT_MESSAGE_HANDLER),
-                      parse, [wok_msg:get_message(MessageTransfert)]) of
+    Handler = case doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER) of
+                {Module, _} -> Module;
+                Module -> Module
+              end,
+    case erlang:apply(Handler, parse, [wok_msg:get_message(MessageTransfert)]) of
       {ok, ParsedMessage, _} ->
         _ = consume(wok_msg:set_message(MessageTransfert, ParsedMessage),
                     wok_message_path:get_message_handlers(

@@ -28,7 +28,7 @@ elixir:
 dist: compile tests elixir doc
 
 distclean:
-	$(verbose) rm -rf _build rebar.lock mix.lock test/eunit deps doc
+	$(verbose) rm -rf _build rebar.lock mix.lock test/eunit deps
 
 dev: dist
 	$(verbose) erl -pa _build/default/lib/*/ebin _build/default/lib/*/include -config config/wok.config
