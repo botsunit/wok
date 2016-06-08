@@ -30,6 +30,9 @@ dist: compile tests elixir doc
 distclean:
 	$(verbose) rm -rf _build rebar.lock mix.lock test/eunit deps doc
 
+dev: dist
+	$(verbose) erl -pa _build/default/lib/*/ebin _build/default/lib/*/include -config config/wok.config
+
 KAFKA_ADVERTISED_HOST_NAME = $(shell ip addr list docker0 |grep "inet " |cut -d' ' -f6|cut -d/ -f1)
 
 define docker_compose_yml_v1
@@ -95,9 +98,10 @@ docker-compose.yml:
 docker-start: docker-stop
 	$(verbose) docker-compose up -d
 	$(verbose) sleep 1
-	$(verbose) docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic testone
-	$(verbose) docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic testtwo
-	$(verbose) docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic testthree
+	$(verbose) docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic test
+	$(verbose) docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic repl
+	$(verbose) docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic public
+	$(verbose) docker-compose run --rm tools kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 3 --partitions 3 --topic service
 
 docker-stop: docker-compose.yml
 	$(verbose) docker-compose kill

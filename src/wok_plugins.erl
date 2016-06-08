@@ -53,7 +53,7 @@ handle_info({run, Name, {Fun, _} = Call}, State) ->
                update_plugin_state(Name, PluginState2, State);
              {send, Topic, Message, PluginState3} ->
                _ = start_plugin(Name, Call),
-               _ = wok:provide(Topic, Message),
+               _ = wok_message:provide(Topic, Message),
                update_plugin_state(Name, PluginState3, State);
              {stop, Reason} ->
                lager:debug("Plugin ~p:~p stop: ~p", [Name, Fun, Reason]),
