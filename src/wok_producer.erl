@@ -1,7 +1,14 @@
 -module(wok_producer).
 -include("../include/wok.hrl").
 
--export([provide/5, provide/4, provide/2]).
+-export([
+         start/0
+         , start/1
+         , start/2
+         , provide/5
+         , provide/4
+         , provide/2
+        ]).
 
 % Behavior
 
@@ -15,6 +22,17 @@
 
 -callback response(MessageID :: integer(), Response :: ok | {error, term()}) ->
   stop | exit | next.
+
+% API
+
+start() ->
+  todo. % TODO
+
+start(_Topic) ->
+  todo. % TODO
+
+start(_Topic, _Partition) ->
+  todo. % TODO
 
 provide(Topic, From, To, Body) ->
   provide(Topic, From, To, Body, []).

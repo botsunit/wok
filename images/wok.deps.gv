@@ -7,7 +7,7 @@ digraph wok_deps {
   ]
 
   wok[label="wok\n(0.3.0)", fontcolor="white", style="filled", fillcolor="black"];
-  lager[label="lager\n(3.2.0)"];
+  lager[label="lager\n(~> 3.2)"];
   wok_http_adapter[label="wok_http_adapter\n(0.0.4)", fontcolor="white", style="filled", fillcolor="black"];
   wok_message_handler[label="wok_message_handler\n(0.2.1)", fontcolor="white", style="filled", fillcolor="black"];
   pipette[label="pipette\n(0.0.1)", style="filled", fillcolor="red"];
@@ -35,10 +35,10 @@ digraph wok_deps {
   wok_mail[label="wok_mail\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
   gen_smtp[label="gen_smtp\n(0.10.0)"];
   wok_i18n[label="wok_i18n\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
-  jsx[label="jsx\n(~> 2.6.0)"];
+  jsx[label="jsx\n(~> 2.6)"];
   whisk[label="whisk\n(0.0.1)", style="filled", fillcolor="red"];
   wok_tmpl_engine[label="wok_tmpl_engine\n(0.0.3)", fontcolor="white", style="filled", fillcolor="black"];
-  erlydtl[label="erlydtl\n(~> 0.11.0)"];
+  erlydtl[label="erlydtl\n(~> 0.11)"];
   edd[label="edd\n(0.0.1)", style="filled", fillcolor="red"];
   basic_auth_middleware[label="basic_auth_middleware\n(0.0.1)", fontcolor="white", style="filled", fillcolor="black"];
   middleware_session[label="middleware_session\n(0.0.4)", fontcolor="white", style="filled", fillcolor="black"];

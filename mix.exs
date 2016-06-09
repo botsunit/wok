@@ -22,7 +22,7 @@ defmodule Wok.Mixfile do
 
   defp deps do
     [
-      {:lager, "~> 3.2.0"},
+      {:lager, "~> 3.2"},
       {:wok_http_adapter, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", branch: "master"},
       {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"},
       {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
@@ -32,7 +32,8 @@ defmodule Wok.Mixfile do
       {:bucs, git: "https://github.com/botsunit/bucs.git", branch: "master"},
       {:doteki, git: "https://github.com/botsunit/doteki.git", branch: "master"},
       {:uuid, git: "https://github.com/avtobiff/erlang-uuid.git", tag: "v0.5.0"},
-      {:tempfile, git: "https://github.com/botsunit/tempfile.git", branch: "master"}    
+      {:tempfile, git: "https://github.com/botsunit/tempfile.git", branch: "master"},
+      {:lager_default_formatter, git: "git@gitlab.botsunit.com:msaas/lager_json_formatter.git", branch: "master"}    
     ]
   end
 end

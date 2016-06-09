@@ -51,6 +51,18 @@ defmodule Wok.Message do
   def unquote(:"reply")(arg1, arg2, arg3, arg4, arg5) do
     :erlang.apply(:"wok_message", :"reply", [arg1, arg2, arg3, arg4, arg5])
   end
+  def unquote(:"encode_reply")(arg1, arg2, arg3, arg4, arg5) do
+    :erlang.apply(:"wok_message", :"encode_reply", [arg1, arg2, arg3, arg4, arg5])
+  end
+  def unquote(:"encode_reply")(arg1, arg2, arg3, arg4) do
+    :erlang.apply(:"wok_message", :"encode_reply", [arg1, arg2, arg3, arg4])
+  end
+  def unquote(:"async_reply")(arg1) do
+    :erlang.apply(:"wok_message", :"async_reply", [arg1])
+  end
+  def unquote(:"encode_message")(arg1, arg2, arg3, arg4) do
+    :erlang.apply(:"wok_message", :"encode_message", [arg1, arg2, arg3, arg4])
+  end
   def unquote(:"provide")(arg1, arg2, arg3, arg4) do
     :erlang.apply(:"wok_message", :"provide", [arg1, arg2, arg3, arg4])
   end

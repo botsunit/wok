@@ -14,9 +14,15 @@
          , custom_data/1
          , custom_data/2
          , custom_data/3
+
          , noreply/1
          , reply/4
          , reply/5
+         , encode_reply/5
+         , encode_reply/4
+         , async_reply/1
+         , encode_message/4
+
          , provide/2
          , provide/4
          , provide/5
@@ -90,7 +96,7 @@ noreply(Msg) ->
             To :: binary(),
             Body :: term()) -> wok_msg:wok_msg().
 reply(Msg, Topic, To, Body) ->
-  wok_msg:set_response(Msg, Topic, undefined, To, Body).
+  reply(Msg, Topic, undefined, To, Body).
 
 -spec reply(Msg :: wok_msg:wok_msg(),
             Topic :: binary() | {binary(), integer()} | {binary(), binary()},
@@ -99,6 +105,38 @@ reply(Msg, Topic, To, Body) ->
             Body :: term()) -> wok_msg:wok_msg().
 reply(Msg, Topic, From, To, Body) ->
   wok_msg:set_response(Msg, Topic, From, To, Body).
+
+-spec encode_reply(Msg :: wok_msg:wok_msg(),
+                   Topic :: binary()
+                   | {Topic :: binary(), Partition :: integer()}
+                   | {Topic :: binary(), Key :: binary()},
+                   From :: binary(),
+                   To :: binary(),
+                   Body :: term()) -> binary().
+encode_reply(Msg, Topic, From, To, Body) ->
+  base64:encode(term_to_binary(reply(Msg, Topic, From, To, Body))).
+
+-spec encode_reply(Msg :: wok_msg:wok_msg(),
+                   Topic :: binary()
+                   | {Topic :: binary(), Partition :: integer()}
+                   | {Topic :: binary(), Key :: binary()},
+                   To :: binary(),
+                   Body :: term()) -> binary().
+encode_reply(Msg, Topic, To, Body) ->
+  encode_reply(Msg, Topic, undefined, To, Body).
+
+-spec async_reply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
+async_reply(Msg) ->
+  wok_msg:set_noreply(Msg).
+
+-spec encode_message(Topic :: binary()
+                     | {Topic :: binary(), Partition :: integer()}
+                     | {Topic :: binary(), Key :: binary()},
+                     From :: binary(),
+                     To :: binary(),
+                     Body :: term()) -> binary().
+encode_message(Topic, From, To, Body) ->
+  encode_reply(wok_msg:new(), Topic, From, To, Body).
 
 % @doc
 % Send a message

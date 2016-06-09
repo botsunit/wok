@@ -5,6 +5,15 @@
 defmodule Wok.Producer do
   @callbacks messages(any, any, any) :: any
   @callbacks response(any, any) :: any
+  def unquote(:"start")() do
+    :erlang.apply(:"wok_producer", :"start", [])
+  end
+  def unquote(:"start")(arg1) do
+    :erlang.apply(:"wok_producer", :"start", [arg1])
+  end
+  def unquote(:"start")(arg1, arg2) do
+    :erlang.apply(:"wok_producer", :"start", [arg1, arg2])
+  end
   def unquote(:"behaviour_info")(arg1) do
     :erlang.apply(:"wok_producer", :"behaviour_info", [arg1])
   end

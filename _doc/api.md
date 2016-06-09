@@ -229,6 +229,78 @@ Wok.Message.provide(topic :: binary() | {binary(), integer()} | {binary(), binar
                     options :: list()) -> {:ok, term()} | {:error, term()}
 ```
 
+## encode_reply/4
+
+```erlang
+wok_message:encode_reply(Msg :: wok_msg:wok_msg(),
+                         Topic :: binary()
+                         | {Topic :: binary(), Partition :: integer()}
+                         | {Topic :: binary(), Key :: binary()},
+                         To :: binary(),
+                         Body :: term()) -> binary().
+```
+
+```elixir
+Wok.Message.encode_reply(msg :: wok_msg:wok_msg(),
+                         topic :: binary()
+                         | {topic :: binary(), partition :: integer()}
+                         | {topic :: binary(), key :: binary()},
+                         to :: binary(),
+                         body :: term()) -> binary()
+```
+
+## encode_reply/5
+
+```erlang
+wok_message:encode_reply(Msg :: wok_msg:wok_msg(),
+                         Topic :: binary()
+                         | {Topic :: binary(), Partition :: integer()}
+                         | {Topic :: binary(), Key :: binary()},
+                         From :: binary(),
+                         To :: binary(),
+                         Body :: term()) -> binary().
+```
+
+```elixir
+Wok.Message.encode_reply(msg :: wok_msg:wok_msg(),
+                         topic :: binary()
+                         | {topic :: binary(), partition :: integer()}
+                         | {topic :: binary(), key :: binary()},
+                         from :: binary(),
+                         to :: binary(),
+                         body :: term()) -> binary().
+```
+
+## async_reply/1
+
+```erlang
+wok_message:async_reply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
+```
+
+```elixir
+Wok.Message.async_reply(wok_msg:wok_msg()) -> wok_msg:wok_msg()
+```
+
+## encode_message/4
+
+```erlang
+wok_message:encode_message(Topic :: binary()
+                           | {Topic :: binary(), Partition :: integer()}
+                           | {Topic :: binary(), Key :: binary()},
+                           From :: binary(),
+                           To :: binary(),
+                           Body :: term()) -> binary().
+```
+
+```elixir
+Wok.Message.encode_message(topic :: binary()
+                           | {topic :: binary(), partition :: integer()}
+                           | {topic :: binary(), key :: binary()},
+                           from :: binary(),
+                           to :: binary(),
+                           body :: term()) -> binary()
+```
+
 # HTTP Request API
 
 ## custom_data/1
