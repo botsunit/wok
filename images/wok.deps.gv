@@ -10,7 +10,6 @@ digraph wok_deps {
   lager[label="lager\n(3.2.0)"];
   wok_http_adapter[label="wok_http_adapter\n(0.0.4)", fontcolor="white", style="filled", fillcolor="black"];
   wok_message_handler[label="wok_message_handler\n(0.2.1)", fontcolor="white", style="filled", fillcolor="black"];
-  wok_producer[label="wok_producer\n(0.2.1)", fontcolor="white", style="filled", fillcolor="black"];
   pipette[label="pipette\n(0.0.1)", style="filled", fillcolor="red"];
   kafe[label="kafe\n(1.3.0)", style="filled", fillcolor="red"];
   poolgirl[label="poolgirl\n(0.0.1)", style="filled", fillcolor="red"];
@@ -48,7 +47,6 @@ digraph wok_deps {
   wok -> lager;
   wok -> wok_http_adapter;
   wok -> wok_message_handler;
-  wok -> wok_producer;
   wok -> pipette;
   wok -> kafe;
   wok -> cowboy;
@@ -69,15 +67,6 @@ digraph wok_deps {
   wok_message_handler -> bucs;
   wok_message_handler -> doteki[style=dotted];
   wok_message_handler -> rebar3_elixir[style=dotted];
-
-  wok_producer -> wok_message_handler;
-  wok_producer -> kafe;
-  wok_producer -> bucs;
-  wok_producer -> doteki;
-  wok_producer -> uuid;
-  wok_producer -> edown[style=dotted];
-  wok_producer -> meck[style=dotted];
-  wok_producer -> rebar3_elixir[style=dotted];
 
   pipette -> lager;
   pipette -> bucs;

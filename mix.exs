@@ -25,7 +25,6 @@ defmodule Wok.Mixfile do
       {:lager, "~> 3.2.0"},
       {:wok_http_adapter, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", branch: "master"},
       {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"},
-      {:wok_producer, git: "git@gitlab.botsunit.com:msaas/wok_producer.git", branch: "master"},
       {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
       {:kafe, git: "https://github.com/botsunit/kafe.git", branch: "master"},
       {:cowboy_default_static_file, git: "https://github.com/botsunit/cowboy_default_static_file.git", branch: "master"},
