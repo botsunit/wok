@@ -19,7 +19,10 @@ init([Static]) ->
               undefined ->
                 [];
               _ ->
-                [?CHILD(wok_messages_sup, [], supervisor, infinity)]
+                [
+                 ?CHILD(wok_messages_sup, [], supervisor, infinity),
+                 ?CHILD(wok_producer_sup, [], supervisor, infinity)
+                ]
             end ++ custom_servers() ++ middlewares_servers(),
   {ok, {
      {one_for_one, 5, 10},

@@ -26,13 +26,13 @@
 % API
 
 start() ->
-  todo. % TODO
+  wok_producer_srv:start().
 
-start(_Topic) ->
-  todo. % TODO
+start(Topic) ->
+  wok_producer_srv:start(Topic).
 
-start(_Topic, _Partition) ->
-  todo. % TODO
+start(Topic, Partition) ->
+  wok_producer_srv:start(Topic, Partition).
 
 provide(Topic, From, To, Body) ->
   provide(Topic, From, To, Body, []).

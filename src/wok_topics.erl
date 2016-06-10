@@ -6,9 +6,16 @@
 -include("../include/wok.hrl").
 
 -export([start_link/0]).
--export([init/1, handle_call/3, handle_cast/2, handle_info/2,
-         terminate/2, code_change/3]).
--export([consume/6, stop_fetching/1, start_fetching/1]).
+-export([init/1
+         , handle_call/3
+         , handle_cast/2
+         , handle_info/2
+         , terminate/2
+         , code_change/3]).
+-export([consume/6
+         , stop_fetching/1
+         , start_fetching/1
+         , assignment_change/3]).
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
@@ -137,6 +144,7 @@ start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], 
                                               {allow_unordered_commit, true}, % ConsumeMethod == one_for_all},
                                               {on_stop_fetching, fun ?MODULE:stop_fetching/1},
                                               {on_start_fetching, fun ?MODULE:start_fetching/1},
+                                              {on_assignment_change, fun ?MODULE:assignment_change/3},
                                               {topics, [Topic]}|Options])) of
         {ok, PID} ->
           MRef = erlang:monitor(process, PID),
@@ -207,6 +215,11 @@ stop_fetching(GroupID) ->
 
 start_fetching(GroupID) ->
   gen_server:cast(?MODULE, {start_fetching, GroupID}).
+
+assignment_change(_GroupID, UnAssigned, ReAssigned) ->
+  [wok_producer_srv:stop(Topic, Partition) || {Topic, Partition} <- UnAssigned],
+  [wok_producer_srv:start(Topic, Partition) || {Topic, Partition} <- ReAssigned],
+  ok.
 
 hexstring(<<X:128/big-unsigned-integer>>) ->
   lists:flatten(io_lib:format("~32.16.0b", [X]));
