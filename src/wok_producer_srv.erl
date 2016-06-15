@@ -27,7 +27,7 @@ start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 start() ->
-  todo. % TODO
+  todo.% TODO
 
 start(_Topic) ->
   todo. % TODO

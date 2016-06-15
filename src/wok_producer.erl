@@ -20,7 +20,10 @@
     Partition :: integer(),
     Message :: term()}].
 
--callback response(MessageID :: integer(), Response :: ok | {error, term()}) ->
+-callback response(MessageID :: integer(),
+                   Response :: ok
+                   | {error, term()}
+                   | {stop, Middleware :: atom(), Reason :: term()}) ->
   stop | exit | next.
 
 % API

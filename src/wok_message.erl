@@ -28,6 +28,8 @@
          , provide/5
         ]).
 
+-type opaque_message_transfert() :: binary().
+
 -spec content(wok_msg:wok_msg()) -> wok_message_handler:message().
 content(Msg) ->
   wok_msg:get_message(Msg).
@@ -112,16 +114,22 @@ reply(Msg, Topic, From, To, Body) ->
                    | {Topic :: binary(), Key :: binary()},
                    From :: binary(),
                    To :: binary(),
-                   Body :: term()) -> binary().
-encode_reply(Msg, Topic, From, To, Body) ->
-  base64:encode(term_to_binary(reply(Msg, Topic, From, To, Body))).
+                   Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
+                                      | {error, term()}.
+encode_reply(Msg, {Topic, Key}, From, To, Body) when is_binary(Key) ->
+  encode_reply(Msg, {Topic, kafe:default_key_to_partition(Topic, Key)}, From, To, Body);
+encode_reply(Msg, Topic, From, To, Body) when is_binary(Topic) ->
+  encode_reply(Msg, {Topic, kafe_rr:next(Topic)}, From, To, Body);
+encode_reply(Msg, {Topic, Partition}, From, To, Body) when is_integer(Partition) ->
+  {ok, Topic, Partition, base64:encode(term_to_binary(reply(Msg, Topic, From, To, Body)))}.
 
 -spec encode_reply(Msg :: wok_msg:wok_msg(),
                    Topic :: binary()
                    | {Topic :: binary(), Partition :: integer()}
                    | {Topic :: binary(), Key :: binary()},
                    To :: binary(),
-                   Body :: term()) -> binary().
+                   Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
+                                      | {error, term()}.
 encode_reply(Msg, Topic, To, Body) ->
   encode_reply(Msg, Topic, undefined, To, Body).
 
@@ -134,7 +142,8 @@ async_reply(Msg) ->
                      | {Topic :: binary(), Key :: binary()},
                      From :: binary(),
                      To :: binary(),
-                     Body :: term()) -> binary().
+                     Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
+                                        | {error, term()}.
 encode_message(Topic, From, To, Body) ->
   encode_reply(wok_msg:new(), Topic, From, To, Body).
 

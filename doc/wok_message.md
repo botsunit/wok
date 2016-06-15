@@ -1,8 +1,23 @@
 
 
 # Module wok_message #
+* [Data Types](#types)
 * [Function Index](#index)
 * [Function Details](#functions)
+
+<a name="types"></a>
+
+## Data Types ##
+
+
+
+
+### <a name="type-opaque_message_transfert">opaque_message_transfert()</a> ###
+
+
+<pre><code>
+opaque_message_transfert() = binary()
+</code></pre>
 
 <a name="index"></a>
 
@@ -96,7 +111,7 @@ custom_data(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Key::a
 ### encode_message/4 ###
 
 <pre><code>
-encode_message(Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, From::binary(), To::binary(), Body::term()) -&gt; binary()
+encode_message(Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, From::binary(), To::binary(), Body::term()) -&gt; {ok, binary(), integer(), <a href="#type-opaque_message_transfert">opaque_message_transfert()</a>} | {error, term()}
 </code></pre>
 <br />
 
@@ -105,7 +120,7 @@ encode_message(Topic::binary() | {Topic::binary(), Partition::integer()} | {Topi
 ### encode_reply/4 ###
 
 <pre><code>
-encode_reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, To::binary(), Body::term()) -&gt; binary()
+encode_reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, To::binary(), Body::term()) -&gt; {ok, binary(), integer(), <a href="#type-opaque_message_transfert">opaque_message_transfert()</a>} | {error, term()}
 </code></pre>
 <br />
 
@@ -114,7 +129,7 @@ encode_reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic
 ### encode_reply/5 ###
 
 <pre><code>
-encode_reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, From::binary(), To::binary(), Body::term()) -&gt; binary()
+encode_reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, From::binary(), To::binary(), Body::term()) -&gt; {ok, binary(), integer(), <a href="#type-opaque_message_transfert">opaque_message_transfert()</a>} | {error, term()}
 </code></pre>
 <br />
 
