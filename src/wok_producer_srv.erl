@@ -50,8 +50,8 @@ pause() ->
 pause(_Topic) ->
   todo. % TODO
 
-pause(_Topic, _Partition) ->
-  todo. % TODO
+pause(Topic, Partition) ->
+  gen_server:call(?SERVER, {pause, Topic, Partition}).
 
 % @hidden
 init([]) ->
@@ -75,6 +75,14 @@ handle_call({stop, Topic, Partition}, _From, State) ->
     false ->
       {reply, ok, State}
   end;
+handle_call({pause, Topic, Partition}, _From, State) ->
+  case lists:keyfind({Topic, Partition}, 1, State) of
+    {{Topic, Partition}, PID, _} ->
+      wok_producer_async_srv:call(PID, pause);
+    false ->
+      ok
+  end,
+  {reply, ok, State};
 handle_call(_Request, _From, State) ->
   {reply, ignore, State}.
 

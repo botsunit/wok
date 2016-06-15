@@ -7,4 +7,6 @@
 -define(DEFAULT_REST_MAX_CONN, 100).
 -define(DEFAULT_MESSAGE_HANDLER, wok_default_message_handler).
 -define(DEFAULT_LOCAL_QUEUE, <<"local_queue">>).
+-define(DEFAULT_PRODUCER_FREQUENCY, 5000).
+-define(DEFAULT_PRODUCER_SIZE, 100).
 
