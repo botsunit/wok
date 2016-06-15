@@ -307,6 +307,20 @@ Wok.Message.encode_message(topic :: binary()
                                               | {:error, term()}
 ```
 
+# Producer API
+
+## start/2
+
+Restart a producer.
+
+```erlang
+wok_producer:start(Topic :: binary(), Partition :: integer()) -> ok | {error, term()}.
+```
+
+```erlang
+Wok.Producer.start(topic :: binary(), partition :: integer()) -> ok | {error, term()}
+```
+
 # HTTP Request API
 
 ## custom_data/1
@@ -969,7 +983,6 @@ Options :
 * `path :: binary()`
 * `secure :: boolean()`
 * `http_only :: boolean()`
-
 
 ## delete_cookie/2
 
