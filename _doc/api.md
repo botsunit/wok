@@ -317,7 +317,7 @@ Restart a producer.
 wok_producer:start(Topic :: binary(), Partition :: integer()) -> ok | {error, term()}.
 ```
 
-```erlang
+```elixir
 Wok.Producer.start(topic :: binary(), partition :: integer()) -> ok | {error, term()}
 ```
 

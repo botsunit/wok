@@ -14,7 +14,7 @@ To store a message for a producer, you must call the function `wok_message:encod
 
 Then you must store the response (`Topic`, `Partition`, `Message`) in your database.
 
-> You can call `wok_message:encode_reply/[5,6]` as many time you needed it.
+You can call `wok_message:encode_reply/[5,6]` as many time you needed it.
 
 The last instruction in your controller must be a call to `wok_response:async_reply/1` :
 
@@ -39,7 +39,7 @@ my_controller(Message) ->
   wok_message:async_reply(Message).
 ```
 
-```Elixir
+```elixir
 def my_controller(message) do
   body = Wok.Message.content(message),
   # Do something with body
@@ -66,7 +66,7 @@ If you want to provide a message outside a message controller, you must encode t
 
 Then you must store the response (`Topic`, `Partition`, `Message`) in your database.
 
-> You can call `wok_message:encode_message/4` as many time you need it.
+You can call `wok_message:encode_message/4` as many time you need it.
 
 ## Producer configuration
 
