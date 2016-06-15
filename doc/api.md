@@ -237,7 +237,8 @@ wok_message:encode_reply(Msg :: wok_msg:wok_msg(),
                          | {Topic :: binary(), Partition :: integer()}
                          | {Topic :: binary(), Key :: binary()},
                          To :: binary(),
-                         Body :: term()) -> binary().
+                         Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
+                                            | {error, term()}.
 ```
 
 ```elixir
@@ -246,7 +247,8 @@ Wok.Message.encode_reply(msg :: wok_msg:wok_msg(),
                          | {topic :: binary(), partition :: integer()}
                          | {topic :: binary(), key :: binary()},
                          to :: binary(),
-                         body :: term()) -> binary()
+                         body :: term()) -> {:ok, binary(), integer(), opaque_message_transfert()}
+                                            | {:error, term()}
 ```
 
 ## encode_reply/5
@@ -258,7 +260,8 @@ wok_message:encode_reply(Msg :: wok_msg:wok_msg(),
                          | {Topic :: binary(), Key :: binary()},
                          From :: binary(),
                          To :: binary(),
-                         Body :: term()) -> binary().
+                         Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
+                                            | {error, term()}.
 ```
 
 ```elixir
@@ -268,7 +271,8 @@ Wok.Message.encode_reply(msg :: wok_msg:wok_msg(),
                          | {topic :: binary(), key :: binary()},
                          from :: binary(),
                          to :: binary(),
-                         body :: term()) -> binary().
+                         body :: term()) -> {:ok, binary(), integer(), opaque_message_transfert()}
+                                            | {:error, term()}
 ```
 
 ## async_reply/1
@@ -289,7 +293,8 @@ wok_message:encode_message(Topic :: binary()
                            | {Topic :: binary(), Key :: binary()},
                            From :: binary(),
                            To :: binary(),
-                           Body :: term()) -> binary().
+                           Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
+                                              | {error, term()}.
 ```
 
 ```elixir
@@ -298,7 +303,8 @@ Wok.Message.encode_message(topic :: binary()
                            | {topic :: binary(), key :: binary()},
                            from :: binary(),
                            to :: binary(),
-                           body :: term()) -> binary()
+                           body :: term()) -> {:ok, binary(), integer(), opaque_message_transfert()}
+                                              | {:error, term()}
 ```
 
 # HTTP Request API
