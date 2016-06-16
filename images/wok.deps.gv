@@ -44,6 +44,7 @@ digraph wok_deps {
   basic_auth_middleware[label="basic_auth_middleware\n(0.0.1)", fontcolor="white", style="filled", fillcolor="black"];
   middleware_session[label="middleware_session\n(0.0.4)", fontcolor="white", style="filled", fillcolor="black"];
   heartbeat_middleware[label="heartbeat_middleware\n(0.0.1)", fontcolor="white", style="filled", fillcolor="black"];
+  qdate[label="qdate\n(master)"];
   erlware_commons[label="erlware_commons\n(v0.15.0)"];
   erlang_localtime[label="erlang_localtime\n(master)"];
 
