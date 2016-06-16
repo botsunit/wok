@@ -14,9 +14,6 @@ defmodule Wok.Producer do
   def unquote(:"start")(arg1, arg2) do
     :erlang.apply(:"wok_producer", :"start", [arg1, arg2])
   end
-  def unquote(:"behaviour_info")(arg1) do
-    :erlang.apply(:"wok_producer", :"behaviour_info", [arg1])
-  end
   def unquote(:"provide")(arg1, arg2) do
     :erlang.apply(:"wok_producer", :"provide", [arg1, arg2])
   end
