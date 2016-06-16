@@ -15,6 +15,14 @@
          , custom_data/2
          , custom_data/3
 
+         , response/1
+         , response_from/1
+         , response_from/2
+         , response_to/1
+         , response_to/2
+         , response_body/1
+         , response_body/2
+
          , noreply/1
          , reply/4
          , reply/5
@@ -88,6 +96,43 @@ custom_data(Msg, Key, Value) when is_atom(Key) ->
     CustomData ->
       {ok, wok_msg:set_custom_data(Msg, maps:put(Key, Value, CustomData))}
   end.
+
+-spec response(wok_msg:wok_msg()) -> {Topic :: term(),
+                                      From :: binary(),
+                                      To :: binary(),
+                                      Body :: term()}.
+response(Msg) ->
+  wok_msg:get_response(Msg).
+
+-spec response_from(wok_msg:wok_msg()) -> binary().
+response_from(Msg) ->
+  {_, From, _, _} = response(Msg),
+  From.
+
+-spec response_to(wok_msg:wok_msg()) -> binary().
+response_to(Msg) ->
+  {_, _, To, _} = response(Msg),
+  To.
+
+-spec response_body(wok_msg:wok_msg()) -> binary().
+response_body(Msg) ->
+  {_, _, _, Body} = response(Msg),
+  Body.
+
+-spec response_from(wok_msg:wok_msg(), binary()) -> wok_msg:wok_msg().
+response_from(Msg, From) ->
+  {Topic, _, To, Body} = response(Msg),
+  wok_msg:set_response(Msg, Topic, From, To, Body).
+
+-spec response_to(wok_msg:wok_msg(), binary()) -> wok_msg:wok_msg().
+response_to(Msg, To) ->
+  {Topic, From, _, Body} = response(Msg),
+  wok_msg:set_response(Msg, Topic, From, To, Body).
+
+-spec response_body(wok_msg:wok_msg(), term()) -> wok_msg:wok_msg().
+response_body(Msg, Body) ->
+  {Topic, From, To, _} = response(Msg),
+  wok_msg:set_response(Msg, Topic, From, To, Body).
 
 -spec noreply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
 noreply(Msg) ->

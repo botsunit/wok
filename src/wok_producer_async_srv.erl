@@ -87,10 +87,11 @@ code_change(_OldVsn, State, _Extra) ->
 produce([], _, _, _) ->
   true;
 produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler) ->
-  KafeNoError = kafe_error:code_change(0),
+  KafeNoError = kafe_error:code(0),
+  lager:info("Produce message #~p on ~p#~p", [MessageID, Topic, Partition]),
   Response = case binary_to_term(base64:decode(Message)) of
-              MessageTransfert = #message_transfert{message = Message} ->
-                case wok_middlewares:outgoing_message(Message) of
+              MessageTransfert = #message_transfert{message = Message0} ->
+                case wok_middlewares:outgoing_message(Message0) of
                   {ok, Message1} ->
                     MessageTransfert1 = MessageTransfert#message_transfert{message = Message1},
                     case wok_msg:get_response(MessageTransfert1) of
@@ -108,7 +109,7 @@ produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler
                         erlang:apply(Handler, response, [MessageID, {error, Other}])
                     end;
                   {stop, Middleware, Reason} = Stop ->
-                    lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason]),
+                    lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message0, Reason]),
                     erlang:apply(Handler, response, [MessageID, Stop])
                 end;
               Msg when is_record(Msg, wok_msg) ->
