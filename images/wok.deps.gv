@@ -71,12 +71,14 @@ digraph wok_deps {
   lager_json_formatter -> jsx;
 
   wok_http_adapter -> edown[style=dotted];
+  wok_http_adapter -> rebar3_elixir[style=dotted];
 
   wok_message_handler -> bucs;
   wok_message_handler -> uuid;
   wok_message_handler -> meck[style=dotted];
   wok_message_handler -> doteki[style=dotted];
   wok_message_handler -> edown[style=dotted];
+  wok_message_handler -> rebar3_elixir[style=dotted];
 
   pipette -> lager;
   pipette -> bucs;
@@ -84,6 +86,7 @@ digraph wok_deps {
   pipette -> uuid;
   pipette -> meck[style=dotted];
   pipette -> edown[style=dotted];
+  pipette -> rebar3_elixir[style=dotted];
 
   kafe -> lager;
   kafe -> bucs;
@@ -92,6 +95,9 @@ digraph wok_deps {
   kafe -> bristow;
   kafe -> meck[style=dotted];
   kafe -> edown[style=dotted];
+  kafe -> rebar3_elixir[style=dotted];
+
+  bristow -> rebar3_elixir[style=dotted];
 
   cowboy -> cowlib;
   cowboy -> ranch;
@@ -99,14 +105,17 @@ digraph wok_deps {
   cowboy_default_static_file -> bucs;
   cowboy_default_static_file -> cowboy;
 
-  bucs -> edown[style=dotted]
+  bucs -> edown[style=dotted];
+  bucs -> rebar3_elixir[style=dotted];
 
   doteki -> bucs;
   doteki -> edown[style=dotted];
+  doteki -> rebar3_elixir[style=dotted];
 
   tempfile -> bucs;
   tempfile -> meck[style=dotted];
   tempfile -> edown[style=dotted];
+  tempfile -> rebar3_elixir[style=dotted];
 
   wok_tests -> bucs;
   wok_tests -> wok_http_adapter;
@@ -114,8 +123,10 @@ digraph wok_deps {
   wok_tests -> doteki;
   wok_tests -> hackney;
   wok_tests -> edown[style=dotted];
+  wok_tests -> rebar3_elixir[style=dotted];
 
   poolgirl -> edown[style=dotted];
+  poolgirl -> rebar3_elixir[style=dotted];
 
   hackney -> idna;
   hackney -> mimerl;
@@ -128,6 +139,7 @@ digraph wok_deps {
   wok_mail -> gen_smtp;
   wok_mail -> meck[style=dotted];
   wok_mail -> edown[style=dotted];
+  wok_mail -> rebar3_elixir[style=dotted];
 
   wok_i18n -> jsx;
   wok_i18n -> lager;
@@ -137,26 +149,32 @@ digraph wok_deps {
   wok_i18n -> bucs;
   wok_i18n -> doteki;
   wok_i18n -> edown[style=dotted];
+  wok_i18n -> rebar3_elixir[style=dotted];
 
   wok_tmpl_engine -> bucs;
   wok_tmpl_engine -> erlydtl;
+  wok_tmpl_engine -> rebar3_elixir[style=dotted];
 
   whisk -> bucs;
   whisk -> edown[style=dotted];
+  whisk -> rebar3_elixir[style=dotted];
 
   basic_auth_middleware -> wok[style=dotted];
   basic_auth_middleware -> wok_tests[style=dotted];
+  basic_auth_middleware -> rebar3_elixir[style=dotted];
 
   middleware_session -> lager;
   middleware_session -> uuid;
   middleware_session -> wok[style=dotted];
   middleware_session -> wok_tests[style=dotted];
+  middleware_session -> rebar3_elixir[style=dotted];
 
   heartbeat_middleware -> lager;
   heartbeat_middleware -> uuid;
   heartbeat_middleware -> qdate;
   heartbeat_middleware -> wok[style=dotted];
   heartbeat_middleware -> wok_tests[style=dotted];
+  heartbeat_middleware -> rebar3_elixir[style=dotted];
 
   qdate -> erlware_commons;
   qdate -> erlang_localtime;
