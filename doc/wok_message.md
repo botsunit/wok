@@ -27,7 +27,7 @@ opaque_message_transfert() = binary()
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#async_reply-1">async_reply/1</a></td><td></td></tr><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-1">content/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-2">content/2</a></td><td></td></tr><tr><td valign="top"><a href="#content_has_map-1">content_has_map/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-3">custom_data/3</a></td><td></td></tr><tr><td valign="top"><a href="#encode_message-4">encode_message/4</a></td><td></td></tr><tr><td valign="top"><a href="#encode_reply-4">encode_reply/4</a></td><td></td></tr><tr><td valign="top"><a href="#encode_reply-5">encode_reply/5</a></td><td></td></tr><tr><td valign="top"><a href="#from-1">from/1</a></td><td></td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#noreply-1">noreply/1</a></td><td></td></tr><tr><td valign="top"><a href="#provide-2">provide/2</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-4">provide/4</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-5">provide/5</a></td><td>
-Send a message.</td></tr><tr><td valign="top"><a href="#reply-4">reply/4</a></td><td></td></tr><tr><td valign="top"><a href="#reply-5">reply/5</a></td><td></td></tr><tr><td valign="top"><a href="#to-1">to/1</a></td><td></td></tr><tr><td valign="top"><a href="#uuid-1">uuid/1</a></td><td></td></tr></table>
+Send a message.</td></tr><tr><td valign="top"><a href="#reply-4">reply/4</a></td><td></td></tr><tr><td valign="top"><a href="#reply-5">reply/5</a></td><td></td></tr><tr><td valign="top"><a href="#response-1">response/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_body-1">response_body/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_body-2">response_body/2</a></td><td></td></tr><tr><td valign="top"><a href="#response_from-1">response_from/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_from-2">response_from/2</a></td><td></td></tr><tr><td valign="top"><a href="#response_to-1">response_to/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_to-2">response_to/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-1">to/1</a></td><td></td></tr><tr><td valign="top"><a href="#uuid-1">uuid/1</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -226,6 +226,69 @@ reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binar
 
 <pre><code>
 reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Topic::binary() | {binary(), integer()} | {binary(), binary()}, From::binary(), To::binary(), Body::term()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+</code></pre>
+<br />
+
+<a name="response-1"></a>
+
+### response/1 ###
+
+<pre><code>
+response(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; {Topic::term(), From::binary(), To::binary(), Body::term()}
+</code></pre>
+<br />
+
+<a name="response_body-1"></a>
+
+### response_body/1 ###
+
+<pre><code>
+response_body(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; binary()
+</code></pre>
+<br />
+
+<a name="response_body-2"></a>
+
+### response_body/2 ###
+
+<pre><code>
+response_body(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, Body::term()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+</code></pre>
+<br />
+
+<a name="response_from-1"></a>
+
+### response_from/1 ###
+
+<pre><code>
+response_from(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; binary()
+</code></pre>
+<br />
+
+<a name="response_from-2"></a>
+
+### response_from/2 ###
+
+<pre><code>
+response_from(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, From::binary()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+</code></pre>
+<br />
+
+<a name="response_to-1"></a>
+
+### response_to/1 ###
+
+<pre><code>
+response_to(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; binary()
+</code></pre>
+<br />
+
+<a name="response_to-2"></a>
+
+### response_to/2 ###
+
+<pre><code>
+response_to(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>, To::binary()) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
 </code></pre>
 <br />
 

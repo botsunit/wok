@@ -42,6 +42,27 @@ defmodule Wok.Message do
   def unquote(:"custom_data")(arg1, arg2, arg3) do
     :erlang.apply(:"wok_message", :"custom_data", [arg1, arg2, arg3])
   end
+  def unquote(:"response")(arg1) do
+    :erlang.apply(:"wok_message", :"response", [arg1])
+  end
+  def unquote(:"response_from")(arg1) do
+    :erlang.apply(:"wok_message", :"response_from", [arg1])
+  end
+  def unquote(:"response_to")(arg1) do
+    :erlang.apply(:"wok_message", :"response_to", [arg1])
+  end
+  def unquote(:"response_body")(arg1) do
+    :erlang.apply(:"wok_message", :"response_body", [arg1])
+  end
+  def unquote(:"response_from")(arg1, arg2) do
+    :erlang.apply(:"wok_message", :"response_from", [arg1, arg2])
+  end
+  def unquote(:"response_to")(arg1, arg2) do
+    :erlang.apply(:"wok_message", :"response_to", [arg1, arg2])
+  end
+  def unquote(:"response_body")(arg1, arg2) do
+    :erlang.apply(:"wok_message", :"response_body", [arg1, arg2])
+  end
   def unquote(:"noreply")(arg1) do
     :erlang.apply(:"wok_message", :"noreply", [arg1])
   end
