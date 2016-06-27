@@ -54,6 +54,7 @@ start_messages() ->
           lager:error("Can't load handler ~p: ~p", [Handler, Reason]),
           init:stop()
       end,
+      _ = application:ensure_all_started(pipette),
       _ = pipette:clean_all(),
       _ = application:ensure_all_started(kafe),
       ok

@@ -12,7 +12,6 @@
                   , crypto
                   , goldrush
                   , lager
-                  , pipette
                  ]},
   {mod, { wok_app, []}},
   {env, []}
