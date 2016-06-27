@@ -7,7 +7,6 @@
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
-  _ = check_message_handler(),
   Static = start_rest(),
   _ = start_messages(),
   wok_sup:start_link(Static).
@@ -42,17 +41,7 @@ start_rest() ->
 start_messages() ->
   case doteki:get_env([wok, messages]) of
     undefined ->
-      ok;
-    _ ->
-      _ = pipette:clean_all(),
-      _ = application:ensure_all_started(kafe),
-      ok
-  end.
-
-check_message_handler() ->
-  case doteki:get_env([wok, messages]) of
-    undefined ->
-      lager:info("No message handler!");
+      lager:info("No message configuration");
     _ ->
       Handler = case doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER) of
                   {Module, _} -> Module;
@@ -64,6 +53,9 @@ check_message_handler() ->
         {error, Reason} ->
           lager:error("Can't load handler ~p: ~p", [Handler, Reason]),
           init:stop()
-      end
+      end,
+      _ = pipette:clean_all(),
+      _ = application:ensure_all_started(kafe),
+      ok
   end.
 
