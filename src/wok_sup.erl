@@ -20,7 +20,14 @@ init([Static]) ->
                 [];
               _ ->
                 [
-                 ?CHILD(wok_messages_sup, [], supervisor, infinity),
+                 ?CHILD(wok_messages_sup, [], supervisor, infinity)
+                ]
+            end ++
+            case doteki:get_env([wok, producer]) of
+              undefined ->
+                [];
+              _ ->
+                [
                  ?CHILD(wok_producer_sup, [], supervisor, infinity)
                 ]
             end ++ custom_servers() ++ middlewares_servers(),
