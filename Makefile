@@ -1,7 +1,5 @@
-include bu.mk
-
 .PHONY: doc docker-compose.yml images/wok.deps.png images/wok.call.png
-REBAR = ./rebar3
+include bu.mk
 
 compile:
 	$(verbose) $(REBAR) compile
