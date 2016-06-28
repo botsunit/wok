@@ -96,7 +96,7 @@ produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler
                     MessageTransfert1 = MessageTransfert#message_transfert{message = Message1},
                     case wok_msg:get_response(MessageTransfert1) of
                       {Topic, From, To, Body} ->
-                        case wok_message:provide(Topic, From, To, Body,
+                        case wok_message:provide({Topic, Partition}, From, To, Body,
                                                  [{headers, #{message_id => MessageID}}]) of
                           {ok, [#{partitions := [#{error_code := KafeNoError}]}]} ->
                             erlang:apply(Handler, response, [MessageID, ok]);
@@ -115,7 +115,7 @@ produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler
               Msg when is_record(Msg, wok_msg) ->
                 case wok_msg:get_response(Msg) of
                   {Topic, From, To, Body} ->
-                    case wok_message:provide(Topic, From, To, Body,
+                    case wok_message:provide({Topic, Partition}, From, To, Body,
                                              [{headers, #{message_id => MessageID}}]) of
                       {ok, [#{partitions := [#{error_code := KafeNoError}]}]} ->
                         erlang:apply(Handler, response, [MessageID, ok]);
