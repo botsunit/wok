@@ -33,7 +33,7 @@ init(_Args) ->
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
-handle_cast({handle, MessageTransfert}, #{services := Services} = State) ->
+handle_cast({handle, #message_transfert{commit_id = CommitID} = MessageTransfert}, #{services := Services} = State) ->
   try
     Handler = case doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER) of
                 {Module, _} -> Module;
@@ -47,9 +47,11 @@ handle_cast({handle, MessageTransfert}, #{services := Services} = State) ->
                       Services),
                     State);
       {error, Reason} ->
-        lager:error("Error parsing message: ~p", [Reason]);
+        lager:error("Error parsing message: ~p", [Reason]),
+        _ = commit(CommitID);
       _ ->
-        lager:error("Wrong message parser return. See wok_message_handler for more informations")
+        lager:error("Wrong message parser return. See wok_message_handler for more informations"),
+        _ = commit(CommitID)
     end
   catch
     Class:Reason1 ->
@@ -87,14 +89,7 @@ handle_cast({terminate, Child, #message_transfert{message = Message,
       _ = pipette:clean_all(),
       init:stop()
   end,
-  case kafe_consumer:commit(CommitID, #{retry => 3}) of
-    {error, Reason1} ->
-      lager:debug("Commit faild : ~p", [Reason1]),
-      _ = pipette:clean_all(),
-      init:stop();
-    _ ->
-      ok
-  end,
+  _ = commit(CommitID),
   _ = case wok_services_sup:terminate_child(Child) of
         ok ->
           case doteki:get_env([wok, messages, local_consumer_group],
@@ -245,5 +240,15 @@ queue(#message_transfert{local_queue = LocalQueue, message = ParsedMessage} = Me
     {error, Reason} ->
       lager:error("Faild to queue message ~p to ~p: ", [ParsedMessage, LocalQueue, Reason]),
       error
+  end.
+
+commit(CommitID) ->
+  case kafe_consumer:commit(CommitID, #{retry => 3}) of
+    {error, Reason1} ->
+      lager:debug("Commit faild : ~p", [Reason1]),
+      _ = pipette:clean_all(),
+      init:stop();
+    _ ->
+      ok
   end.
 

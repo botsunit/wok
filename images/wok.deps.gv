@@ -6,7 +6,7 @@ digraph wok_deps {
     rankdir=LR;
   ]
 
-  wok[label="wok\n(0.4.1)", fontcolor="white", style="filled", fillcolor="black"];
+  wok[label="wok\n(0.4.2)", fontcolor="white", style="filled", fillcolor="black"];
   lager[label="lager\n(~> 3.2)"];
   lager_json_formatter[label="lager_json_formatter\n(~> 0.0.3)", style="filled", fillcolor="red"];
   wok_http_adapter[label="wok_http_adapter\n(0.1.0)", fontcolor="white", style="filled", fillcolor="black"];
@@ -37,7 +37,7 @@ digraph wok_deps {
   ssl_verify_fun[label="ssl_verify_fun\n(1.1.0)"];
   wok_mail[label="wok_mail\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
   gen_smtp[label="gen_smtp\n(~> 0.11.0)"];
-  wok_i18n[label="wok_i18n\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
+  wok_i18n[label="wok_i18n\n(0.1.2)", fontcolor="white", style="filled", fillcolor="black"];
   wok_tmpl_engine[label="wok_tmpl_engine\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
   whisk[label="whisk\n(0.1.1)", style="filled", fillcolor="red"];
   erlydtl[label="erlydtl\n(~> 0.11.0)"];
