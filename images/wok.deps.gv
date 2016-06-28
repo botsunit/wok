@@ -41,9 +41,9 @@ digraph wok_deps {
   wok_tmpl_engine[label="wok_tmpl_engine\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
   whisk[label="whisk\n(0.1.1)", style="filled", fillcolor="red"];
   erlydtl[label="erlydtl\n(~> 0.11.0)"];
-  basic_auth_middleware[label="basic_auth_middleware\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  middleware_session[label="middleware_session\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  heartbeat_middleware[label="heartbeat_middleware\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
+  basic_auth_middleware[label="basic_auth_middleware\n(0.1.0)", fontcolor="white", style="filled", fillcolor="black"];
+  middleware_session[label="middleware_session\n(0.1.0)", fontcolor="white", style="filled", fillcolor="black"];
+  heartbeat_middleware[label="heartbeat_middleware\n(0.1.0)", fontcolor="white", style="filled", fillcolor="black"];
   qdate[label="qdate\n(master)"];
   erlware_commons[label="erlware_commons\n(v0.15.0)"];
   erlang_localtime[label="erlang_localtime\n(master)"];
