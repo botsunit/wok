@@ -27,7 +27,7 @@ start_child(#message_transfert{consume_method = one_for_one, service_name = Serv
     true ->
       {queue, MessageTransfert};
     false ->
-      lager:info("Start service one_for_one : ~p | ~p", [ServiceName, Childs]),
+      lager:debug("Start service one_for_one : ~p | ~p", [ServiceName, Childs]),
       start_child2(MessageTransfert)
   end.
 
