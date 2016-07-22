@@ -24,7 +24,7 @@ opaque_message_transfert() = binary()
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#async_reply-1">async_reply/1</a></td><td></td></tr><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-1">content/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-2">content/2</a></td><td></td></tr><tr><td valign="top"><a href="#content_has_map-1">content_has_map/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-3">custom_data/3</a></td><td></td></tr><tr><td valign="top"><a href="#encode_message-4">encode_message/4</a></td><td></td></tr><tr><td valign="top"><a href="#encode_reply-4">encode_reply/4</a></td><td></td></tr><tr><td valign="top"><a href="#encode_reply-5">encode_reply/5</a></td><td></td></tr><tr><td valign="top"><a href="#from-1">from/1</a></td><td></td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#noreply-1">noreply/1</a></td><td></td></tr><tr><td valign="top"><a href="#provide-2">provide/2</a></td><td>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#async_reply-1">async_reply/1</a></td><td></td></tr><tr><td valign="top"><a href="#body-1">body/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-1">content/1</a></td><td></td></tr><tr><td valign="top"><a href="#content-2">content/2</a></td><td></td></tr><tr><td valign="top"><a href="#content_has_map-1">content_has_map/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td></td></tr><tr><td valign="top"><a href="#custom_data-3">custom_data/3</a></td><td></td></tr><tr><td valign="top"><a href="#encode_message-4">encode_message/4</a></td><td></td></tr><tr><td valign="top"><a href="#encode_reply-4">encode_reply/4</a></td><td></td></tr><tr><td valign="top"><a href="#encode_reply-5">encode_reply/5</a></td><td></td></tr><tr><td valign="top"><a href="#from-1">from/1</a></td><td></td></tr><tr><td valign="top"><a href="#global_state-1">global_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#headers-1">headers/1</a></td><td></td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td></td></tr><tr><td valign="top"><a href="#noreply-1">noreply/1</a></td><td></td></tr><tr><td valign="top"><a href="#param-2">param/2</a></td><td></td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td></td></tr><tr><td valign="top"><a href="#provide-2">provide/2</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-4">provide/4</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-5">provide/5</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#reply-4">reply/4</a></td><td></td></tr><tr><td valign="top"><a href="#reply-5">reply/5</a></td><td></td></tr><tr><td valign="top"><a href="#response-1">response/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_body-1">response_body/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_body-2">response_body/2</a></td><td></td></tr><tr><td valign="top"><a href="#response_from-1">response_from/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_from-2">response_from/2</a></td><td></td></tr><tr><td valign="top"><a href="#response_to-1">response_to/1</a></td><td></td></tr><tr><td valign="top"><a href="#response_to-2">response_to/2</a></td><td></td></tr><tr><td valign="top"><a href="#to-1">to/1</a></td><td></td></tr><tr><td valign="top"><a href="#uuid-1">uuid/1</a></td><td></td></tr></table>
@@ -175,6 +175,24 @@ local_state(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; 
 
 <pre><code>
 noreply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
+</code></pre>
+<br />
+
+<a name="param-2"></a>
+
+### param/2 ###
+
+<pre><code>
+param(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>, Param::binary() | list() | atom()) -&gt; binary() | undefined
+</code></pre>
+<br />
+
+<a name="params-1"></a>
+
+### params/1 ###
+
+<pre><code>
+params(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a> | <a href="/home/glejeune/Dropbox/BotsUnit/Dev/msaas/wok/_build/default/lib/wok_message_handler/doc/wok_message_handler.md#type-message">wok_message_handler:message()</a>) -&gt; #{}
 </code></pre>
 <br />
 

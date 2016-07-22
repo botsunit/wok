@@ -27,6 +27,12 @@ defmodule Wok.Message do
   def unquote(:"body")(arg1) do
     :erlang.apply(:"wok_message", :"body", [arg1])
   end
+  def unquote(:"params")(arg1) do
+    :erlang.apply(:"wok_message", :"params", [arg1])
+  end
+  def unquote(:"param")(arg1, arg2) do
+    :erlang.apply(:"wok_message", :"param", [arg1, arg2])
+  end
   def unquote(:"global_state")(arg1) do
     :erlang.apply(:"wok_message", :"global_state", [arg1])
   end

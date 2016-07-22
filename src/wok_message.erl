@@ -9,6 +9,8 @@
          , to/1
          , headers/1
          , body/1
+         , params/1
+         , param/2
          , global_state/1
          , local_state/1
          , custom_data/1
@@ -69,6 +71,14 @@ headers(Msg) ->
 -spec body(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
 body(Msg) ->
   wok_msg:get_body(content(Msg)).
+
+-spec params(wok_msg:wok_msg() | wok_message_handler:message()) -> map().
+params(Msg) ->
+  wok_msg:get_params(content(Msg)).
+
+-spec param(wok_msg:wok_msg() | wok_message_handler:message(), binary() | list() | atom()) -> binary() | undefined.
+param(Msg, Param) ->
+  wok_msg:get_params(content(Msg), Param).
 
 -spec global_state(wok_msg:wok_msg()) -> any().
 global_state(Msg) ->

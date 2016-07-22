@@ -181,11 +181,11 @@ consume(#message_transfert{message = ParsedMessage,
           lager:info("Missing consumer group in configuration"),
           exit(config_error);
         LocalConsumerGroup ->
-          lists:foreach(fun(Service) ->
+          lists:foreach(fun({Service, Params}) ->
                             LocalConsumerGroupOffset = pipette:offset(LocalQueue,
                                                                       #{consumer => LocalConsumerGroup}),
                             MessageTransfert1 = MessageTransfert#message_transfert{
-                                                  message = ParsedMessage3,
+                                                  message = wok_msg:set_message_params(ParsedMessage3, Params),
                                                   service = Service,
                                                   action = maps:get(Service, ServicesActions)},
                             MessageTransfert2 = wok_msg:set_local_state(MessageTransfert1, undefined),
