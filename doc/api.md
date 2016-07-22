@@ -72,6 +72,24 @@ wok_message:body(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
 Wok.Message.body(wok_msg:wok_msg() | wok_message_handler:message()) -> binary()
 ```
 
+## params/1
+
+```erlang
+wok_message:params(wok_msg:wok_msg() | wok_message_handler:message()) -> maps().
+```
+```elixir
+Wok.Message.params(wok_msg:wok_msg() | wok_message_handler:message()) -> maps()
+```
+
+## param/2
+
+```erlang
+wok_message:param(wok_msg:wok_msg() | wok_message_handler:message(), binary() | string() | atom()) -> binary() | undefined.
+```
+```elixir
+Wok.Message.param(wok_msg:wok_msg() | wok_message_handler:message(), binary() | string() | atom()) -> binary() | :undefined
+```
+
 ## global_state/1
 
 ```erlang
