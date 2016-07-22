@@ -3,7 +3,7 @@
 -compile([{parse_transform, lager_transform}]).
 -include_lib("wok_message_handler/include/wok_message_handler.hrl").
 
--export([my_action/1, my_async_action/1, my_answer/1]).
+-export([my_action/1, my_async_action/1, my_answer/1, parameterized_action/1]).
 -export([my_service_get/1, my_service_post/1, my_service_get2/1]).
 -export([ws_init/1, ws_handle/2, ws_info/2]).
 
@@ -45,6 +45,10 @@ my_answer(Message) ->
   timer:sleep(2000 + random:uniform(4000)),
   lager:info("END dummy_service_handler:my_answer =>>>>>>>>>< ~p",
              [wok_message:content(Message)]),
+  wok_message:noreply(Message).
+
+parameterized_action(Message) ->
+  lager:info("====> ~p", [wok_message:params(Message)]),
   wok_message:noreply(Message).
 
 % rest
