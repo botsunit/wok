@@ -14,7 +14,7 @@ defmodule Wok.Mixfile do
 
   def application do
     [
-       applications: [:syntax_tools, :compiler, :crypto, :goldrush, :lager, :pipette],
+       applications: [:syntax_tools, :compiler, :crypto, :goldrush, :lager],
        env: [],
        mod: {:wok_app, []}
     ]

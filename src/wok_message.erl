@@ -78,7 +78,7 @@ params(Msg) ->
 
 -spec param(wok_msg:wok_msg() | wok_message_handler:message(), binary() | list() | atom()) -> binary() | undefined.
 param(Msg, Param) ->
-  wok_msg:get_params(content(Msg), Param).
+  wok_msg:get_param(content(Msg), Param).
 
 -spec global_state(wok_msg:wok_msg()) -> any().
 global_state(Msg) ->
