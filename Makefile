@@ -1,8 +1,16 @@
 .PHONY: doc docker-compose.yml images/wok.deps.png images/wok.call.png
 include bu.mk
 
-compile:
+compile-erl:
 	$(verbose) $(REBAR) compile
+
+compile-ex: elixir
+	$(verbose) $(MIX) deps.get
+	$(verbose) $(MIX) compile
+
+elixir:
+	$(verbose) $(REBAR) elixir generate_mix
+	$(verbose) $(REBAR) elixir generate_lib
 
 tests:
 	$(verbose) $(REBAR) eunit
@@ -14,19 +22,27 @@ doc: images/wok.call.png images/wok.deps.png _doc/doc.yml
 	$(verbose) ${CP} _doc/* doc
 
 images/wok.call.png: images/wok.call.gv
-	@dot -T png -o images/wok.call.png images/wok.call.gv
+	$(verbose) dot -T png -o images/wok.call.png images/wok.call.gv
 
 images/wok.deps.png: images/wok.deps.gv
-	@dot -T png -o images/wok.deps.png images/wok.deps.gv
+	$(verbose) dot -T png -o images/wok.deps.png images/wok.deps.gv
 
-elixir:
-	$(verbose) $(REBAR) elixir generate_mix
-	$(verbose) $(REBAR) elixir generate_lib
+dist-erl: clean-erl compile-erl tests
 
-dist: compile tests elixir doc
+dist-ex: clean-ex compile-ex
 
-distclean:
-	$(verbose) rm -rf _build rebar.lock mix.lock test/eunit deps
+dist: dist-erl dist-ex doc
+
+clean-ex:
+	$(verbose) $(RM_RF) _build deps
+
+clean-erl:
+	$(verbose) $(RM_RF) _build test/eunit
+
+clean: clean-ex clean-erl
+
+distclean: clean-ex clean-erl
+	$(verbose) rm -f rebar.lock mix.lock
 
 dev: compile
 	$(verbose) erl -pa _build/default/lib/*/ebin _build/default/lib/*/include -config config/wok.config

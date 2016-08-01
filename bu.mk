@@ -27,6 +27,7 @@ CP = cp
 CP_R = cp -r
 RM = rm
 RM_RF = rm -rf
+RM_F = rm -f
 MKDIR_P = mkdir -p
 
 # Core functions.

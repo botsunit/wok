@@ -8,7 +8,8 @@ defmodule Wok.Mixfile do
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps
+      deps: deps,
+      aliases: aliases
     ]
   end
 
@@ -25,15 +26,41 @@ defmodule Wok.Mixfile do
       {:lager, "~> 3.2"},
       {:lager_json_formatter, "~> 0.0.3"},
       {:wok_http_adapter, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", tag: "0.1.0"},
-      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"},
+      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", tag: "0.4.2"},
       {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", tag: "0.1.1"},
-      {:kafe, "~> 1.5"},
+      {:kafe, "~> 1.5.1"},
       {:cowboy_default_static_file, git: "https://github.com/botsunit/cowboy_default_static_file.git", tag: "1.2.1"},
       {:cowboy, git: "https://github.com/ninenines/cowboy.git", tag: "2.0.0-pre.3"},
-      {:bucs, "~> 0.1"},
-      {:doteki, "~> 0.1"},
+      {:bucs, "~> 0.1.6"},
+      {:doteki, "~> 0.1.9"},
       {:uuid, git: "https://github.com/avtobiff/erlang-uuid.git", tag: "v0.5.0"},
       {:tempfile, git: "https://github.com/botsunit/tempfile.git", tag: "1.1.1"}    
     ]
   end
+
+  defp aliases do
+    [compile: [&pre_compile_hooks/1, "compile", &post_compile_hooks/1]]
+  end
+
+  defp pre_compile_hooks(_) do
+    run_hook_cmd [
+    ]
+  end
+
+  defp post_compile_hooks(_) do
+    run_hook_cmd [
+    ]
+  end
+
+  defp run_hook_cmd(commands) do
+    {_, os} = :os.type
+    for command <- commands, do: (fn
+      ({regex, cmd}) ->
+         if Regex.match?(Regex.compile!(regex), Atom.to_string(os)) do
+           Mix.Shell.cmd cmd, [], fn(x) -> Mix.Shell.IO.info(String.strip(x)) end
+         end
+      (cmd) ->
+        Mix.Shell.cmd cmd, [], fn(x) -> Mix.Shell.IO.info(String.strip(x)) end
+      end).(command)
+  end    
 end
