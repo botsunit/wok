@@ -95,7 +95,7 @@ wok_middelware_no_middleware_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one();
      (_) ->
@@ -127,7 +127,7 @@ wok_middelware_inout_two_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_two();
      (_) ->
@@ -167,7 +167,7 @@ wok_middelware_one_and_two_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -209,7 +209,7 @@ wok_middelware_stop_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_three();
@@ -258,7 +258,7 @@ wok_middelware_one_and_two_with_only_two_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -306,7 +306,7 @@ wok_middelware_one_and_two_with_only_one_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -354,7 +354,7 @@ wok_middelware_one_and_two_with_except_two_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -402,7 +402,7 @@ wok_middelware_one_and_two_with_except_one_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -452,7 +452,7 @@ wok_middelware_one_and_two_with_except_one_with_get_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -500,7 +500,7 @@ wok_middelware_one_and_two_with_except_one_with_post_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -550,7 +550,7 @@ wok_middelware_one_and_two_with_only_one_with_get_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -598,7 +598,7 @@ wok_middelware_one_and_two_with_only_one_with_post_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_one(),
        unmeck_middleware_two();
@@ -638,7 +638,7 @@ wok_middelware_with_missing_methods_test_() ->
        {wok_middlewares:start_link(), wok_r()}
    end,
    fun
-     ({{ok, _},_}) ->
+     ({{ok, _}, _}) ->
        wok_middlewares:stop(),
        unmeck_middleware_four();
      (_) ->

@@ -22,7 +22,7 @@ start_child(#message_transfert{consume_method = one_for_all} = MessageTransfert)
 start_child(#message_transfert{consume_method = one_for_one, service_name = ServiceName} = MessageTransfert) ->
   Childs = lists:usort(
              [buclists:keyfind(registered_name, 1, erlang:process_info(P), undefined) ||
-              {_,P,_,_} <- supervisor:which_children(?MODULE)]),
+              {_, P, _, _} <- supervisor:which_children(?MODULE)]),
   case lists:member(ServiceName, Childs) of
     true ->
       {queue, MessageTransfert};

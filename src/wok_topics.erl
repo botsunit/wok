@@ -164,7 +164,7 @@ start_groups([{_, _, _, _, _, _, _, _} = G|Rest], CGPrefix, LQPrefix, Acc) ->
 
 local_queues(ConsumeMethod, Prefix, Topic, Partitions) ->
   lists:foldl(fun(P, Acc) ->
-                  maps:put(P, local_queue(ConsumeMethod, Prefix, Topic, P),Acc)
+                  maps:put(P, local_queue(ConsumeMethod, Prefix, Topic, P), Acc)
               end, #{}, Partitions).
 
 local_queue(one_for_one, Prefix, Topic, Partition) ->
@@ -232,7 +232,7 @@ hexstring(<<X:512/big-unsigned-integer>>) ->
 
 -ifdef(TEST).
 start_groups_ok_test() ->
-  FakePID = c:pid(0,0,0),
+  FakePID = c:pid(0, 0, 0),
   meck:new(kafe),
   meck:expect(kafe, topics, 0, #{<<"test">> => #{0 => broker0, 1 => broker1, 2 => broker2}}),
   meck:expect(kafe, start_consumer, 3, {ok, FakePID}),
@@ -272,7 +272,7 @@ start_groups_ok_test() ->
   meck:unload(kafe).
 
 start_groups_missing_queue_test() ->
-  FakePID = c:pid(0,0,0),
+  FakePID = c:pid(0, 0, 0),
   meck:new(kafe),
   meck:expect(kafe, topics, 0, #{<<"test">> => #{0 => broker0, 1 => broker1, 2 => broker2}}),
   meck:expect(kafe, start_consumer, 3, {ok, FakePID}),
@@ -307,7 +307,7 @@ start_groups_missing_queue_test() ->
   meck:unload(kafe).
 
 start_groups_false_test() ->
-  FakePID = c:pid(0,0,0),
+  FakePID = c:pid(0, 0, 0),
   meck:new(kafe),
   meck:expect(kafe, topics, 0, #{<<"test">> => #{0 => broker0, 1 => broker1, 2 => broker2}}),
   meck:expect(kafe, start_consumer, 3, {ok, FakePID}),

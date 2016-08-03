@@ -1,22 +1,10 @@
-.PHONY: doc docker-compose.yml images/wok.deps.png images/wok.call.png
+HAS_ELIXIR=1
+
 include bu.mk
 
-compile-erl:
-	$(verbose) $(REBAR) compile
+.PHONY: docker-compose.yml images/wok.deps.png images/wok.call.png
 
-compile-ex: elixir
-	$(verbose) $(MIX) deps.get
-	$(verbose) $(MIX) compile
-
-elixir:
-	$(verbose) $(REBAR) elixir generate_mix
-	$(verbose) $(REBAR) elixir generate_lib
-
-tests:
-	$(verbose) $(REBAR) eunit
-
-doc: images/wok.call.png images/wok.deps.png _doc/doc.yml
-	$(verbose) $(REBAR) as doc edoc
+doc:: images/wok.call.png images/wok.deps.png _doc/doc.yml
 	$(verbose) ${MKDIR_P} doc/images
 	$(verbose) ${CP} images/*.png doc/images
 	$(verbose) ${CP} _doc/* doc
@@ -26,26 +14,6 @@ images/wok.call.png: images/wok.call.gv
 
 images/wok.deps.png: images/wok.deps.gv
 	$(verbose) dot -T png -o images/wok.deps.png images/wok.deps.gv
-
-dist-erl: clean-erl compile-erl tests
-
-dist-ex: clean-ex compile-ex
-
-dist: dist-erl dist-ex doc
-
-clean-ex:
-	$(verbose) $(RM_RF) _build deps
-
-clean-erl:
-	$(verbose) $(RM_RF) _build test/eunit
-
-clean: clean-ex clean-erl
-
-distclean: clean-ex clean-erl
-	$(verbose) rm -f rebar.lock mix.lock
-
-dev: compile
-	$(verbose) erl -pa _build/default/lib/*/ebin _build/default/lib/*/include -config config/wok.config
 
 KAFKA_ADVERTISED_HOST_NAME = $(shell ip addr list docker0 |grep "inet " |cut -d' ' -f6|cut -d/ -f1)
 

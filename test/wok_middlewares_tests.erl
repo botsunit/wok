@@ -39,10 +39,10 @@ wok_routes_no_ops_test_() ->
    end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/fake_middleware/dummy_post",
-                       {fake_middleware,my_dummy_post}, fake_middleware},
-                      {'GET',"/fake_middleware/dummy_get",
-                       {fake_middleware,my_dummy_get}, fake_middleware}],
+        ?assertMatch([{'POST', "/fake_middleware/dummy_post",
+                       {fake_middleware, my_dummy_post}, fake_middleware},
+                      {'GET', "/fake_middleware/dummy_get",
+                       {fake_middleware, my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -65,10 +65,10 @@ wok_routes_no_default_namespace_test_() ->
    end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/dummy_post",
-                       {fake_middleware,my_dummy_post}, fake_middleware},
-                      {'GET',"/dummy_get",
-                       {fake_middleware,my_dummy_get}, fake_middleware}],
+        ?assertMatch([{'POST', "/dummy_post",
+                       {fake_middleware, my_dummy_post}, fake_middleware},
+                      {'GET', "/dummy_get",
+                       {fake_middleware, my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -91,10 +91,10 @@ wok_routes_namespace_test_() ->
    end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/custom/dummy_post",
-                       {fake_middleware,my_dummy_post}, fake_middleware},
-                      {'GET',"/custom/dummy_get",
-                       {fake_middleware,my_dummy_get}, fake_middleware}],
+        ?assertMatch([{'POST', "/custom/dummy_post",
+                       {fake_middleware, my_dummy_post}, fake_middleware},
+                      {'GET', "/custom/dummy_get",
+                       {fake_middleware, my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -117,10 +117,10 @@ wok_routes_route_change_test_() ->
    end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/fake_middleware/dummy_post",
-                       {fake_middleware,my_dummy_post}, fake_middleware},
-                      {'GET',"/fake_middleware/get_dummy",
-                       {fake_middleware,my_dummy_get}, fake_middleware}],
+        ?assertMatch([{'POST', "/fake_middleware/dummy_post",
+                       {fake_middleware, my_dummy_post}, fake_middleware},
+                      {'GET', "/fake_middleware/get_dummy",
+                       {fake_middleware, my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -146,10 +146,10 @@ wok_routes_route_change_all_test_() ->
    end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/fake_middleware/post_dummy",
-                       {fake_middleware,my_dummy_post}, fake_middleware},
-                      {'GET',"/fake_middleware/get_dummy",
-                       {fake_middleware,my_dummy_get}, fake_middleware}],
+        ?assertMatch([{'POST', "/fake_middleware/post_dummy",
+                       {fake_middleware, my_dummy_post}, fake_middleware},
+                      {'GET', "/fake_middleware/get_dummy",
+                       {fake_middleware, my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -175,10 +175,10 @@ wok_routes_route_change_with_custom_prefix_test_() ->
    end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/custom/dummy_post",
-                       {fake_middleware,my_dummy_post}, fake_middleware},
-                      {'GET',"/custom/get_dummy",
-                       {fake_middleware,my_dummy_get}, fake_middleware}],
+        ?assertMatch([{'POST', "/custom/dummy_post",
+                       {fake_middleware, my_dummy_post}, fake_middleware},
+                      {'GET', "/custom/get_dummy",
+                       {fake_middleware, my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -204,10 +204,10 @@ wok_routes_route_change_with_no_prefix_test_() ->
    end,
    [
     fun() ->
-        ?assertMatch([{'POST',"/dummy_post",
-                       {fake_middleware,my_dummy_post}, fake_middleware},
-                      {'GET',"/get_dummy",
-                       {fake_middleware,my_dummy_get}, fake_middleware}],
+        ?assertMatch([{'POST', "/dummy_post",
+                       {fake_middleware, my_dummy_post}, fake_middleware},
+                      {'GET', "/get_dummy",
+                       {fake_middleware, my_dummy_get}, fake_middleware}],
                      wok_middlewares:routes())
     end
    ]}.
@@ -262,9 +262,9 @@ wok_middelware_with_state_test_() ->
    fun(R) ->
        {with, R,
         [fun(X) -> ?assertMatch({ok, _}, X) end,
-         fun(_) -> ?assertMatch([init,parameters], wok_middlewares:state(fake_middleware)) end,
-         fun(_) -> ?assertMatch(ok, wok_middlewares:state(fake_middleware, [init,new_parameters])) end,
-         fun(_) -> ?assertMatch([init,new_parameters], wok_middlewares:state(fake_middleware)) end]
+         fun(_) -> ?assertMatch([init, parameters], wok_middlewares:state(fake_middleware)) end,
+         fun(_) -> ?assertMatch(ok, wok_middlewares:state(fake_middleware, [init, new_parameters])) end,
+         fun(_) -> ?assertMatch([init, new_parameters], wok_middlewares:state(fake_middleware)) end]
        }
    end}.
 

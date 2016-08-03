@@ -128,6 +128,12 @@ produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler
                     erlang:apply(Handler, response, [MessageID, {error, Other}])
                 end
             end,
+  provide_response(Response, Rest, Topic, Partition, Handler);
+produce([{MessageID, _, _, _}|Rest], Topic, Partition, Handler) ->
+  provide_response(erlang:apply(Handler, response, [MessageID, {error, wrong_topic_partition}]),
+                   Rest, Topic, Partition, Handler).
+
+provide_response(Response, Rest, Topic, Partition, Handler) ->
   case Response of
     next ->
       produce(Rest, Topic, Partition, Handler);
@@ -137,16 +143,4 @@ produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler
     exit ->
       lager:debug("Exit producer for ~p#~p", [Topic, Partition]),
       false
-  end;
-produce([{MessageID, _, _, _}|Rest], Topic, Partition, Handler) ->
-  case erlang:apply(Handler, response, [MessageID, {error, wrong_topic_partition}]) of
-    next ->
-      produce(Rest, Topic, Partition, Handler);
-    stop ->
-      lager:debug("Stop producer for ~p#~p", [Topic, Partition]),
-      true;
-    exit ->
-      lager:debug("Exit producer for ~p#~p", [Topic, Partition]),
-      false
   end.
-

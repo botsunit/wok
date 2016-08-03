@@ -37,11 +37,11 @@ wok_cowboy_handler_uncompiled_routes_test_() ->
               {'PATCH', {fake_rest_handler, update}},
               {'PUT', {fake_rest_handler, update}},
               {'GET', {fake_rest_handler, show}}
-            ]},{
+            ]}, {
             "/api/users", [
               {'POST', {fake_rest_handler, create}},
               {'GET', {fake_rest_handler, index}}]}
-            ], #{static_path := [],static_route := []}
+            ], #{static_path := [], static_route := []}
           },
            wok_http_handler:routes()
         )
@@ -53,46 +53,46 @@ wok_cowboy_handler_routes_test_() ->
    fun(_) -> ok end,
    [fun() ->
         ?assertMatch(
-           {[{'_',[],[{
+           {[{'_', [], [{
                 [<<"route">>, <<"one">>],
                 [],
                 wok_cowboy_handler,
                 [{'GET', {dummy_service_handler, my_service_get}}]
                }]}],
-            #{static_path := [],static_route := []}},
+            #{static_path := [], static_route := []}},
            wok_cowboy_handler:routes([{'GET', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
-           {[{'_',[],[{
+           {[{'_', [], [{
                 [<<"route">>, <<"one">>],
                 [],
                 wok_cowboy_handler,
                 [{'POST', {dummy_service_handler, my_service_get}}]
                }]}],
-            #{static_path := [],static_route := []}},
+            #{static_path := [], static_route := []}},
            wok_cowboy_handler:routes([{'POST', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
-           {[{'_',[],[{
+           {[{'_', [], [{
                 [<<"route">>, <<"one">>],
                 [],
                 wok_cowboy_handler,
                 [{'CUSTOM', {dummy_service_handler, my_service_get}}]
                }]}],
-            #{static_path := [],static_route := []}},
+            #{static_path := [], static_route := []}},
            wok_cowboy_handler:routes([{'CUSTOM', "/route/one", {dummy_service_handler, my_service_get}}]))
     end,
     fun() ->
         ?assertMatch(
-           {[{'_',[],[{
+           {[{'_', [], [{
                 [<<"priv">>, <<"public">>, '...'],
                 [],
                 cowboy_static,
-                {dir, "/tmp", [{mimetypes,cow_mimetypes,all}, {default_file, "index.html"}]}
+                {dir, "/tmp", [{mimetypes, cow_mimetypes, all}, {default_file, "index.html"}]}
                }]}],
-            #{static_path := "/tmp",static_route := "/priv/public"}},
+            #{static_path := "/tmp", static_route := "/priv/public"}},
            wok_cowboy_handler:routes([{static, "/priv/public", {dir, "/tmp"}}]))
     end]}.
 

@@ -78,7 +78,7 @@ path(Verb, Handler, Function, Args) when (Verb == 'GET' orelse
       maps:fold(fun(K, V, Acc) ->
                     K1 = "/:" ++ bucs:to_string(K) ++ "(/|\\Z)",
                     V1 = "/" ++ bucs:to_string(V) ++ "\\1",
-                    re:replace(Acc, K1, V1, [{return,list}, global])
+                    re:replace(Acc, K1, V1, [{return, list}, global])
                 end, Path, Args)
   end.
 

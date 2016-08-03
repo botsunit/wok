@@ -24,17 +24,17 @@ defmodule Wok.Mixfile do
   defp deps do
     [
       {:lager, "~> 3.2"},
-      {:lager_json_formatter, "~> 0.0.3"},
-      {:wok_http_adapter, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", tag: "0.1.0"},
-      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", tag: "0.4.2"},
-      {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", tag: "0.1.1"},
-      {:kafe, "~> 1.5.1"},
-      {:cowboy_default_static_file, git: "https://github.com/botsunit/cowboy_default_static_file.git", tag: "1.2.1"},
+      {:lager_json_formatter, "~> 0.0.4"},
+      {:wok_http_adapter, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", tag: "0.1.1"},
+      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", tag: "0.4.4"},
+      {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", tag: "0.1.2"},
+      {:kafe, "~> 1.6.0"},
+      {:cowboy_default_static_file, git: "https://github.com/botsunit/cowboy_default_static_file.git", tag: "1.2.2"},
       {:cowboy, git: "https://github.com/ninenines/cowboy.git", tag: "2.0.0-pre.3"},
-      {:bucs, "~> 0.1.6"},
-      {:doteki, "~> 0.1.9"},
+      {:bucs, "~> 0.1.7"},
+      {:doteki, "~> 0.1.10"},
       {:uuid, git: "https://github.com/avtobiff/erlang-uuid.git", tag: "v0.5.0"},
-      {:tempfile, git: "https://github.com/botsunit/tempfile.git", tag: "1.1.1"}    
+      {:tempfile, git: "https://github.com/botsunit/tempfile.git", tag: "1.1.2"}    
     ]
   end
 

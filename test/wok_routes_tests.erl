@@ -42,8 +42,8 @@ routes_test_() ->
             [
              {
               "/public/[...]", cowboy_static,
-              {dir,StaticPath,
-               [{mimetypes,cow_mimetypes,all},{default_file,"index.html"}]}
+              {dir, StaticPath,
+               [{mimetypes, cow_mimetypes, all}, {default_file, "index.html"}]}
              },
              {
               "/chat/:id/private/:idroom", [

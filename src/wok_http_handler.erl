@@ -13,13 +13,13 @@ routes() ->
 routes(Routes) ->
   routes(
     lists:sort(fun
-                 ({_,A,_,_}, {_,B,_,_}) ->
+                 ({_, A, _, _}, {_, B, _, _}) ->
                    A > B;
-                 ({_,A,_}, {_,B,_,_}) ->
+                 ({_, A, _}, {_, B, _, _}) ->
                    A > B;
-                 ({_,A,_,_}, {_,B,_}) ->
+                 ({_, A, _, _}, {_, B, _}) ->
                    A > B;
-                 ({_,A,_}, {_,B,_}) ->
+                 ({_, A, _}, {_, B, _}) ->
                    A > B
                end,
                Routes),
@@ -41,7 +41,7 @@ cors_headers(Path) ->
                                     <<"Content-Type">>,
                                     <<"Content-Range">>,
                                     <<"Content-Disposition">>,
-                                    <<"Content-Description">>]),<<", ">>)}
+                                    <<"Content-Description">>]), <<", ">>)}
   ] ++
   case doteki:get_env([wok, rest, cors, 'Access-Control-Expose-Headers'], undefined) of
     undefined -> [];
@@ -116,7 +116,7 @@ routes([{Verb, Path, Handler, Middleware}|Rest], Acc) ->
 add_route(Path, static, Filepath, {Routes, _}) ->
   StaticPath = static_path(Filepath),
   StaticRoute = bucuri:join(Path, "[...]"),
-  {case lists:keyfind(StaticRoute,1, Routes) of
+  {case lists:keyfind(StaticRoute, 1, Routes) of
     {StaticRoute, _} ->
       lists:keyreplace(StaticRoute, 1, Routes, {StaticRoute,
                                                 cowboy_static,
