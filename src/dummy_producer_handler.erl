@@ -4,7 +4,7 @@
 
 %% API
 -export([start_link/0]).
--export([store/3, messages/3, response/2]).
+-export([store/3, messages/3, response/3]).
 
 %% gen_server callbacks
 -export([init/1
@@ -20,8 +20,8 @@ store(Topic, Partition, Message) ->
 messages(Topic, Partition, NumMessage) ->
   gen_server:call(?MODULE, {messages, Topic, Partition, NumMessage}).
 
-response(MessageID, Response) ->
-  gen_server:call(?MODULE, {response, MessageID, Response}).
+response(MessageID, Response, Retry) ->
+  gen_server:call(?MODULE, {response, MessageID, Response, Retry}).
 
 start_link() ->
   gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
@@ -48,7 +48,7 @@ handle_call({messages, Topic, Partition, NumMessage}, _From, State) ->
               []
           end,
   {reply, Reply, State};
-handle_call({response, MessageID, Response}, _From, State) ->
+handle_call({response, MessageID, Response, _Retry}, _From, State) ->
   case Response of
     {error, _} ->
       {reply, exit, State};

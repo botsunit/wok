@@ -23,8 +23,9 @@
 -callback response(MessageID :: integer(),
                    Response :: ok
                    | {error, term()}
-                   | {stop, Middleware :: atom(), Reason :: term()}) ->
-  stop | exit | next.
+                   | {stop, Middleware :: atom(), Reason :: term()},
+                   Retry :: true | false) ->
+  stop | exit | next | retry.
 
 % API
 

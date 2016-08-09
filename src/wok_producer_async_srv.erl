@@ -87,6 +87,8 @@ code_change(_OldVsn, State, _Extra) ->
 produce([], _, _, _) ->
   true;
 produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler) ->
+  produce([{MessageID, Topic, Partition, Message, false}|Rest], Topic, Partition, Handler);
+produce([{MessageID, Topic, Partition, Message, Retry} = M|Rest], Topic, Partition, Handler) ->
   KafeNoError = kafe_error:code(0),
   lager:info("Produce message #~p on ~p#~p", [MessageID, Topic, Partition]),
   Response = case binary_to_term(base64:decode(Message)) of
@@ -99,18 +101,18 @@ produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler
                         case wok_message:provide({Topic, Partition}, From, To, Body,
                                                  [{headers, #{message_id => MessageID}}]) of
                           {ok, [#{partitions := [#{error_code := KafeNoError}]}]} ->
-                            erlang:apply(Handler, response, [MessageID, ok]);
+                            erlang:apply(Handler, response, [MessageID, ok, Retry]);
                           {ok, [#{partitions := [#{error_code := KafeError}]}]} ->
-                            erlang:apply(Handler, response, [MessageID, {error, KafeError}]);
+                            erlang:apply(Handler, response, [MessageID, {error, KafeError}, Retry]);
                           E ->
-                            erlang:apply(Handler, response, [MessageID, E])
+                            erlang:apply(Handler, response, [MessageID, E, Retry])
                         end;
                       Other ->
-                        erlang:apply(Handler, response, [MessageID, {error, Other}])
+                        erlang:apply(Handler, response, [MessageID, {error, Other}, Retry])
                     end;
                   {stop, Middleware, Reason} = Stop ->
                     lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message0, Reason]),
-                    erlang:apply(Handler, response, [MessageID, Stop])
+                    erlang:apply(Handler, response, [MessageID, Stop, Reason])
                 end;
               Msg when is_record(Msg, wok_msg) ->
                 case wok_msg:get_response(Msg) of
@@ -118,23 +120,25 @@ produce([{MessageID, Topic, Partition, Message}|Rest], Topic, Partition, Handler
                     case wok_message:provide({Topic, Partition}, From, To, Body,
                                              [{headers, #{message_id => MessageID}}]) of
                       {ok, [#{partitions := [#{error_code := KafeNoError}]}]} ->
-                        erlang:apply(Handler, response, [MessageID, ok]);
+                        erlang:apply(Handler, response, [MessageID, ok, Retry]);
                       {ok, [#{partitions := [#{error_code := KafeError}]}]} ->
-                        erlang:apply(Handler, response, [MessageID, {error, KafeError}]);
+                        erlang:apply(Handler, response, [MessageID, {error, KafeError}, Retry]);
                       E ->
-                        erlang:apply(Handler, response, [MessageID, E])
+                        erlang:apply(Handler, response, [MessageID, E, Retry])
                     end;
                   Other ->
-                    erlang:apply(Handler, response, [MessageID, {error, Other}])
+                    erlang:apply(Handler, response, [MessageID, {error, Other}, Retry])
                 end
             end,
-  provide_response(Response, Rest, Topic, Partition, Handler);
-produce([{MessageID, _, _, _}|Rest], Topic, Partition, Handler) ->
-  provide_response(erlang:apply(Handler, response, [MessageID, {error, wrong_topic_partition}]),
-                   Rest, Topic, Partition, Handler).
+  provide_response(Response, M, Rest, Topic, Partition, Handler);
+produce([{MessageID, _, _, _, Retry} = M|Rest], Topic, Partition, Handler) ->
+  provide_response(erlang:apply(Handler, response, [MessageID, {error, wrong_topic_partition}, Retry]),
+                   M, Rest, Topic, Partition, Handler).
 
-provide_response(Response, Rest, Topic, Partition, Handler) ->
+provide_response(Response, {MessageID, Topic, Partition, Message, _}, Rest, Topic, Partition, Handler) ->
   case Response of
+    retry ->
+      produce([{MessageID, Topic, Partition, Message, true}|Rest], Topic, Partition, Handler);
     next ->
       produce(Rest, Topic, Partition, Handler);
     stop ->

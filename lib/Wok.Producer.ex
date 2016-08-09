@@ -4,7 +4,7 @@
 # MODIFY IT AT YOUR OWN RISK AND ONLY IF YOU KNOW WHAT YOU ARE DOING!
 defmodule Wok.Producer do
   @callback messages(any, any, any) :: any
-  @callback response(any, any) :: any
+  @callback response(any, any, any) :: any
   def unquote(:"start")() do
     :erlang.apply(:"wok_producer", :"start", [])
   end

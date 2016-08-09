@@ -4,7 +4,7 @@
 * [Function Index](#index)
 * [Function Details](#functions)
 
-__This module defines the `wok_producer` behaviour.__<br /> Required callback functions: `messages/3`, `response/2`.
+__This module defines the `wok_producer` behaviour.__<br /> Required callback functions: `messages/3`, `response/3`.
 
 <a name="index"></a>
 
