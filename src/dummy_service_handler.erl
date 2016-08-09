@@ -7,12 +7,19 @@
 -export([my_service_get/1, my_service_post/1, my_service_get2/1]).
 -export([ws_init/1, ws_handle/2, ws_info/2]).
 
+-define(RAND, begin
+                case code:ensure_loaded(rand) of
+                  {module, rand} -> rand;
+                  _ -> random
+                end
+              end).
+
 % controler
 
 my_action(Message) ->
   lager:info("BEGIN dummy_service_handler:my_action =>>>>>>>>>< ~p :: ~p",
              [wok_message:content(Message), wok_message:global_state(Message)]),
-  timer:sleep(2000 + random:uniform(4000)),
+  timer:sleep(2000 + erlang:apply(?RAND, uniform, [4000])),
   lager:info("END dummy_service_handler:my_action =>>>>>>>>>< ~p",
              [wok_message:content(Message)]),
   wok_message:reply(Message,
@@ -23,7 +30,7 @@ my_action(Message) ->
 my_async_action(Message) ->
   lager:info("BEGIN dummy_service_handler:my_action =>>>>>>>>>< ~p :: ~p",
              [wok_message:content(Message), wok_message:global_state(Message)]),
-  timer:sleep(2000 + random:uniform(4000)),
+  timer:sleep(2000 + erlang:apply(?RAND, uniform, [4000])),
   case wok_message:encode_reply(Message,
                                 {<<"test">>, <<"mYk3Y">>},
                                 <<"my_service/my_controler/my_answer">>,
@@ -42,7 +49,7 @@ my_async_action(Message) ->
 my_answer(Message) ->
   lager:info("BEGIN dummy_service_handler:my_answer =>>>>>>>>>< ~p :: ~p",
              [wok_message:content(Message), wok_message:global_state(Message)]),
-  timer:sleep(2000 + random:uniform(4000)),
+  timer:sleep(2000 + erlang:apply(?RAND, uniform, [4000])),
   lager:info("END dummy_service_handler:my_answer =>>>>>>>>>< ~p",
              [wok_message:content(Message)]),
   wok_message:noreply(Message).
