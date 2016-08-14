@@ -25,16 +25,12 @@ defmodule Wok.Mixfile do
     [
       {:lager, "~> 3.2"},
       {:lager_json_formatter, "~> 0.0.4"},
-      {:wok_http_adapter, git: "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", tag: "0.1.1"},
-      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"},
       {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
       {:kafe, "~> 1.6.0"},
-      {:cowboy_default_static_file, git: "https://github.com/botsunit/cowboy_default_static_file.git", tag: "1.2.2"},
-      {:cowboy, git: "https://github.com/ninenines/cowboy.git", tag: "2.0.0-pre.3"},
       {:bucs, "~> 0.1.7"},
       {:doteki, "~> 0.1.10"},
       {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", branch: "master"},
-      {:tempfile, git: "https://github.com/botsunit/tempfile.git", tag: "1.1.2"}    
+      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"}    
     ]
   end
 

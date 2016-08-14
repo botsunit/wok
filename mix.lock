@@ -1,8 +1,5 @@
 %{"bristow": {:hex, :bristow, "0.1.0", "27705f1cbeee269df38656833b51142d5e889e3e03d401330ee8c5b7a7b7cc96", [:rebar3, :mix, :make], []},
   "bucs": {:hex, :bucs, "0.1.7", "12735681657c19f32218cefde65ca8ccd905eb2239ceda82318ec3eec714688a", [:rebar3, :mix, :make], []},
-  "cowboy": {:git, "https://github.com/ninenines/cowboy.git", "dbb636034f20736e16eb9d6c809217c9525b6cbd", [tag: "2.0.0-pre.3"]},
-  "cowboy_default_static_file": {:git, "https://github.com/botsunit/cowboy_default_static_file.git", "6f3a5e7e2b1e40778b2a17e47b3d11720de43a20", [tag: "1.2.2"]},
-  "cowlib": {:git, "https://github.com/ninenines/cowlib", "8cf98c9f3d1292c1b08fca5ca99772ae912eaa86", [ref: "master"]},
   "doteki": {:hex, :doteki, "0.1.10", "b9b28f1e854a45f2be8542b4d076064cf8d65b0a9b3efcf196c6cfe46ef6af47", [:rebar3, :mix, :make], [{:bucs, "~> 0.1.7", [hex: :bucs, optional: false]}]},
   "goldrush": {:hex, :goldrush, "0.1.8", "2024ba375ceea47e27ea70e14d2c483b2d8610101b4e852ef7f89163cdb6e649", [:rebar3], []},
   "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
@@ -11,8 +8,5 @@
   "lager_json_formatter": {:hex, :lager_json_formatter, "0.0.4", "d440d43505b74bbd3d8acdab782e76396991f7d385471155bc688aeaad385008", [:rebar3, :mix, :make], [{:jsx, "~> 2.6", [hex: :jsx, optional: false]}, {:lager, "~> 3.2", [hex: :lager, optional: false]}]},
   "pipette": {:git, "git@gitlab.botsunit.com:msaas/pipette.git", "b01cf92b6a74716ebfe6f747c83f44789f52b9c2", [branch: "master"]},
   "poolgirl": {:hex, :poolgirl, "0.1.1", "212cae409d4316dca3272dad766d1ac52e94bb1eadad79e497e084c70caafc53", [:rebar3, :mix, :make], []},
-  "ranch": {:git, "https://github.com/ninenines/ranch", "741bfb73ca663394ecf7a73410506d66f01985a6", [ref: "1.1.0"]},
-  "tempfile": {:git, "https://github.com/botsunit/tempfile.git", "2e52dccc34c41adc5ec93e5ef3571e0f9f0f5c16", [tag: "1.1.2"]},
   "uuid": {:git, "https://github.com/botsunit/erlang-uuid.git", "5c83fbdd3b6ef8e2d1e2764c053bf9eab9d94173", [branch: "master"]},
-  "wok_http_adapter": {:git, "git@gitlab.botsunit.com:msaas/wok_http_adapter.git", "1bb12ea5a3a60c9357903b1299ff3523817d8586", [tag: "0.1.1"]},
   "wok_message_handler": {:git, "git@gitlab.botsunit.com:msaas/wok_message_handler.git", "5126cd53d1e91475e169e688f01239e08f973674", [branch: "master"]}}
