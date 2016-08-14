@@ -24,7 +24,7 @@ defmodule Wok.Mixfile do
   defp deps do
     [
       {:lager, "~> 3.2"},
-      {:lager_json_formatter, "~> 0.0.4"},
+      {:lager_json_formatter, git: "https://github.com/botsunit/lager_json_formatter.git", branch: "master"},
       {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
       {:kafe, "~> 1.6.0"},
       {:bucs, "~> 0.1.7"},
