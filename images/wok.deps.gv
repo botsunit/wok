@@ -6,25 +6,26 @@ digraph wok_deps {
     rankdir=LR;
   ]
 
-  wok[label="wok\n(0.4.4)", fontcolor="white", style="filled", fillcolor="black"];
+  wok[label="wok\n(wok_cowboy)", fontcolor="white", style="filled", fillcolor="black"];
   lager[label="lager\n(~> 3.2)"];
-  lager_json_formatter[label="lager_json_formatter\n(~> 0.0.4)", style="filled", fillcolor="red"];
+  lager_json_formatter[label="lager_json_formatter\n(master)", style="filled", fillcolor="red"];
   wok_http_adapter[label="wok_http_adapter\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  wok_message_handler[label="wok_message_handler\n(0.4.4)", fontcolor="white", style="filled", fillcolor="black"];
-  pipette[label="pipette\n(0.1.2)", style="filled", fillcolor="red"];
+  wok_message_handler[label="wok_message_handler\n(master)", fontcolor="white", style="filled", fillcolor="black"];
+  pipette[label="pipette\n(master)", style="filled", fillcolor="red"];
   kafe[label="kafe\n(~> 1.6.0)", style="filled", fillcolor="red"];
   cowboy[label="cowboy\n(2.0.0-pre.3)"];
   cowboy_default_static_file[label="cowboy_default_static_file\n(1.2.2)", style="filled", fillcolor="red"];
   bucs[label="bucs\n(~> 0.1.7)", style="filled", fillcolor="red"];
   doteki[label="doteki\n(~> 0.1.10)", style="filled", fillcolor="red"];
-  uuid[label="erlang-uuid\n(v0.5.0)"];
+  uuid[label="erlang-uuid\n(master)"];
   tempfile[label="tempfile\n(1.1.2)", style="filled", fillcolor="red"];
   rebar3_elixir[label="rebar3_elixir\n(> 0)", style="filled", fillcolor="red"];
   wok_tests[label="wok_tests\n(0.2.2)", fontcolor="white", style="filled", fillcolor="black"];
   meck[label="meck\n(master)"];
   edown[label="edown\n(master)"];
   goldrush[label="goldrush\n(0.1.8)"];
-  jsx[label="jsx\n(~> 2.6)"];
+  // jsx[label="jsx\n(~> 2.6)"];
+  jsone[label="jsone\n(~> 1.2.6)"];
   poolgirl[label="poolgirl\n(~> 0.1.1)", style="filled", fillcolor="red"];
   bristow[label="bristow\n(~> 0.1.0)", style="filled", fillcolor="red"];
   cowlib[label="cowlib\n(master)"];
@@ -37,7 +38,7 @@ digraph wok_deps {
   ssl_verify_fun[label="ssl_verify_fun\n(1.1.0)"];
   wok_mail[label="wok_mail\n(0.1.2)", fontcolor="white", style="filled", fillcolor="black"];
   gen_smtp[label="gen_smtp\n(~> 0.11.0)"];
-  wok_i18n[label="wok_i18n\n(0.1.3)", fontcolor="white", style="filled", fillcolor="black"];
+  // wok_i18n[label="wok_i18n\n(0.1.3)", fontcolor="white", style="filled", fillcolor="black"];
   wok_tmpl_engine[label="wok_tmpl_engine\n(0.1.2)", fontcolor="white", style="filled", fillcolor="black"];
   whisk[label="whisk\n(0.1.2)", style="filled", fillcolor="red"];
   erlydtl[label="erlydtl\n(~> 0.11.0)"];
@@ -47,28 +48,37 @@ digraph wok_deps {
   qdate[label="qdate\n(master)"];
   erlware_commons[label="erlware_commons\n(v0.15.0)"];
   erlang_localtime[label="erlang_localtime\n(master)"];
+  wok_cowboy[label="wok_cowboy\n(master)", fontcolor="white", style="filled", fillcolor="black"];
 
   wok -> lager;
   wok -> lager_json_formatter
-  wok -> wok_http_adapter;
   wok -> wok_message_handler;
   wok -> pipette;
   wok -> kafe;
-  wok -> cowboy;
-  wok -> cowboy_default_static_file;
   wok -> bucs;
   wok -> doteki;
   wok -> uuid;
-  wok -> tempfile;
   wok-> rebar3_elixir[style=dotted];
   wok -> meck[style=dotted];
   wok -> wok_tests[style=dotted];
   wok -> edown[style=dotted];
 
+  wok_cowboy -> lager;
+  wok_cowboy -> wok_http_adapter;
+  wok_cowboy -> cowboy;
+  wok_cowboy -> cowboy_default_static_file;
+  wok_cowboy -> bucs;
+  wok_cowboy -> doteki;
+  wok_cowboy -> tempfile;
+  wok_cowboy -> meck[style=dotted];
+  wok_cowboy -> wok_tests[style=dotted];
+  wok_cowboy -> wok[style=dotted];
+
   lager -> goldrush;
 
   lager_json_formatter -> lager;
-  lager_json_formatter -> jsx;
+  //lager_json_formatter -> jsx;
+  lager_json_formatter -> jsone;
 
   wok_http_adapter -> edown[style=dotted];
   wok_http_adapter -> rebar3_elixir[style=dotted];
@@ -141,15 +151,15 @@ digraph wok_deps {
   wok_mail -> edown[style=dotted];
   wok_mail -> rebar3_elixir[style=dotted];
 
-  wok_i18n -> jsx;
-  wok_i18n -> lager;
-  wok_i18n -> wok_tmpl_engine;
-  wok_i18n -> whisk;
-  wok_i18n -> wok;
-  wok_i18n -> bucs;
-  wok_i18n -> doteki;
-  wok_i18n -> edown[style=dotted];
-  wok_i18n -> rebar3_elixir[style=dotted];
+  // wok_i18n -> jsx;
+  // wok_i18n -> lager;
+  // wok_i18n -> wok_tmpl_engine;
+  // wok_i18n -> whisk;
+  // wok_i18n -> wok;
+  // wok_i18n -> bucs;
+  // wok_i18n -> doteki;
+  // wok_i18n -> edown[style=dotted];
+  // wok_i18n -> rebar3_elixir[style=dotted];
 
   wok_tmpl_engine -> bucs;
   wok_tmpl_engine -> erlydtl;
