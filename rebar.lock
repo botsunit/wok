@@ -7,7 +7,7 @@
  {<<"lager">>,{pkg,<<"lager">>,<<"3.2.1">>},0},
  {<<"lager_json_formatter">>,
   {git,"https://github.com/botsunit/lager_json_formatter.git",
-       {ref,"9a74282fb1c763362e6812e9996c81100e4fcb79"}},
+       {ref,"1eeef3a5b3ccba211e9a95632a418317aca38c2e"}},
   0},
  {<<"pipette">>,
   {git,"git@gitlab.botsunit.com:msaas/pipette.git",
