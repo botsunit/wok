@@ -10,7 +10,7 @@
          terminate/2, code_change/3]).
 
 start_link(#message_transfert{consume_method = one_for_all} = MessageTransfert) ->
-  gen_server:start_link({local, bucs:to_atom(uuid:to_string(uuid:uuid1()))},
+  gen_server:start_link({local, bucs:to_atom(uuid:to_string(uuid:uuid4()))},
                         ?MODULE, MessageTransfert, []);
 start_link(#message_transfert{consume_method = one_for_one, service_name = ServiceName} = MessageTransfert) ->
   gen_server:start_link({local, ServiceName},
