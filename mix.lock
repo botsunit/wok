@@ -5,7 +5,7 @@
   "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
   "kafe": {:hex, :kafe, "1.6.0", "e2dc358c2d22938ca38fa8ba3fb393ca909dc488300db49dbf83baee9b6f8fe5", [:rebar3, :mix, :make], [{:bristow, "~> 0.1.0", [hex: :bristow, optional: false]}, {:bucs, "~> 0.1.7", [hex: :bucs, optional: false]}, {:doteki, "~> 0.1.10", [hex: :doteki, optional: false]}, {:lager, "~> 3.2", [hex: :lager, optional: false]}, {:poolgirl, "~> 0.1.1", [hex: :poolgirl, optional: false]}]},
   "lager": {:hex, :lager, "3.2.1", "eef4e18b39e4195d37606d9088ea05bf1b745986cf8ec84f01d332456fe88d17", [:rebar3], [{:goldrush, "0.1.8", [hex: :goldrush, optional: false]}]},
-  "lager_json_formatter": {:git, "https://github.com/botsunit/lager_json_formatter.git", "1eeef3a5b3ccba211e9a95632a418317aca38c2e", [branch: "master"]},
+  "lager_json_formatter": {:git, "https://github.com/botsunit/lager_json_formatter.git", "340473e5d9d9f800989348621c7d47e0565fe804", [branch: "master"]},
   "pipette": {:git, "git@gitlab.botsunit.com:msaas/pipette.git", "b01cf92b6a74716ebfe6f747c83f44789f52b9c2", [branch: "master"]},
   "poolgirl": {:hex, :poolgirl, "0.1.1", "212cae409d4316dca3272dad766d1ac52e94bb1eadad79e497e084c70caafc53", [:rebar3, :mix, :make], []},
   "uuid": {:git, "https://github.com/botsunit/erlang-uuid.git", "5c83fbdd3b6ef8e2d1e2764c053bf9eab9d94173", [branch: "master"]},
