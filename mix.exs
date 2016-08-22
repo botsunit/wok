@@ -4,7 +4,7 @@ defmodule Wok.Mixfile do
   def project do
     [
       app: :wok,
-      version: "0.4.5",
+      version: "0.5.0",
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -23,14 +23,14 @@ defmodule Wok.Mixfile do
 
   defp deps do
     [
-      {:lager, "~> 3.2"},
-      {:lager_json_formatter, git: "https://github.com/botsunit/lager_json_formatter.git", branch: "master"},
-      {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
-      {:kafe, "~> 1.6.0"},
-      {:bucs, "~> 0.1.7"},
-      {:doteki, "~> 0.1.10"},
-      {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", branch: "master"},
-      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"}    
+      {:lager, "~> 3.2.0"},
+      {:lager_json_formatter, git: "https://github.com/botsunit/lager_json_formatter.git", tag: "0.1.0"},
+      {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", tag: "0.1.3"},
+      {:kafe, "~> 1.6.1"},
+      {:bucs, "~> 0.1.8"},
+      {:doteki, "~> 0.1.11"},
+      {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.6.0"},
+      {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", tag: "0.5.0"}    
     ]
   end
 
