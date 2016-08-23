@@ -27,8 +27,8 @@ digraph wok_deps {
   middleware_session[label="middleware_session\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
   heartbeat_middleware[label="heartbeat_middleware\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
   basic_auth_middleware[label="basic_auth_middleware\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  wok_i18n[label="wok_i18n\n(0.1.4)", fontcolor="white", style="filled", fillcolor="black"];
   wok_cowboy[label="wok_cowboy\n(0.1.0)", fontcolor="white", style="filled", fillcolor="black"];
+  wok_i18n[label="wok_i18n\n(0.1.4)", fontcolor="white", style="filled", fillcolor="black"];
 
   lager[label="lager\n(~> 3.2.0)"];
   cowboy[label="cowboy\n(2.0.0-pre.3)"];
@@ -158,6 +158,7 @@ digraph wok_deps {
   wok_i18n -> wok;
   wok_i18n -> bucs;
   wok_i18n -> doteki;
+  wok_i18n -> wok_cowboy;
   wok_i18n -> edown[style=dotted];
   wok_i18n -> rebar3_elixir[style=dotted];
 
