@@ -16,6 +16,8 @@
          , custom_data/1
          , custom_data/2
          , custom_data/3
+         , topic/1
+         , partition/1
 
          , response/1
          , response_from/1
@@ -106,6 +108,14 @@ custom_data(Msg, Key, Value) when is_atom(Key) ->
     CustomData ->
       {ok, wok_msg:set_custom_data(Msg, maps:put(Key, Value, CustomData))}
   end.
+
+-spec topic(wok_msg:wok_msg()) -> binary() | undefined.
+topic(Msg) ->
+  wok_msg:get_topic(Msg).
+
+-spec partition(wok_msg:wok_msg()) -> integer() | undefined.
+partition(Msg) ->
+  wok_msg:get_partition(Msg).
 
 -spec response(wok_msg:wok_msg()) -> {Topic :: term(),
                                       From :: binary(),

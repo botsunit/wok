@@ -48,6 +48,12 @@ defmodule Wok.Message do
   def unquote(:"custom_data")(arg1, arg2, arg3) do
     :erlang.apply(:"wok_message", :"custom_data", [arg1, arg2, arg3])
   end
+  def unquote(:"topic")(arg1) do
+    :erlang.apply(:"wok_message", :"topic", [arg1])
+  end
+  def unquote(:"partition")(arg1) do
+    :erlang.apply(:"wok_message", :"partition", [arg1])
+  end
   def unquote(:"response")(arg1) do
     :erlang.apply(:"wok_message", :"response", [arg1])
   end
