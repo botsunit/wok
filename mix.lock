@@ -3,10 +3,10 @@
   "doteki": {:hex, :doteki, "0.1.11", "8b6c7ab6c4f1cadb263ac11f67a4ec8e574a8af815b687354f34358c46f13024", [:rebar3, :mix, :make], [{:bucs, "~> 0.1.8", [hex: :bucs, optional: false]}]},
   "goldrush": {:hex, :goldrush, "0.1.8", "2024ba375ceea47e27ea70e14d2c483b2d8610101b4e852ef7f89163cdb6e649", [:rebar3], []},
   "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
-  "kafe": {:git, "https://github.com/botsunit/kafe.git", "915535d49c708a85c7f95607f461c9e9ae6c542f", [branch: "master"]},
+  "kafe": {:git, "https://github.com/botsunit/kafe.git", "2584ba6a2164ee6efcf0f4a0a4edc06025fa7f5c", [branch: "master"]},
   "lager": {:hex, :lager, "3.2.1", "eef4e18b39e4195d37606d9088ea05bf1b745986cf8ec84f01d332456fe88d17", [:rebar3], [{:goldrush, "0.1.8", [hex: :goldrush, optional: false]}]},
   "lager_json_formatter": {:git, "https://github.com/botsunit/lager_json_formatter.git", "d1ed3ec29052fcbe5602bd9603fff2eee78660fe", [tag: "0.1.0"]},
   "pipette": {:git, "git@gitlab.botsunit.com:msaas/pipette.git", "7a9babf96e7106fa0c6adfe6759267a163d10277", [tag: "0.1.3"]},
-  "poolgirl": {:git, "https://github.com/botsunit/poolgirl.git", "0ded1186cdefb717a28189077f2fd168e70304b7", [branch: "master"]},
+  "poolgirl": {:git, "https://github.com/botsunit/poolgirl.git", "da102238a3572c9109509dce10194b51c5a2a784", [branch: "master"]},
   "uuid": {:git, "https://github.com/botsunit/erlang-uuid.git", "582cab69bdff5c56ca3907226ed7dca8663b5701", [tag: "0.6.0"]},
   "wok_message_handler": {:git, "git@gitlab.botsunit.com:msaas/wok_message_handler.git", "26ad21c7fcaab8d6ff3fa66ddad5a9ee12d4a5ce", [branch: "master"]}}
