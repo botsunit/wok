@@ -38,10 +38,13 @@ handle_cast(serve, #message_transfert{message = Message,
                                       action = {Module, Function}} = State) ->
   lager:debug("Serve message ~p", [Message]),
   State1 = try
-               erlang:apply(Module, Function, [State])
-             catch
-               E:R -> State#message_transfert{message = {exception, {E, R}}}
-             end,
+             erlang:apply(Module, Function, [State])
+           catch
+             Class:Reason ->
+               lager:error("~p:~p/1 Faild!~n  => Stacktrace:~s",
+                           [Module, Function, lager:pr_stacktrace(erlang:get_stacktrace(), {Class, Reason})]),
+               State#message_transfert{message = {exception, {Class, Reason}}}
+           end,
   _ = wok_dispatcher:finish(self(), State1),
   {noreply, State1};
 handle_cast(_Msg, Message) ->
