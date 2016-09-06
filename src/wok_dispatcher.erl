@@ -85,7 +85,7 @@ handle_cast({terminate, Child, #message_transfert{message = Message,
           lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason])
       end;
     R ->
-      lager:error("Message controler faild : ~p", [R]),
+      lager:error("Message controler faild : ~p~n  => Stacktrace: ~s", [R, lager:pr_stacktrace(erlang:get_stacktrace())]),
       _ = pipette:clean_all(),
       init:stop()
   end,
