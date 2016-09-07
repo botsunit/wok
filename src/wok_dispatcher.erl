@@ -61,56 +61,65 @@ handle_cast({handle, #message_transfert{commit_id = CommitID} = MessageTransfert
 handle_cast({terminate, Child, #message_transfert{message = Message,
                                                   local_queue = LocalQueue,
                                                   commit_id = CommitID} = MessageTransfert}, State) ->
-  case wok_msg:get_response(MessageTransfert) of
-    noreply ->
-      ok;
-    {_, _, _, _} ->
-      case wok_middlewares:outgoing_message(Message) of
-        {ok, Message1} ->
-          MessageTransfert1 = MessageTransfert#message_transfert{message = Message1},
-          case wok_msg:get_response(MessageTransfert1) of
-            {Topic, From, To, Body} ->
-              case wok_message:provide(Topic, From, To, Body) of
-                {ok, _} ->
-                  lager:debug("Message provided");
-                E ->
-                  lager:error("Faild to provide message : ~p", [E]),
-                  _ = pipette:clean_all(),
-                  init:stop()
+  Commit = case wok_msg:get_response(MessageTransfert) of
+             noreply ->
+               ok;
+             {_, _, _, _} ->
+               case wok_middlewares:outgoing_message(Message) of
+                 {ok, Message1} ->
+                   MessageTransfert1 = MessageTransfert#message_transfert{message = Message1},
+                   case wok_msg:get_response(MessageTransfert1) of
+                     {Topic, From, To, Body} ->
+                       case wok_message:provide(Topic, From, To, Body) of
+                         {ok, _} ->
+                           lager:debug("Message provided"),
+                           ok;
+                         E ->
+                           lager:error("Failed to provide message : ~p", [E]),
+                           _ = pipette:clean_all(),
+                           init:stop(),
+                           stop
+                       end;
+                     noreply ->
+                       ok
+                   end;
+                 {stop, Middleware, Reason} ->
+                   lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason]),
+                   ok
+               end;
+             R ->
+               lager:error("Message controler failed : ~p~n  => Stacktrace: ~s", [R, lager:pr_stacktrace(erlang:get_stacktrace())]),
+               _ = pipette:clean_all(),
+               init:stop(),
+               stop
+           end,
+  case Commit of
+    ok ->
+      _ = commit(CommitID),
+      _ = case wok_services_sup:terminate_child(Child) of
+            ok ->
+              case doteki:get_env([wok, messages, local_consumer_group],
+                                  doteki:get_env([wok, messages, consumer_group], undefined)) of
+                undefined ->
+                  lager:error("Missing consumer group in configuration"),
+                  exit(config_error);
+                LocalConsumerGroup ->
+                  case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
+                    {ok, Data} ->
+                      force_consume(Data);
+                    {error, no_data} ->
+                      ok;
+                    {error, E2} ->
+                      lager:error("Pipette out error: ~p", [E2]),
+                      ok
+                  end
               end;
-            noreply ->
-              ok
+            E1 ->
+              lager:error("Faild to stop service #~p : ~p", [Child, E1])
           end;
-        {stop, Middleware, Reason} ->
-          lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Message, Reason])
-      end;
-    R ->
-      lager:error("Message controler faild : ~p~n  => Stacktrace: ~s", [R, lager:pr_stacktrace(erlang:get_stacktrace())]),
-      _ = pipette:clean_all(),
-      init:stop()
+    _ ->
+      ok
   end,
-  _ = commit(CommitID),
-  _ = case wok_services_sup:terminate_child(Child) of
-        ok ->
-          case doteki:get_env([wok, messages, local_consumer_group],
-                              doteki:get_env([wok, messages, consumer_group], undefined)) of
-            undefined ->
-              lager:error("Missing consumer group in configuration"),
-              exit(config_error);
-            LocalConsumerGroup ->
-              case pipette:out(LocalQueue, #{consumer => LocalConsumerGroup}) of
-                {ok, Data} ->
-                  force_consume(Data);
-                {error, no_data} ->
-                  ok;
-                {error, E2} ->
-                  lager:error("Pipette out error: ~p", [E2]),
-                  ok
-              end
-          end;
-        E1 ->
-          lager:error("Faild to stop service #~p : ~p", [Child, E1])
-      end,
   {noreply, State};
 handle_cast(_Msg, State) ->
   {noreply, State}.
