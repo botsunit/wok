@@ -28,7 +28,7 @@ defmodule Wok.Mixfile do
       {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
       {:kafe, git: "https://github.com/botsunit/kafe.git", branch: "master"},
       {:bucs, "~> 0.1.8"},
-      {:doteki, "~> 0.1.11"},
+      {:doteki, "~> 0.1.12"},
       {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.6.0"},
       {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"}    
     ]
