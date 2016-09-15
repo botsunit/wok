@@ -24,11 +24,11 @@ defmodule Wok.Mixfile do
   defp deps do
     [
       {:lager, "~> 3.2.0"},
-      {:lager_json_formatter, git: "https://github.com/botsunit/lager_json_formatter.git", tag: "0.1.0"},
-      {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", branch: "master"},
-      {:kafe, git: "https://github.com/botsunit/kafe.git", branch: "master"},
-      {:bucs, "~> 0.1.8"},
-      {:doteki, "~> 0.1.12"},
+      {:lager_json_formatter, "~> 0.1.1"},
+      {:pipette, git: "git@gitlab.botsunit.com:msaas/pipette.git", tag: "0.1.4"},
+      {:kafe, "~> 1.6.2"},
+      {:bucs, "~> 0.1.9"},
+      {:doteki, "~> 0.1.13"},
       {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.6.0"},
       {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", branch: "master"}    
     ]
