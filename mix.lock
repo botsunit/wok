@@ -9,4 +9,4 @@
   "pipette": {:git, "git@gitlab.botsunit.com:msaas/pipette.git", "2775b2cb24856ba7074996a1b62e83ab2f09933a", [tag: "0.1.4"]},
   "poolgirl": {:hex, :poolgirl, "0.1.4", "e60128df254b2d495e83c91079e4984564627240238dcbcf9a3e61fad68db600", [:rebar3, :mix, :make], [{:doteki, "~> 0.1.13", [hex: :doteki, optional: false]}]},
   "uuid": {:git, "https://github.com/botsunit/erlang-uuid.git", "582cab69bdff5c56ca3907226ed7dca8663b5701", [tag: "0.6.0"]},
-  "wok_message_handler": {:git, "git@gitlab.botsunit.com:msaas/wok_message_handler.git", "237c1d55a4fb1095ea830cf641b42782da47d33e", [branch: "master"]}}
+  "wok_message_handler": {:git, "git@gitlab.botsunit.com:msaas/wok_message_handler.git", "8e253fd88f1a1a19647d3af560e6338e7ab693b2", [tag: "0.5.1"]}}

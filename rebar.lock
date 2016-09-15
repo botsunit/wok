@@ -17,5 +17,5 @@
   0},
  {<<"wok_message_handler">>,
   {git,"git@gitlab.botsunit.com:msaas/wok_message_handler.git",
-       {ref,"237c1d55a4fb1095ea830cf641b42782da47d33e"}},
+       {ref,"8e253fd88f1a1a19647d3af560e6338e7ab693b2"}},
   0}].
