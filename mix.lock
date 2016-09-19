@@ -3,7 +3,7 @@
   "doteki": {:hex, :doteki, "0.1.13", "c78ba7b2373371d5319896f462d437456e7c9de75ed79aa433bac8532235057f", [:rebar3, :mix, :make], [{:bucs, "~> 0.1.9", [hex: :bucs, optional: false]}]},
   "goldrush": {:hex, :goldrush, "0.1.8", "2024ba375ceea47e27ea70e14d2c483b2d8610101b4e852ef7f89163cdb6e649", [:rebar3], []},
   "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
-  "kafe": {:hex, :kafe, "1.6.2", "b13c5e7511d12c907240d56f03d35d54fb2da30eb594612e5dca4d574de20738", [:rebar3, :mix, :make], [{:bristow, "~> 0.1.1", [hex: :bristow, optional: false]}, {:bucs, "~> 0.1.9", [hex: :bucs, optional: false]}, {:doteki, "~> 0.1.13", [hex: :doteki, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}, {:poolgirl, "~> 0.1.4", [hex: :poolgirl, optional: false]}]},
+  "kafe": {:git, "https://github.com/botsunit/kafe.git", "9cefad4e09658c64a9ea84fe2cdcd65516c8359b", [branch: "master"]},
   "lager": {:hex, :lager, "3.2.1", "eef4e18b39e4195d37606d9088ea05bf1b745986cf8ec84f01d332456fe88d17", [:rebar3], [{:goldrush, "0.1.8", [hex: :goldrush, optional: false]}]},
   "lager_json_formatter": {:hex, :lager_json_formatter, "0.1.1", "5c708f540f23774bda3f7b3d41d6f1ff17232d9178a85304d7974c152b758bdf", [:rebar3, :mix, :make], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}]},
   "pipette": {:git, "git@gitlab.botsunit.com:msaas/pipette.git", "2775b2cb24856ba7074996a1b62e83ab2f09933a", [tag: "0.1.4"]},
