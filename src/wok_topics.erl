@@ -202,8 +202,6 @@ group_options([], Acc) ->
   Acc;
 group_options([{fetch_frequency, Value}|Rest], Acc) ->
   group_options(Rest, Acc#{fetch_interval => Value});
-group_options([{max_messages, Value}|Rest], Acc) ->
-  group_options(Rest, Acc#{fetch_size => Value});
 group_options([{Key, Value}|Rest], Acc) ->
   group_options(Rest, maps:put(Key, Value, Acc)).
 
@@ -342,9 +340,7 @@ start_groups_false_test() ->
 
 group_options_test() ->
   ?assertMatch(#{fetch_interval := 1000,
-                 fetch_size := 2000,
                  other_option := other_value},
                group_options([{fetch_frequency, 1000},
-                              {max_messages, 2000},
                               {other_option, other_value}])).
 -endif.
