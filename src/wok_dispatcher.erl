@@ -25,10 +25,12 @@ finish(Child, MessageTransfert) ->
 
 init(_Args) ->
   erlang:send_after(1000, self(), fetch),
-  {ok, #{services => wok_message_path:get_message_path_handlers(
+  Services = wok_message_path:get_message_path_handlers(
                        doteki:get_env([wok, messages, services],
                                       doteki:get_env([wok, messages, controllers],
-                                                     doteki:get_env([wok, messages, controlers], []))))}}. % BW compatibility :/
+                                                     doteki:get_env([wok, messages, controlers], [])))),
+  [wok_metrics:init_controler(Module, Function) || {_Route, {Module, Function}} <- maps:to_list(Services)],
+  {ok, #{services => Services}}.
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.

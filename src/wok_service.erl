@@ -27,7 +27,10 @@ handle_cast(serve, #message_transfert{message = Message,
                                       action = {Module, Function}} = State) ->
   lager:debug("Serve message ~p", [Message]),
   State1 = try
-             erlang:apply(Module, Function, [State])
+             Start = erlang:system_time(milli_seconds),
+             S = erlang:apply(Module, Function, [State]),
+             wok_metrics:controler_duration(Module, Function, erlang:system_time(milli_seconds) - Start),
+             S
            catch
              Class:Reason ->
                lager:error("~p:~p/1 Faild!~n  => Stacktrace:~s",
