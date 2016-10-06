@@ -5,7 +5,7 @@
   "folsom": {:hex, :folsom, "0.8.3", "71cff146152fa95e6092e62119f9dc96888660111e7b61853c8fdcf80598a4e0", [:rebar3], [{:bear, "0.8.3", [hex: :bear, optional: false]}]},
   "goldrush": {:hex, :goldrush, "0.1.8", "2024ba375ceea47e27ea70e14d2c483b2d8610101b4e852ef7f89163cdb6e649", [:rebar3], []},
   "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
-  "kafe": {:git, "https://github.com/botsunit/kafe.git", "cfd167dfe9e7497a93d0d5b633b1424b68314157", [branch: "2.0.0"]},
+  "kafe": {:git, "https://github.com/botsunit/kafe.git", "52e3b42f6238085032f43d36942a308ca23e5c20", [branch: "2.0.0"]},
   "lager": {:hex, :lager, "3.2.1", "eef4e18b39e4195d37606d9088ea05bf1b745986cf8ec84f01d332456fe88d17", [:rebar3], [{:goldrush, "0.1.8", [hex: :goldrush, optional: false]}]},
   "lager_json_formatter": {:hex, :lager_json_formatter, "0.1.1", "5c708f540f23774bda3f7b3d41d6f1ff17232d9178a85304d7974c152b758bdf", [:rebar3, :mix, :make], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}]},
   "metrics": {:hex, :metrics, "2.1.0", "6cd43bcd7eb0702458184b9dc8e53ba4338696bfbe90698b45010a870dc227da", [:rebar3], []},
