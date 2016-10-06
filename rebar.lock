@@ -5,7 +5,7 @@
  {<<"jsx">>,{pkg,<<"jsx">>,<<"2.8.0">>},1},
  {<<"kafe">>,
   {git,"https://github.com/botsunit/kafe.git",
-       {ref,"5ec22f50786117fbf537382d98ab75933280786d"}},
+       {ref,"cfd167dfe9e7497a93d0d5b633b1424b68314157"}},
   0},
  {<<"lager">>,{pkg,<<"lager">>,<<"3.2.1">>},0},
  {<<"lager_json_formatter">>,{pkg,<<"lager_json_formatter">>,<<"0.1.1">>},0},
