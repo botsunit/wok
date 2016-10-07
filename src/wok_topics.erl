@@ -128,8 +128,9 @@ start_groups([{Topic, ConsumeMethod, Options}|Rest], CGPrefix, LQPrefix, Acc) wh
       ServiceNames = service_names(LocalQueues),
       start_groups([{Topic, ConsumeMethod, LocalQueues, ServiceNames, Options}|Rest], CGPrefix, LQPrefix, Acc);
     _ ->
-      lager:error("Topic ~p does not exist in Kafka !", [Topic]),
-      init:stop()
+      lager:error("Can't create the consumer group ~s_~s : Kafka unavailable of topic ~s does not exist !", [CGPrefix, Topic, Topic]),
+      init:stop(),
+      Acc
   end;
 start_groups([{Topic, Other, _}|_], _, _, _) ->
   lager:error("Invalid consumer method ~p for tomic ~p !", [Other, Topic]),

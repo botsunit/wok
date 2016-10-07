@@ -31,8 +31,7 @@ defmodule Wok.Mixfile do
       {:doteki, "~> 0.1.13"},
       {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.6.0"},
       {:wok_message_handler, git: "git@gitlab.botsunit.com:msaas/wok_message_handler.git", tag: "0.5.1"},
-      {:metrics, git: "https://github.com/botsunit/erlang-metrics.git", branch: "add_delete"},
-      {:folsom, "~> 0.8.3", only: :dev}    
+      {:metrics, git: "https://github.com/botsunit/erlang-metrics.git", branch: "add_delete"}    
     ]
   end
 

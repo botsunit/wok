@@ -28,6 +28,7 @@ handle_cast(serve, #message_transfert{message = Message,
   lager:debug("Serve message ~p", [Message]),
   State1 = try
              Start = erlang:system_time(milli_seconds),
+             wok_metrics:controler_messages(Module, Function),
              S = erlang:apply(Module, Function, [State]),
              wok_metrics:controler_duration(Module, Function, erlang:system_time(milli_seconds) - Start),
              S
