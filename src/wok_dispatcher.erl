@@ -100,8 +100,7 @@ handle_cast({terminate, Child, #message_transfert{message = Message,
       _ = commit(CommitID),
       _ = case wok_services_sup:terminate_child(Child) of
             ok ->
-              case doteki:get_env([wok, messages, local_consumer_group],
-                                  doteki:get_env([wok, messages, consumer_group], undefined)) of
+              case wok_utils:local_consumer_group() of
                 undefined ->
                   lager:error("Missing consumer group in configuration"),
                   exit(config_error);
@@ -127,8 +126,7 @@ handle_cast(_Msg, State) ->
   {noreply, State}.
 
 handle_info(fetch, State) ->
-  case doteki:get_env([wok, messages, local_consumer_group],
-                      doteki:get_env([wok, messages, consumer_group], undefined)) of
+  case wok_utils:local_consumer_group() of
     undefined ->
       lager:error("Missing consumer group in configuration"),
       exit(config_error);
@@ -186,8 +184,7 @@ consume(#message_transfert{message = ParsedMessage,
   ParsedMessage2 = wok_msg:set_global_state(ParsedMessage1, wok_state:state()),
   case wok_middlewares:incoming_message(ParsedMessage2) of
     {ok, ParsedMessage3} ->
-      case doteki:get_env([wok, messages, local_consumer_group],
-                          doteki:get_env([wok, messages, consumer_group], undefined)) of
+      case wok_utils:local_consumer_group() of
         undefined ->
           lager:info("Missing consumer group in configuration"),
           exit(config_error);

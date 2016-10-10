@@ -25,7 +25,7 @@ start_link() ->
   gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 init(_) ->
-  case doteki:get_env([wok, messages, consumer_group]) of
+  case wok_utils:consumer_group() of
     undefined ->
       lager:error("Missing consumer group in configuration"),
       {stop, missing_consumer_group};

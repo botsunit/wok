@@ -44,11 +44,12 @@ application:ensure_all_started(wok).
 <ul>
 <li><tt>handler :: atom()</tt> : handler used to create and parse messages. See <a href="https://gitlab.botsunit.com/msaas/wok_message_handler">wok_message_handler</a> for more informations.</li>
 <li><tt>services :: list()</tt> : <a  href="#services_conf">Services configuration</a></li>
-<li><tt>consumer_group :: binary()</tt> : Name of the Kafka' consumer group</li>
+<li><tt>consumer_group :: binary() | random | {random, [{prefix, term()}]}</tt> : Name of the Kafka' consumer group</li>
 <li><tt>local_queue_name :: binary()</tt> : Name of the pipette' queue</li>
-<li><tt>local_consumer_group :: binary()</tt> : Name of the pipette' consumer group</li>
+<li><tt>local_consumer_group :: binary() | random | {random, [{prefix, term()}]}</tt> : Name of the pipette' consumer group</li>
 <li><tt>max_services_fork :: integer()</tt> : Maximum number of messages in parallel</li>
 <li><tt>topics :: list()</tt> : <a href="#topic_conf">Topics configuration</a></li>
+<li><tt>from_beginning :: true | false</tt> : Start consuming from beginning (default true)</li>
 </ul>
 
 <a name="rest_conf"></a><h4>REST configuration</h4>

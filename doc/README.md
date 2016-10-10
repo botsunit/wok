@@ -62,15 +62,17 @@ application:ensure_all_started(wok).
 
 * `services :: list()` : [Services configuration](#services_conf)
 
-* `consumer_group :: binary()` : Name of the Kafka' consumer group
+* `consumer_group :: binary() | random | {random, [{prefix, term()}]}` : Name of the Kafka' consumer group
 
 * `local_queue_name :: binary()` : Name of the pipette' queue
 
-* `local_consumer_group :: binary()` : Name of the pipette' consumer group
+* `local_consumer_group :: binary() | random | {random, [{prefix, term()}]}` : Name of the pipette' consumer group
 
 * `max_services_fork :: integer()` : Maximum number of messages in parallel
 
 * `topics :: list()` : [Topics configuration](#topic_conf)
+
+* `from_beginning :: true | false` : Start consuming from beginning (default true)
 
 <a name="rest_conf"></a>
 
