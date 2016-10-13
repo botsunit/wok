@@ -1,3 +1,4 @@
+{"1.1.0",
 [{<<"bristow">>,{pkg,<<"bristow">>,<<"0.1.1">>},1},
  {<<"bucs">>,{pkg,<<"bucs">>,<<"0.1.9">>},0},
  {<<"doteki">>,{pkg,<<"doteki">>,<<"0.1.13">>},0},
@@ -5,7 +6,7 @@
  {<<"jsx">>,{pkg,<<"jsx">>,<<"2.8.0">>},1},
  {<<"kafe">>,
   {git,"https://github.com/botsunit/kafe.git",
-       {ref,"8b6844698b5f5c0851008cfc5ca793a302fb94c5"}},
+       {ref,"72459f8e79f1b780586781d0e026962706bc2fb8"}},
   0},
  {<<"lager">>,{pkg,<<"lager">>,<<"3.2.1">>},0},
  {<<"lager_json_formatter">>,{pkg,<<"lager_json_formatter">>,<<"0.1.1">>},0},
@@ -28,4 +29,14 @@
  {<<"wok_message_handler">>,
   {git,"git@gitlab.botsunit.com:msaas/wok_message_handler.git",
        {ref,"8e253fd88f1a1a19647d3af560e6338e7ab693b2"}},
-  0}].
+  0}]}.
+[
+{pkg_hash,[
+ {<<"bristow">>, <<"1F9C1D6F0368E23E34B67908F5578BEB3FAED9668DE8F86BFE4E4047D1F59A86">>},
+ {<<"bucs">>, <<"810FDFEB83ADF127E6303FBB1E8139BD575699DEE8204F46F162908B5F343CF5">>},
+ {<<"doteki">>, <<"C78BA7B2373371D5319896F462D437456E7C9DE75ED79AA433BAC8532235057F">>},
+ {<<"goldrush">>, <<"2024BA375CEEA47E27EA70E14D2C483B2D8610101B4E852EF7F89163CDB6E649">>},
+ {<<"jsx">>, <<"749BEC6D205C694AE1786D62CEA6CC45A390437E24835FD16D12D74F07097727">>},
+ {<<"lager">>, <<"EEF4E18B39E4195D37606D9088EA05BF1B745986CF8EC84F01D332456FE88D17">>},
+ {<<"lager_json_formatter">>, <<"5C708F540F23774BDA3F7B3D41D6F1FF17232D9178A85304D7974C152B758BDF">>}]}
+].
