@@ -7,6 +7,9 @@
          , set_params/2
          , set_action/2
          , set_to/2
+         , set_global_state/1
+         , set_local_state/2
+         , get_local_state/1
          , get_response/1
 
          , content/1
@@ -19,6 +22,14 @@
          , global_state/1
          , local_state/1
          , custom_data/1
+
+         , response/1
+         , response_from/1
+         , response_from/2
+         , response_to/1
+         , response_to/2
+         , response_body/1
+         , response_body/2
 
          , noreply/1
          , reply/4
@@ -62,6 +73,19 @@ set_action(Message, Action) ->
 set_to(#wok_message{request = Req} = Message, Route) ->
   Message#wok_message{request = Req#msg{to = Route}}.
 
+% @hidden
+set_global_state(Message) ->
+  Message#wok_message{global_state = wok_state:state()}.
+
+% @hidden
+set_local_state(Message, State) ->
+  Message#wok_message{local_state = State}.
+
+% @hidden
+get_local_state(#wok_message{local_state = State}) ->
+  State.
+
+% @hidden
 get_response(#wok_message{reply = false}) ->
   noreply;
 get_response(#wok_message{response = #msg{topic = Topic,
@@ -77,7 +101,7 @@ get_response(#wok_message{response = #msg{topic = Topic,
   end.
 
 % @doc
-% Return the incomming message as map
+% Return the incoming message as map
 % @end
 -spec content(message()) -> map().
 content(Message) ->
@@ -89,42 +113,42 @@ content(Message) ->
     params => params(Message)}.
 
 % @doc
-% Return the message UUID
+% Return the incoming message UUID
 % @end
 -spec uuid(message()) -> binary() | undefined.
 uuid(#wok_message{request = Message}) ->
   wok_message_handler:get_uuid(Message).
 
 % @doc
-% Return the message from
+% Return the incoming message from
 % @end
 -spec from(message()) -> binary() | undefined.
 from(#wok_message{request = Message}) ->
   wok_message_handler:get_from(Message).
 
 % @doc
-% Return the message to
+% Return the incoming message to
 % @end
 -spec to(message()) -> binary() | undefined.
 to(#wok_message{request = Message}) ->
   wok_message_handler:get_to(Message).
 
 % @doc
-% Return the message headers
+% Return the incoming message headers
 % @end
 -spec headers(message()) -> binary() | undefined.
 headers(#wok_message{request = Message}) ->
   wok_message_handler:get_headers(Message).
 
 % @doc
-% Return the message body
+% Return the incoming message body
 % @end
 -spec body(message()) -> binary() | undefined.
 body(#wok_message{request = Message}) ->
   wok_message_handler:get_body(Message).
 
 % @doc
-% Return the message params
+% Return the incoming message params
 % @end
 -spec params(message()) -> binary() | undefined.
 params(#wok_message{request = Message}) ->
@@ -150,6 +174,51 @@ local_state(#wok_message{local_state = GlobalState}) ->
 -spec custom_data(message()) -> map().
 custom_data(#wok_message{custom_data = GlobalState}) ->
   GlobalState.
+
+% @doc
+% Return the outgoing message as map
+% @end
+-spec response(message()) -> map().
+response(Message) ->
+  #{from => response_from(Message),
+    to => response_to(Message),
+    body => response_body(Message)}.
+
+% @doc
+% Return the outgoing message from
+% @end
+response_from(#wok_message{response = Response}) ->
+  wok_message_handler:get_from(Response).
+
+% @doc
+% Update the outgoing message from
+% @end
+response_from(#wok_message{response = Response} = Message, From) ->
+  Message#wok_message{response = Response#msg{from = From}}.
+
+% @doc
+% Return the outgoing message to
+% @end
+response_to(#wok_message{response = Response}) ->
+  wok_message_handler:get_to(Response).
+
+% @doc
+% Update the outgoing message to
+% @end
+response_to(#wok_message{response = Response} = Message, To) ->
+  Message#wok_message{response = Response#msg{to = To}}.
+
+% @doc
+% Return the outgoing message body
+% @end
+response_body(#wok_message{response = Response}) ->
+  wok_message_handler:get_body(Response).
+
+% @doc
+% Update the outgoing message body
+% @end
+response_body(#wok_message{response = Response} = Message, Body) ->
+  Message#wok_message{response = Response#msg{body = Body}}.
 
 % @doc
 % Set a no reply response

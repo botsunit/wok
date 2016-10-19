@@ -1,5 +1,5 @@
 % @hidden
--module(wok_subscriber).
+-module(wok_kafe_subscriber).
 -behaviour(kafe_consumer_subscriber).
 -compile([{parse_transform, lager_transform}]).
 -include_lib("kafe/include/kafe_consumer.hrl").
@@ -34,7 +34,7 @@ handle_message(#message{topic = Topic,
       Services =  wok_message_path:get_message_handlers(
                     wok_message:to(WokMessage),
                     ServicesDef),
-      consume(Services, WokMessage, ServicesDef); % TODO
+      consume(Services, WokMessage, ServicesDef);
     {error, Error} ->
       lager:info("Can't parse message at offset ~p from topic ~s, partition ~p: ~p",
                  [Offset, Topic, Partition, Error])
@@ -52,15 +52,38 @@ consume([{Route, Params}|Rest], WokMessage, ServicesDef) ->
       WokMessage1 = wok_message:set_params(WokMessage, Params),
       WokMessage2 = wok_message:set_action(WokMessage1, Action),
       WokMessage3 = wok_message:set_to(WokMessage2, Route),
+      WokMessage4 = wok_message:set_global_state(WokMessage3),
       % TODO metrics
       % TODO middlewares
-      Response = erlang:apply(Module, Function, [WokMessage3]),
-      case wok_message:get_response(Response) of
-        noreply ->
-          ok;
-        {reply, Topic, From, To, Body} ->
-          lager:info("====> ~p", [From]),
-          wok_message:provide(Topic, From, To, Body)
+      case wok_middlewares:incoming_message(WokMessage4) of
+        {ok, WokMessage5} ->
+          Response = erlang:apply(Module, Function, [WokMessage5]),
+          case wok_message:get_response(Response) of
+            noreply ->
+              ok;
+            {reply, _, _, _, _} ->
+              case wok_middlewares:outgoing_message(Response) of
+                {ok, Response1} ->
+                  case wok_message:get_response(Response1) of
+                    noreply ->
+                      ok;
+                    {reply, Topic, From, To, Body} ->
+                      wok_message:provide(Topic, From, To, Body)
+                  end;
+                {stop, Middleware, Reason} ->
+                  lager:info("Middleware ~s stop response for message ~s from ~s reason: ~p",
+                             [Middleware,
+                              wok_message:uuid(WokMessage5),
+                              wok_message:from(WokMessage5),
+                              Reason])
+              end
+          end;
+        {stop, Middleware, Reason} ->
+          lager:info("Middleware ~s stop message ~s from ~s reason: ~p",
+                     [Middleware,
+                      wok_message:uuid(WokMessage4),
+                      wok_message:from(WokMessage4),
+                      Reason])
       end
   end,
   consume(Rest, WokMessage, ServicesDef).

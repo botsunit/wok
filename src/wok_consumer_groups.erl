@@ -69,7 +69,7 @@ start_groups([], _, Acc) ->
 start_groups([{Topic, Options}|Rest], CGPrefix, Acc) ->
   ConsumerGroup = <<CGPrefix/binary, "_", Topic/binary>>,
   case kafe:start_consumer(ConsumerGroup,
-                           wok_subscriber,
+                           wok_kafe_subscriber,
                            group_options([{topics, [Topic]}|Options])) of
     {ok, PID} ->
       MRef = erlang:monitor(process, PID),

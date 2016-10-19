@@ -18,7 +18,7 @@ routes() ->
   ].
 
 incoming_message(Message) ->
-  lager:info("Middleware ingoing ~p was called - message: ~p - state: ~p", [?MODULE, wok_message:content(Message), wok_message:local_state(Message)]),
+  lager:info("Middleware incoming ~p was called - message: ~p - state: ~p", [?MODULE, wok_message:content(Message), wok_message:local_state(Message)]),
   {ok, Message}. % {stop, Reason, Message}.
 
 outgoing_message(Message) ->
