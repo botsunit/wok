@@ -20,7 +20,6 @@ init([Static]) ->
                 [];
               _ ->
                 [
-                 % ?CHILD(wok_messages_sup, [], supervisor, infinity)
                  ?CHILD(wok_consumer_groups, [], worker, 5000)
                 ]
             end ++
@@ -29,7 +28,7 @@ init([Static]) ->
                 [];
               _ ->
                 [
-                 % TODO REWRITE ?CHILD(wok_producer_sup, [], supervisor, infinity)
+                 ?CHILD(wok_producer_sup, [], supervisor, infinity)
                 ]
             end ++ custom_servers() ++ middlewares_servers(),
   {ok, {

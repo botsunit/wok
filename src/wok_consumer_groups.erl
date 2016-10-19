@@ -13,6 +13,7 @@
          , handle_info/2
          , terminate/2
          , code_change/3]).
+-export([assignment_change/3]).
 
 -define(SERVER, ?MODULE).
 
@@ -70,7 +71,9 @@ start_groups([{Topic, Options}|Rest], CGPrefix, Acc) ->
   ConsumerGroup = <<CGPrefix/binary, "_", Topic/binary>>,
   case kafe:start_consumer(ConsumerGroup,
                            wok_kafe_subscriber,
-                           group_options([{topics, [Topic]}|Options])) of
+                           group_options([{topics, [Topic]},
+                                          {on_assignment_change, fun ?MODULE:assignment_change/3}
+                                          |Options])) of
     {ok, PID} ->
       MRef = erlang:monitor(process, PID),
       lager:debug("Start consumer ~p for topic ~p", [ConsumerGroup, Topic]),
@@ -96,4 +99,9 @@ group_options([{fetch_frequency, Value}|Rest], Acc) ->
   group_options(Rest, Acc#{fetch_interval => Value});
 group_options([{Key, Value}|Rest], Acc) ->
   group_options(Rest, maps:put(Key, Value, Acc)).
+
+assignment_change(_GroupID, UnAssigned, ReAssigned) ->
+  [wok_producer_srv:stop(Topic, Partition) || {Topic, Partition} <- UnAssigned],
+  [wok_producer_srv:start(Topic, Partition) || {Topic, Partition} <- ReAssigned],
+  ok.
 

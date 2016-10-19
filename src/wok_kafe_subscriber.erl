@@ -54,30 +54,10 @@ consume([{Route, Params}|Rest], WokMessage, ServicesDef) ->
       WokMessage3 = wok_message:set_to(WokMessage2, Route),
       WokMessage4 = wok_message:set_global_state(WokMessage3),
       % TODO metrics
-      % TODO middlewares
       case wok_middlewares:incoming_message(WokMessage4) of
         {ok, WokMessage5} ->
           Response = erlang:apply(Module, Function, [WokMessage5]),
-          case wok_message:get_response(Response) of
-            noreply ->
-              ok;
-            {reply, _, _, _, _} ->
-              case wok_middlewares:outgoing_message(Response) of
-                {ok, Response1} ->
-                  case wok_message:get_response(Response1) of
-                    noreply ->
-                      ok;
-                    {reply, Topic, From, To, Body} ->
-                      wok_message:provide(Topic, From, To, Body)
-                  end;
-                {stop, Middleware, Reason} ->
-                  lager:info("Middleware ~s stop response for message ~s from ~s reason: ~p",
-                             [Middleware,
-                              wok_message:uuid(WokMessage5),
-                              wok_message:from(WokMessage5),
-                              Reason])
-              end
-          end;
+          send_response(Response);
         {stop, Middleware, Reason} ->
           lager:info("Middleware ~s stop message ~s from ~s reason: ~p",
                      [Middleware,
@@ -87,4 +67,26 @@ consume([{Route, Params}|Rest], WokMessage, ServicesDef) ->
       end
   end,
   consume(Rest, WokMessage, ServicesDef).
+
+send_response(Response) ->
+  case wok_message:get_response(Response) of
+    noreply ->
+      ok;
+    {reply, _, _, _, _} ->
+      case wok_middlewares:outgoing_message(Response) of
+        {ok, Response1} ->
+          case wok_message:get_response(Response1) of
+            noreply ->
+              ok;
+            {reply, Topic, From, To, Body} ->
+              wok_message:provide(Topic, From, To, Body) % TODO ERROR !!!
+          end;
+        {stop, Middleware, Reason} ->
+          lager:info("Middleware ~s stop response for message ~s from ~s reason: ~p",
+                     [Middleware,
+                      wok_message:uuid(Response),
+                      wok_message:from(Response),
+                      Reason])
+      end
+  end.
 

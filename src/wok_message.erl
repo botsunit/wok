@@ -34,6 +34,10 @@
          , noreply/1
          , reply/4
          , reply/5
+         , encode_reply/5
+         , encode_reply/4
+         , async_reply/1
+         , encode_message/4
 
          , provide/2
          , provide/4
@@ -41,6 +45,7 @@
         ]).
 
 -type message() :: term().
+-type opaque() :: binary().
 
 % @hidden
 new(Topic, Partition, Offset, Key, Value) ->
@@ -187,36 +192,42 @@ response(Message) ->
 % @doc
 % Return the outgoing message from
 % @end
+-spec response_from(message()) -> binary().
 response_from(#wok_message{response = Response}) ->
   wok_message_handler:get_from(Response).
 
 % @doc
 % Update the outgoing message from
 % @end
+-spec response_from(message(), binary()) -> message().
 response_from(#wok_message{response = Response} = Message, From) ->
   Message#wok_message{response = Response#msg{from = From}}.
 
 % @doc
 % Return the outgoing message to
 % @end
+-spec response_to(message()) -> binary().
 response_to(#wok_message{response = Response}) ->
   wok_message_handler:get_to(Response).
 
 % @doc
 % Update the outgoing message to
 % @end
+-spec response_to(message(), binary()) -> message().
 response_to(#wok_message{response = Response} = Message, To) ->
   Message#wok_message{response = Response#msg{to = To}}.
 
 % @doc
 % Return the outgoing message body
 % @end
+-spec response_body(message()) -> binary().
 response_body(#wok_message{response = Response}) ->
   wok_message_handler:get_body(Response).
 
 % @doc
 % Update the outgoing message body
 % @end
+-spec response_body(message(), term()) -> message().
 response_body(#wok_message{response = Response} = Message, Body) ->
   Message#wok_message{response = Response#msg{body = Body}}.
 
@@ -293,4 +304,60 @@ provide(Topic, From, To, Body, Options) ->
               Message :: binary()) -> {ok, term()} | {error, term()}.
 provide(Topic, Message) ->
   wok_producer:provide(Topic, Message).
+
+% @doc
+% Encore a message for an async producer
+% @end
+-spec encode_reply(Message :: message(),
+                   Topic :: binary()
+                   | {Topic :: binary(), Partition :: integer()}
+                   | {Topic :: binary(), Key :: binary()},
+                   From :: binary(),
+                   To :: binary(),
+                   Body :: term()) ->
+  {ok, Topic :: binary(), Partition :: integer(), EncodedMessage :: opaque()}
+  | {error, term()}.
+encode_reply(Message, {Topic, Key}, From, To, Body) when is_binary(Key) ->
+  encode_reply(Message, {Topic, kafe:default_key_to_partition(Topic, Key)}, From, To, Body);
+encode_reply(Message, Topic, From, To, Body) when is_binary(Topic) ->
+  encode_reply(Message, {Topic, kafe_rr:next(Topic)}, From, To, Body);
+encode_reply(Message, {Topic, Partition}, From, To, Body) when is_integer(Partition) ->
+  {ok, Topic, Partition, base64:encode(term_to_binary(reply(Message, Topic, From, To, Body)))}.
+
+% @doc
+% Encore a message for an async producer
+%
+% Since the sender is not specified, we will use the recipient of the incoming message
+% @end
+-spec encode_reply(Message :: wok_msg:wok_msg(),
+                   Topic :: binary()
+                   | {Topic :: binary(), Partition :: integer()}
+                   | {Topic :: binary(), Key :: binary()},
+                   To :: binary(),
+                   Body :: term()) ->
+  {ok, Topic :: binary(), Partition :: integer(), EncodedMessage :: opaque()}
+  | {error, term()}.
+encode_reply(Message = #wok_message{request = #msg{to = From}}, Topic, To, Body) ->
+  encode_reply(Message, Topic, From, To, Body).
+
+% @doc
+% Set an async response
+% @end
+-spec async_reply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
+async_reply(Msg) ->
+  noreply(Msg).
+
+% @doc
+% Encode a reponse for an async producer
+% @end
+-spec encode_message(Topic :: binary()
+                     | {Topic :: binary(), Partition :: integer()}
+                     | {Topic :: binary(), Key :: binary()},
+                     From :: binary(),
+                     To :: binary(),
+                     Body :: term()) ->
+  {ok, Topic :: binary(), Partition :: integer(), EncodedMessage :: opaque()}
+  | {error, term()}.
+encode_message(Topic, From, To, Body) ->
+  encode_reply(#wok_message{}, Topic, From, To, Body).
 
