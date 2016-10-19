@@ -18,6 +18,7 @@
          , to/1
          , headers/1
          , body/1
+         , body/2
          , params/1
          , global_state/1
          , local_state/1
@@ -151,6 +152,13 @@ headers(#wok_message{request = Message}) ->
 -spec body(message()) -> binary() | undefined.
 body(#wok_message{request = Message}) ->
   wok_message_handler:get_body(Message).
+
+% @doc
+% Update the incoming message body
+% @end
+-spec body(message(), term()) -> message().
+body(#wok_message{request = Request} = Message, Body) ->
+  Message#wok_message{request = Request#msg{body = Body}}.
 
 % @doc
 % Return the incoming message params

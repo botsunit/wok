@@ -6,10 +6,4 @@ defmodule Wok do
   def unquote(:"start")() do
     :erlang.apply(:"wok", :"start", [])
   end
-  def unquote(:"state")() do
-    :erlang.apply(:"wok", :"state", [])
-  end
-  def unquote(:"state")(arg1) do
-    :erlang.apply(:"wok", :"state", [arg1])
-  end
 end

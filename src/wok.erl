@@ -1,10 +1,12 @@
-% @hidden
 -module(wok).
 
 -export([start/0]).
 -export([state/0, state/1]).
 
-% @hidden
+% @doc
+% Start Wok
+% @end
+-spec start() -> ok.
 start() ->
   application:ensure_all_started(?MODULE).
 

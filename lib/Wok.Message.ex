@@ -6,12 +6,6 @@ defmodule Wok.Message do
   def unquote(:"content")(arg1) do
     :erlang.apply(:"wok_message", :"content", [arg1])
   end
-  def unquote(:"content_has_map")(arg1) do
-    :erlang.apply(:"wok_message", :"content_has_map", [arg1])
-  end
-  def unquote(:"content")(arg1, arg2) do
-    :erlang.apply(:"wok_message", :"content", [arg1, arg2])
-  end
   def unquote(:"uuid")(arg1) do
     :erlang.apply(:"wok_message", :"uuid", [arg1])
   end
@@ -27,11 +21,11 @@ defmodule Wok.Message do
   def unquote(:"body")(arg1) do
     :erlang.apply(:"wok_message", :"body", [arg1])
   end
+  def unquote(:"body")(arg1, arg2) do
+    :erlang.apply(:"wok_message", :"body", [arg1, arg2])
+  end
   def unquote(:"params")(arg1) do
     :erlang.apply(:"wok_message", :"params", [arg1])
-  end
-  def unquote(:"param")(arg1, arg2) do
-    :erlang.apply(:"wok_message", :"param", [arg1, arg2])
   end
   def unquote(:"global_state")(arg1) do
     :erlang.apply(:"wok_message", :"global_state", [arg1])
@@ -42,35 +36,23 @@ defmodule Wok.Message do
   def unquote(:"custom_data")(arg1) do
     :erlang.apply(:"wok_message", :"custom_data", [arg1])
   end
-  def unquote(:"custom_data")(arg1, arg2) do
-    :erlang.apply(:"wok_message", :"custom_data", [arg1, arg2])
-  end
-  def unquote(:"custom_data")(arg1, arg2, arg3) do
-    :erlang.apply(:"wok_message", :"custom_data", [arg1, arg2, arg3])
-  end
-  def unquote(:"topic")(arg1) do
-    :erlang.apply(:"wok_message", :"topic", [arg1])
-  end
-  def unquote(:"partition")(arg1) do
-    :erlang.apply(:"wok_message", :"partition", [arg1])
-  end
   def unquote(:"response")(arg1) do
     :erlang.apply(:"wok_message", :"response", [arg1])
   end
   def unquote(:"response_from")(arg1) do
     :erlang.apply(:"wok_message", :"response_from", [arg1])
   end
-  def unquote(:"response_to")(arg1) do
-    :erlang.apply(:"wok_message", :"response_to", [arg1])
-  end
-  def unquote(:"response_body")(arg1) do
-    :erlang.apply(:"wok_message", :"response_body", [arg1])
-  end
   def unquote(:"response_from")(arg1, arg2) do
     :erlang.apply(:"wok_message", :"response_from", [arg1, arg2])
   end
+  def unquote(:"response_to")(arg1) do
+    :erlang.apply(:"wok_message", :"response_to", [arg1])
+  end
   def unquote(:"response_to")(arg1, arg2) do
     :erlang.apply(:"wok_message", :"response_to", [arg1, arg2])
+  end
+  def unquote(:"response_body")(arg1) do
+    :erlang.apply(:"wok_message", :"response_body", [arg1])
   end
   def unquote(:"response_body")(arg1, arg2) do
     :erlang.apply(:"wok_message", :"response_body", [arg1, arg2])
@@ -78,11 +60,20 @@ defmodule Wok.Message do
   def unquote(:"noreply")(arg1) do
     :erlang.apply(:"wok_message", :"noreply", [arg1])
   end
+  def unquote(:"reply")(arg1, arg2, arg3, arg4, arg5) do
+    :erlang.apply(:"wok_message", :"reply", [arg1, arg2, arg3, arg4, arg5])
+  end
   def unquote(:"reply")(arg1, arg2, arg3, arg4) do
     :erlang.apply(:"wok_message", :"reply", [arg1, arg2, arg3, arg4])
   end
-  def unquote(:"reply")(arg1, arg2, arg3, arg4, arg5) do
-    :erlang.apply(:"wok_message", :"reply", [arg1, arg2, arg3, arg4, arg5])
+  def unquote(:"provide")(arg1, arg2, arg3, arg4) do
+    :erlang.apply(:"wok_message", :"provide", [arg1, arg2, arg3, arg4])
+  end
+  def unquote(:"provide")(arg1, arg2, arg3, arg4, arg5) do
+    :erlang.apply(:"wok_message", :"provide", [arg1, arg2, arg3, arg4, arg5])
+  end
+  def unquote(:"provide")(arg1, arg2) do
+    :erlang.apply(:"wok_message", :"provide", [arg1, arg2])
   end
   def unquote(:"encode_reply")(arg1, arg2, arg3, arg4, arg5) do
     :erlang.apply(:"wok_message", :"encode_reply", [arg1, arg2, arg3, arg4, arg5])
@@ -95,14 +86,5 @@ defmodule Wok.Message do
   end
   def unquote(:"encode_message")(arg1, arg2, arg3, arg4) do
     :erlang.apply(:"wok_message", :"encode_message", [arg1, arg2, arg3, arg4])
-  end
-  def unquote(:"provide")(arg1, arg2, arg3, arg4) do
-    :erlang.apply(:"wok_message", :"provide", [arg1, arg2, arg3, arg4])
-  end
-  def unquote(:"provide")(arg1, arg2, arg3, arg4, arg5) do
-    :erlang.apply(:"wok_message", :"provide", [arg1, arg2, arg3, arg4, arg5])
-  end
-  def unquote(:"provide")(arg1, arg2) do
-    :erlang.apply(:"wok_message", :"provide", [arg1, arg2])
   end
 end

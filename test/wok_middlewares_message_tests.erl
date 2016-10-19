@@ -1,5 +1,5 @@
 -module(wok_middlewares_message_tests).
-
+-include("../include/wok_message_handler.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 meck_middleware_one() ->
@@ -10,11 +10,11 @@ meck_middleware_one() ->
               end),
   meck:expect(fake_middleware_one, incoming_message,
               fun(M) ->
-                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) + 1)}
+                  {ok, wok_message:body(M, wok_message:body(M) + 1)}
               end),
   meck:expect(fake_middleware_one, outgoing_message,
               fun(M) ->
-                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) + 2)}
+                  {ok, wok_message:response_body(M, wok_message:response_body(M) + 2)}
               end).
 
 unmeck_middleware_one() ->
@@ -28,11 +28,11 @@ meck_middleware_two() ->
               end),
   meck:expect(fake_middleware_two, incoming_message,
               fun(M) ->
-                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) * 2)}
+                  {ok, wok_message:body(M, wok_message:body(M) * 2)}
               end),
   meck:expect(fake_middleware_two, outgoing_message,
               fun(M) ->
-                  {ok, wok_msg:set_message(M, wok_msg:get_message(M) *3)}
+                  {ok, wok_message:response_body(M, wok_message:response_body(M) * 3)}
               end).
 
 unmeck_middleware_two() ->
@@ -112,12 +112,13 @@ wok_middelware_inout_one_test_() ->
         [fun(X) -> ?assertMatch({ok, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun(_) ->
-             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
-             ?assertEqual(2, wok_msg:get_message(M))
+             {ok, M} = wok_middlewares:incoming_message(#wok_message{request = #msg{body = 1}}),
+
+             ?assertEqual(2, wok_message:body(M))
          end,
          fun(_) ->
-             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
-             ?assertEqual(2, wok_msg:get_message(M))
+             {ok, M} = wok_middlewares:outgoing_message(#wok_message{response = #msg{body = 1}}),
+             ?assertEqual(3, wok_message:response_body(M))
          end]
        }
    end}.
@@ -152,12 +153,12 @@ wok_middelware_inout_one_and_two_test_() ->
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_two)) end,
          fun(_) ->
-             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
-             ?assertEqual(4, wok_msg:get_message(M))
+             {ok, M} = wok_middlewares:incoming_message(#wok_message{request = #msg{body = 1}}),
+             ?assertEqual(4, wok_message:body(M))
          end,
          fun(_) ->
-             {ok, M} = wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1)),
-             ?assertEqual(4, wok_msg:get_message(M))
+             {ok, M} = wok_middlewares:outgoing_message(#wok_message{response = #msg{body = 1}}),
+             ?assertEqual(5, wok_message:response_body(M))
          end]
        }
    end}.
@@ -191,8 +192,8 @@ wok_middelware_inout_stop_test_() ->
         [fun(X) -> ?assertMatch({ok, _}, X) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_one)) end,
          fun(_) -> ?assertMatch(nostate, wok_middlewares:state(fake_middleware_three)) end,
-         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:incoming_message(wok_msg:set_message(wok_msg:new(), 1))) end,
-         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:outgoing_message(wok_msg:set_message(wok_msg:new(), 1))) end]
+         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:incoming_message(#wok_message{request = #msg{body = 1}})) end,
+         fun(_) -> ?assertMatch({stop, fake_middleware_three, test}, wok_middlewares:outgoing_message(#wok_message{response = #msg{body = 1}})) end]
        }
    end}.
 

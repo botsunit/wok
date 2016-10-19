@@ -24,7 +24,7 @@ wok_default_message_handler_test_() ->
                    219, 168, 11, 178, 1, 11, 8, 12, 120, 156, 75, 202, 79, 169, 4, 0, 4, 26, 1, 175>>,
         Message = wok_default_message_handler:create(<<"from">>, <<"to">>, <<"body">>),
         ?assertEqual(Result, Message),
-        ?assertMatch({ok, #message{
+        ?assertMatch({ok, #msg{
                              uuid = <<"76c22bf7-6a92-4a08-8c38-65206e4f51b2">>,
                              to = [<<"to">>],
                              from = <<"from">>,
@@ -42,7 +42,7 @@ wok_default_message_handler_test_() ->
         Message = wok_default_message_handler:create(<<"from">>, <<"to">>, <<"body">>,
                                                      [{headers, #{compress => false}}]),
         ?assertEqual(Result, Message),
-        ?assertMatch({ok, #message{
+        ?assertMatch({ok, #msg{
                              uuid = <<"76c22bf7-6a92-4a08-8c38-65206e4f51b2">>,
                              to = [<<"to">>],
                              from = <<"from">>,
@@ -61,7 +61,7 @@ wok_default_message_handler_test_() ->
         Message = wok_default_message_handler:create(<<"from">>, <<"to">>, {<<"body">>, as, ["tuple"]},
                                                      [{headers, #{compress => false}}]),
         ?assertEqual(Result, Message),
-        ?assertMatch({ok, #message{
+        ?assertMatch({ok, #msg{
                              uuid = <<"76c22bf7-6a92-4a08-8c38-65206e4f51b2">>,
                              to = [<<"to">>],
                              from = <<"from">>,
