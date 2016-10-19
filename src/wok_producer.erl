@@ -1,3 +1,4 @@
+% @hidden
 -module(wok_producer).
 -include("../include/wok.hrl").
 

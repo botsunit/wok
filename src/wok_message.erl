@@ -1,216 +1,200 @@
 -module(wok_message).
+-include("../include/wok.hrl").
+-include("../include/wok_message_handler.hrl").
 
 -export([
-         content/1
-         , content/2
-         , content_has_map/1
+         new/5
+         , set_params/2
+         , set_action/2
+         , set_to/2
+         , get_response/1
+
+         , content/1
          , uuid/1
          , from/1
          , to/1
          , headers/1
          , body/1
          , params/1
-         , param/2
          , global_state/1
          , local_state/1
          , custom_data/1
-         , custom_data/2
-         , custom_data/3
-         , topic/1
-         , partition/1
-
-         , response/1
-         , response_from/1
-         , response_from/2
-         , response_to/1
-         , response_to/2
-         , response_body/1
-         , response_body/2
 
          , noreply/1
          , reply/4
          , reply/5
-         , encode_reply/5
-         , encode_reply/4
-         , async_reply/1
-         , encode_message/4
 
          , provide/2
          , provide/4
          , provide/5
         ]).
 
--type opaque_message_transfert() :: binary().
+-type message() :: term().
 
--spec content(wok_msg:wok_msg()) -> wok_message_handler:message().
-content(Msg) ->
-  wok_msg:get_message(Msg).
-
--spec content_has_map(wok_msg:wok_msg()) -> map().
-content_has_map(Msg) ->
-  wok_msg:get_message_has_map(Msg).
-
--spec content(wok_msg:wok_msg(), wok_message_handler:message()) -> wok_msg:wok_msg().
-content(Msg, Message) ->
-  wok_msg:set_message(Msg, Message).
-
--spec uuid(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
-uuid(Msg) ->
-  wok_msg:get_uuid(content(Msg)).
-
--spec from(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
-from(Msg) ->
-  wok_msg:get_from(content(Msg)).
-
--spec to(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
-to(Msg) ->
-  wok_msg:get_to(content(Msg)).
-
--spec headers(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
-headers(Msg) ->
-  wok_msg:get_headers(content(Msg)).
-
--spec body(wok_msg:wok_msg() | wok_message_handler:message()) -> binary().
-body(Msg) ->
-  wok_msg:get_body(content(Msg)).
-
--spec params(wok_msg:wok_msg() | wok_message_handler:message()) -> map().
-params(Msg) ->
-  wok_msg:get_params(content(Msg)).
-
--spec param(wok_msg:wok_msg() | wok_message_handler:message(), binary() | list() | atom()) -> binary() | undefined.
-param(Msg, Param) ->
-  wok_msg:get_param(content(Msg), Param).
-
--spec global_state(wok_msg:wok_msg()) -> any().
-global_state(Msg) ->
-  wok_msg:get_global_state(Msg).
-
--spec local_state(wok_msg:wok_msg()) -> any().
-local_state(Msg) ->
-  wok_msg:get_local_state(Msg).
-
--spec custom_data(wok_msg:wok_msg()) -> map().
-custom_data(Msg) ->
-  wok_msg:get_custom_data(Msg).
-
--spec custom_data(wok_msg:wok_msg(), atom()) -> any().
-custom_data(Msg, Key) when is_atom(Key) ->
-  #{Key := Data} = wok_msg:get_custom_data(Msg),
-  Data.
-
--spec custom_data(wok_msg:wok_msg(), atom(), any()) -> {ok, wok_msg:wok_msg(), any()}
-                                                       | {ok, wok_msg:wok_msg()}.
-custom_data(Msg, Key, Value) when is_atom(Key) ->
-  case wok_msg:get_custom_data(Msg) of
-    #{Key := Old} = CustomData ->
-      {ok, Old, wok_msg:set_custom_data(Msg, maps:put(Key, Value, CustomData))};
-    CustomData ->
-      {ok, wok_msg:set_custom_data(Msg, maps:put(Key, Value, CustomData))}
+% @hidden
+new(Topic, Partition, Offset, Key, Value) ->
+  Handler = case doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER) of
+              {Module, _} -> Module;
+              Module -> Module
+            end,
+  case erlang:apply(Handler, parse, [Value]) of
+    {ok, Msg, _} ->
+      {ok, #wok_message{
+              request = Msg#msg{
+                          offset = Offset,
+                          key = Key,
+                          message = Value,
+                          topic = Topic,
+                          partition = Partition}}};
+    Error ->
+      Error
   end.
 
--spec topic(wok_msg:wok_msg()) -> binary() | undefined.
-topic(Msg) ->
-  wok_msg:get_topic(Msg).
+% @hidden
+set_params(#wok_message{request = Req} = Message, Params) ->
+  Message#wok_message{request = Req#msg{params = Params}}.
 
--spec partition(wok_msg:wok_msg()) -> integer() | undefined.
-partition(Msg) ->
-  wok_msg:get_partition(Msg).
+% @hidden
+set_action(Message, Action) ->
+  Message#wok_message{action = Action}.
 
--spec response(wok_msg:wok_msg()) -> {Topic :: term(),
-                                      From :: binary(),
-                                      To :: binary(),
-                                      Body :: term()}.
-response(Msg) ->
-  wok_msg:get_response(Msg).
+% @hidden
+set_to(#wok_message{request = Req} = Message, Route) ->
+  Message#wok_message{request = Req#msg{to = Route}}.
 
--spec response_from(wok_msg:wok_msg()) -> binary().
-response_from(Msg) ->
-  {_, From, _, _} = response(Msg),
-  From.
+get_response(#wok_message{reply = false}) ->
+  noreply;
+get_response(#wok_message{response = #msg{topic = Topic,
+                                          partition = Partition,
+                                          from = From,
+                                          to = To,
+                                          body = Body}}) ->
+  case Partition of
+    undefined ->
+      {reply, Topic, From, To, Body};
+    _ ->
+      {reply, {Topic, Partition}, From, To, Body}
+  end.
 
--spec response_to(wok_msg:wok_msg()) -> binary().
-response_to(Msg) ->
-  {_, _, To, _} = response(Msg),
-  To.
+% @doc
+% Return the incomming message as map
+% @end
+-spec content(message()) -> map().
+content(Message) ->
+  #{uuid => uuid(Message),
+    from => from(Message),
+    to => to(Message),
+    headers => headers(Message),
+    body => body(Message),
+    params => params(Message)}.
 
--spec response_body(wok_msg:wok_msg()) -> binary().
-response_body(Msg) ->
-  {_, _, _, Body} = response(Msg),
-  Body.
+% @doc
+% Return the message UUID
+% @end
+-spec uuid(message()) -> binary() | undefined.
+uuid(#wok_message{request = Message}) ->
+  wok_message_handler:get_uuid(Message).
 
--spec response_from(wok_msg:wok_msg(), binary()) -> wok_msg:wok_msg().
-response_from(Msg, From) ->
-  {Topic, _, To, Body} = response(Msg),
-  wok_msg:set_response(Msg, Topic, From, To, Body).
+% @doc
+% Return the message from
+% @end
+-spec from(message()) -> binary() | undefined.
+from(#wok_message{request = Message}) ->
+  wok_message_handler:get_from(Message).
 
--spec response_to(wok_msg:wok_msg(), binary()) -> wok_msg:wok_msg().
-response_to(Msg, To) ->
-  {Topic, From, _, Body} = response(Msg),
-  wok_msg:set_response(Msg, Topic, From, To, Body).
+% @doc
+% Return the message to
+% @end
+-spec to(message()) -> binary() | undefined.
+to(#wok_message{request = Message}) ->
+  wok_message_handler:get_to(Message).
 
--spec response_body(wok_msg:wok_msg(), term()) -> wok_msg:wok_msg().
-response_body(Msg, Body) ->
-  {Topic, From, To, _} = response(Msg),
-  wok_msg:set_response(Msg, Topic, From, To, Body).
+% @doc
+% Return the message headers
+% @end
+-spec headers(message()) -> binary() | undefined.
+headers(#wok_message{request = Message}) ->
+  wok_message_handler:get_headers(Message).
 
--spec noreply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
-noreply(Msg) ->
-  wok_msg:set_noreply(Msg).
+% @doc
+% Return the message body
+% @end
+-spec body(message()) -> binary() | undefined.
+body(#wok_message{request = Message}) ->
+  wok_message_handler:get_body(Message).
 
--spec reply(Msg :: wok_msg:wok_msg(),
-            Topic :: binary() | {binary(), integer()} | {binary(), binary()},
-            To :: binary(),
-            Body :: term()) -> wok_msg:wok_msg().
-reply(Msg, Topic, To, Body) ->
-  reply(Msg, Topic, undefined, To, Body).
+% @doc
+% Return the message params
+% @end
+-spec params(message()) -> binary() | undefined.
+params(#wok_message{request = Message}) ->
+  wok_message_handler:get_params(Message).
 
--spec reply(Msg :: wok_msg:wok_msg(),
+% @doc
+% Return the global state for the given message
+% @end
+-spec global_state(message()) -> term() | undefined.
+global_state(#wok_message{global_state = GlobalState}) ->
+  GlobalState.
+
+% @doc
+% Return the local state for the given message
+% @end
+-spec local_state(message()) -> term() | undefined.
+local_state(#wok_message{local_state = GlobalState}) ->
+  GlobalState.
+
+% @doc
+% Return the custon datas for the given message
+% @end
+-spec custom_data(message()) -> map().
+custom_data(#wok_message{custom_data = GlobalState}) ->
+  GlobalState.
+
+% @doc
+% Set a no reply response
+% @end
+-spec noreply(message()) -> message().
+noreply(Message) ->
+  Message#wok_message{reply = false}.
+
+% @doc
+% Set the response message
+% @end
+-spec reply(Msg :: message(),
             Topic :: binary() | {binary(), integer()} | {binary(), binary()},
             From :: binary(),
             To :: binary(),
-            Body :: term()) -> wok_msg:wok_msg().
-reply(Msg, Topic, From, To, Body) ->
-  wok_msg:set_response(Msg, Topic, From, To, Body).
-
--spec encode_reply(Msg :: wok_msg:wok_msg(),
-                   Topic :: binary()
-                   | {Topic :: binary(), Partition :: integer()}
-                   | {Topic :: binary(), Key :: binary()},
-                   From :: binary(),
-                   To :: binary(),
-                   Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
-                                      | {error, term()}.
-encode_reply(Msg, {Topic, Key}, From, To, Body) when is_binary(Key) ->
-  encode_reply(Msg, {Topic, kafe:default_key_to_partition(Topic, Key)}, From, To, Body);
-encode_reply(Msg, Topic, From, To, Body) when is_binary(Topic) ->
-  encode_reply(Msg, {Topic, kafe_rr:next(Topic)}, From, To, Body);
-encode_reply(Msg, {Topic, Partition}, From, To, Body) when is_integer(Partition) ->
-  {ok, Topic, Partition, base64:encode(term_to_binary(reply(Msg, Topic, From, To, Body)))}.
-
--spec encode_reply(Msg :: wok_msg:wok_msg(),
-                   Topic :: binary()
-                   | {Topic :: binary(), Partition :: integer()}
-                   | {Topic :: binary(), Key :: binary()},
-                   To :: binary(),
-                   Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
-                                      | {error, term()}.
-encode_reply(Msg, Topic, To, Body) ->
-  encode_reply(Msg, Topic, undefined, To, Body).
-
--spec async_reply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
-async_reply(Msg) ->
-  wok_msg:set_noreply(Msg).
-
--spec encode_message(Topic :: binary()
-                     | {Topic :: binary(), Partition :: integer()}
-                     | {Topic :: binary(), Key :: binary()},
-                     From :: binary(),
-                     To :: binary(),
-                     Body :: term()) -> {ok, binary(), integer(), opaque_message_transfert()}
-                                        | {error, term()}.
-encode_message(Topic, From, To, Body) ->
-  encode_reply(wok_msg:new(), Topic, From, To, Body).
+            Body :: term()) -> message().
+reply(Message, {Topic, Partition}, From, To, Body) ->
+  Message#wok_message{
+    reply = true,
+    response = #msg{
+                  from = From,
+                  to = To,
+                  body = Body,
+                  topic = Topic,
+                  partition = Partition}};
+reply(Message, Topic, From, To, Body) ->
+  Message#wok_message{
+    reply = true,
+    response = #msg{
+                  from = From,
+                  to = To,
+                  body = Body,
+                  topic = Topic,
+                  partition = undefined}}.
+% @doc
+% Set the response message
+%
+% Since the sender is not specified, we will use the recipient of the incoming message
+% @end
+-spec reply(Msg :: message(),
+            Topic :: binary() | {binary(), integer()} | {binary(), binary()},
+            To :: binary(),
+            Body :: term()) -> message().
+reply(Message = #wok_message{request = #msg{to = From}}, Topic, To, Body) ->
+  reply(Message, Topic, From, To, Body).
 
 % @doc
 % Send a message

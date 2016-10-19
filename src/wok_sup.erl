@@ -13,14 +13,15 @@ start_link(Static) ->
 
 init([Static]) ->
   Childs = [?CHILD(wok_state, [Static], worker, 5000),
-            ?CHILD(wok_middlewares, [], worker, 5000),
+            % TODO REWRITE  ?CHILD(wok_middlewares, [], worker, 5000),
             ?CHILD(wok_plugins, [], worker, 5000)] ++
             case doteki:get_env([wok, messages]) of
               undefined ->
                 [];
               _ ->
                 [
-                 ?CHILD(wok_messages_sup, [], supervisor, infinity)
+                 % ?CHILD(wok_messages_sup, [], supervisor, infinity)
+                 ?CHILD(wok_consumer_groups, [], worker, 5000)
                 ]
             end ++
             case doteki:get_env([wok, producer]) of
@@ -28,7 +29,7 @@ init([Static]) ->
                 [];
               _ ->
                 [
-                 ?CHILD(wok_producer_sup, [], supervisor, infinity)
+                 % TODO REWRITE ?CHILD(wok_producer_sup, [], supervisor, infinity)
                 ]
             end ++ custom_servers() ++ middlewares_servers(),
   {ok, {
