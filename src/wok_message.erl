@@ -5,6 +5,7 @@
 -export([
          new/5
          , new_req/5
+         , build_event_message/5
          , set_params/2
          , set_action/2
          , set_to/2
@@ -87,6 +88,20 @@ new_req(From, To, Headers, Message, UUID) ->
 % @hidden
 set_params(#wok_message{request = Req} = Message, Params) ->
   Message#wok_message{request = Req#msg{params = Params}}.
+
+% @hidden
+build_event_message(Payload, From, MessageID, BuildBodyFun, Options) ->
+  #wok_message{
+     request = #msg{
+                  uuid = bucs:to_binary(uuid:to_string(uuid:uuid4())),
+                  from = From,
+                  to = <<"to_bot">>,
+                  headers = #{message_id => MessageID},
+                  body = BuildBodyFun(Payload, Options),
+                  message = Payload,
+                  offset = buclists:keyfind(offset, 1, Options, 0),
+                  topic = buclists:keyfind(topic, 1, Options, <<"topic">>),
+                  partition = buclists:keyfind(partition, 1, Options, 1)}}.
 
 % @hidden
 set_action(Message, Action) ->

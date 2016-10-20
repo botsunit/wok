@@ -53,6 +53,35 @@ wok_message_tests_test_() ->
     fun() ->
         ?assertMatch(#wok_message{
                         request = #msg{
+                                     uuid = _,
+                                     from = <<"from">>,
+                                     to = <<"to_bot">>,
+                                     headers = #{message_id := 123},
+                                     body = #{hello := <<"world">>,
+                                              hola := <<"mundo">>,
+                                              bonjour := <<"monde">>},
+                                     message = #{hello := <<"world">>,
+                                                 hola := <<"mundo">>},
+                                     offset = 2,
+                                     topic = <<"my_topic">>,
+                                     partition = 3}},
+                     wok_message:build_event_message(#{hello => <<"world">>,
+                                                       hola => <<"mundo">>},
+                                                     <<"from">>,
+                                                     123,
+                                                     fun(Payload, Options) ->
+                                                         maps:merge(
+                                                           Payload,
+                                                           buclists:keyfind(data, 1, Options, #{}))
+                                                     end,
+                                                     [{topic, <<"my_topic">>},
+                                                      {partition, 3},
+                                                      {offset, 2},
+                                                      {data, #{bonjour => <<"monde">>}}]))
+    end,
+    fun() ->
+        ?assertMatch(#wok_message{
+                        request = #msg{
                                      params = test}},
                      wok_message:set_params(#wok_message{}, test))
     end,
