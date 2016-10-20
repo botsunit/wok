@@ -26,6 +26,8 @@
          , global_state/1
          , local_state/1
          , custom_data/1
+         , custom_data/2
+         , custom_data/3
 
          , response/1
          , response_from/1
@@ -207,15 +209,36 @@ global_state(#wok_message{global_state = GlobalState}) ->
 % Return the local state for the given message
 % @end
 -spec local_state(message()) -> term() | undefined.
-local_state(#wok_message{local_state = GlobalState}) ->
-  GlobalState.
+local_state(#wok_message{local_state = LocalState}) ->
+  LocalState.
 
 % @doc
-% Return the custon datas for the given message
+% Return the custom datas as map for the given message
 % @end
 -spec custom_data(message()) -> map().
-custom_data(#wok_message{custom_data = GlobalState}) ->
-  GlobalState.
+custom_data(#wok_message{custom_data = CustomData}) ->
+  CustomData.
+
+% @doc
+% Return the custom data value for the given message and key
+% @end
+-spec custom_data(message(), atom()) -> any() | undefined.
+custom_data(#wok_message{custom_data = CustomData}, Key)  when is_atom(Key)->
+  maps:get(Key, CustomData, undefined).
+
+% @doc
+% Add (or replace) a custom data for the given message
+% @end
+-spec custom_data(message(), atom(), any()) -> {ok, any(), message()} | {ok, message()}.
+custom_data(#wok_message{custom_data = CustomData} = Message, Key, Value)  when is_atom(Key) ->
+  case maps:get(Key, CustomData, undefined) of
+    undefined ->
+      {ok, Message#wok_message{
+             custom_data = maps:put(Key, Value, CustomData)}};
+    Old ->
+      {ok, Old, Message#wok_message{
+                  custom_data = maps:put(Key, Value, CustomData)}}
+  end.
 
 % @doc
 % Return the outgoing message as map

@@ -17,7 +17,7 @@
           response = #msg{},
           global_state = undefined,
           local_state = undefined,
-          custom_data = undefined,
+          custom_data = #{},
           reply = false,
           action
          }).
