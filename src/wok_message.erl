@@ -4,6 +4,7 @@
 
 -export([
          new/5
+         , new_req/5
          , set_params/2
          , set_action/2
          , set_to/2
@@ -66,6 +67,16 @@ new(Topic, Partition, Offset, Key, Value) ->
     Error ->
       Error
   end.
+
+% @hidden
+% for tests
+new_req(From, To, Headers, Message, UUID) ->
+  #wok_message{request = #msg{
+                            from = From,
+                            to = To,
+                            headers = Headers,
+                            message = Message,
+                            uuid = UUID}}.
 
 % @hidden
 set_params(#wok_message{request = Req} = Message, Params) ->
