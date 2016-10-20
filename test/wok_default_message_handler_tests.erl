@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("bucs/include/bucassert.hrl").
--include_lib("../include/wok_message_handler.hrl").
+-include("../include/wok_message_handler.hrl").
 
 wok_default_message_handler_test_() ->
   {setup,

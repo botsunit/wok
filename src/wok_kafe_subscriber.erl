@@ -3,7 +3,11 @@
 -behaviour(kafe_consumer_subscriber).
 -compile([{parse_transform, lager_transform}]).
 -include_lib("kafe/include/kafe_consumer.hrl").
--include_lib("../include/wok_message_handler.hrl").
+-include("../include/wok_message_handler.hrl").
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-export([test_action/1]).
+-endif.
 
 -export([
          init/4
@@ -43,11 +47,15 @@ handle_message(#message{topic = Topic,
 
 consume([], _, _) ->
   ok;
-consume([{Route, Params}|Rest], WokMessage, ServicesDef) ->
+consume([Current|Rest], WokMessage, ServicesDef) ->
+  consume(Current, WokMessage, ServicesDef),
+  consume(Rest, WokMessage, ServicesDef);
+consume({Route, Params}, WokMessage, ServicesDef) ->
   case maps:get(Route, ServicesDef, undefined) of
     undefined ->
       lager:info("Ignore message ~s from ~s", [wok_message:uuid(WokMessage),
-                                               wok_message:from(WokMessage)]);
+                                               wok_message:from(WokMessage)]),
+      no_route;
     {Module, Function} = Action ->
       WokMessage1 = wok_message:set_params(WokMessage, Params),
       WokMessage2 = wok_message:set_action(WokMessage1, Action),
@@ -58,35 +66,250 @@ consume([{Route, Params}|Rest], WokMessage, ServicesDef) ->
         {ok, WokMessage5} ->
           Response = erlang:apply(Module, Function, [WokMessage5]),
           send_response(Response);
-        {stop, Middleware, Reason} ->
+        {stop, Middleware, Reason} = Stop ->
           lager:info("Middleware ~s stop message ~s from ~s reason: ~p",
                      [Middleware,
                       wok_message:uuid(WokMessage4),
                       wok_message:from(WokMessage4),
-                      Reason])
+                      Reason]),
+          Stop
       end
-  end,
-  consume(Rest, WokMessage, ServicesDef).
+  end.
 
 send_response(Response) ->
   case wok_message:get_response(Response) of
     noreply ->
-      ok;
+      noreply;
     {reply, _, _, _, _} ->
       case wok_middlewares:outgoing_message(Response) of
         {ok, Response1} ->
           case wok_message:get_response(Response1) of
             noreply ->
-              ok;
+              {noreply, middlewares};
             {reply, Topic, From, To, Body} ->
-              wok_message:provide(Topic, From, To, Body) % TODO ERROR !!!
+              wok_message:provide(Topic, From, To, Body), % TODO ERROR !!!
+              {reply, Response1}
           end;
-        {stop, Middleware, Reason} ->
+        {stop, Middleware, Reason} = Stop ->
           lager:info("Middleware ~s stop response for message ~s from ~s reason: ~p",
                      [Middleware,
                       wok_message:uuid(Response),
                       wok_message:from(Response),
-                      Reason])
+                      Reason]),
+          Stop
       end
   end.
 
+-ifdef(TEST).
+test_action(Message) ->
+  wok_message:reply(
+    Message,
+    {<<"topic1">>, 1},
+    <<"to">>,
+    <<"message response">>).
+
+wok_kafe_subscriber_test_() ->
+  {setup,
+   fun() ->
+       meck:new(wok_message, [passthrough]),
+       meck:expect(wok_message, set_global_state, fun(Message) ->
+                                                      Message
+                                                  end),
+       meck:expect(wok_message, provide, 4, ok),
+       meck:new(wok_middlewares),
+       meck:expect(wok_middlewares, incoming_message, fun(Message) ->
+                                                          {ok, Message}
+                                                      end),
+       meck:expect(wok_middlewares, outgoing_message, fun(Message) ->
+                                                          {ok, Message}
+                                                      end)
+   end,
+   fun(_) ->
+       meck:unload(wok_middlewares),
+       meck:unload(wok_message)
+   end,
+   [
+     fun() ->
+         WokMessage = #wok_message{
+                         request = #msg{uuid = <<"UUID">>,
+                                        from = <<"from">>,
+                                        to = <<"dest/1">>,
+                                        body = <<"message body">>,
+                                        offset = 1,
+                                        key = <<>>,
+                                        message = <<1, 2, 3, 4, 5>>,
+                                        topic = <<"topic">>,
+                                        partition = 0}},
+         ServicesDef = #{<<"dest/1">> => {?MODULE, test_action},
+                         <<"dest/2">> => {?MODULE, test_action_undef}},
+         ?assertMatch(
+            {reply, #wok_message{
+                       request = #msg{
+                                    uuid = <<"UUID">>,
+                                    from = <<"from">>,
+                                    to = <<"dest/1">>,
+                                    body = <<"message body">>,
+                                    params = #{},
+                                    offset = 1,
+                                    key = <<>>,
+                                    message = <<1,2,3,4,5>>,
+                                    topic = <<"topic">>,
+                                    partition = 0},
+                       response = #msg{
+                                     from = <<"dest/1">>,
+                                     to = <<"to">>,
+                                     body = <<"message response">>,
+                                     topic = <<"topic1">>,
+                                     partition = 1},
+                       reply = true,
+                       action = {?MODULE, test_action}}},
+            consume({<<"dest/1">>, #{}}, WokMessage, ServicesDef))
+     end
+   ]}.
+
+wok_kafe_subscriber_noreply_by_outgoing_middleware_test_() ->
+  {setup,
+   fun() ->
+       meck:new(wok_message, [passthrough]),
+       meck:expect(wok_message, set_global_state, fun(Message) ->
+                                                      Message
+                                                  end),
+       meck:expect(wok_message, provide, 4, ok),
+       meck:new(wok_middlewares),
+       meck:expect(wok_middlewares, incoming_message, fun(Message) ->
+                                                          {ok, Message}
+                                                      end),
+       meck:expect(wok_middlewares, outgoing_message, fun(Message) ->
+                                                          {ok,
+                                                           wok_message:noreply(Message)}
+                                                      end)
+   end,
+   fun(_) ->
+       meck:unload(wok_middlewares),
+       meck:unload(wok_message)
+   end,
+   [
+     fun() ->
+         WokMessage = #wok_message{
+                         request = #msg{uuid = <<"UUID">>,
+                                        from = <<"from">>,
+                                        to = <<"dest/1">>,
+                                        body = <<"message body">>,
+                                        offset = 1,
+                                        key = <<>>,
+                                        message = <<1, 2, 3, 4, 5>>,
+                                        topic = <<"topic">>,
+                                        partition = 0}},
+         ServicesDef = #{<<"dest/1">> => {?MODULE, test_action},
+                         <<"dest/2">> => {?MODULE, test_action_undef}},
+         ?assertMatch(
+            {noreply, middlewares},
+            consume({<<"dest/1">>, #{}}, WokMessage, ServicesDef))
+     end
+   ]}.
+
+wok_kafe_subscriber_stop_by_outgoing_middleware_test_() ->
+  {setup,
+   fun() ->
+       meck:new(wok_message, [passthrough]),
+       meck:expect(wok_message, set_global_state, fun(Message) ->
+                                                      Message
+                                                  end),
+       meck:expect(wok_message, provide, 4, ok),
+       meck:new(wok_middlewares),
+       meck:expect(wok_middlewares, incoming_message, fun(Message) ->
+                                                          {ok, Message}
+                                                      end),
+       meck:expect(wok_middlewares, outgoing_message, fun(Message) ->
+                                                          {stop, test_middleware, outgoing}
+                                                      end)
+   end,
+   fun(_) ->
+       meck:unload(wok_middlewares),
+       meck:unload(wok_message)
+   end,
+   [
+     fun() ->
+         WokMessage = #wok_message{
+                         request = #msg{uuid = <<"UUID">>,
+                                        from = <<"from">>,
+                                        to = <<"dest/1">>,
+                                        body = <<"message body">>,
+                                        offset = 1,
+                                        key = <<>>,
+                                        message = <<1, 2, 3, 4, 5>>,
+                                        topic = <<"topic">>,
+                                        partition = 0}},
+         ServicesDef = #{<<"dest/1">> => {?MODULE, test_action},
+                         <<"dest/2">> => {?MODULE, test_action_undef}},
+         ?assertMatch(
+            {stop, test_middleware, outgoing},
+            consume({<<"dest/1">>, #{}}, WokMessage, ServicesDef))
+     end
+   ]}.
+
+wok_kafe_subscriber_stop_by_incoming_middleware_test_() ->
+  {setup,
+   fun() ->
+       meck:new(wok_message, [passthrough]),
+       meck:expect(wok_message, set_global_state, fun(Message) ->
+                                                      Message
+                                                  end),
+       meck:expect(wok_message, provide, 4, ok),
+       meck:new(wok_middlewares),
+       meck:expect(wok_middlewares, incoming_message, fun(Message) ->
+                                                          {stop, test_middleware, incoming}
+                                                      end)
+   end,
+   fun(_) ->
+       meck:unload(wok_middlewares),
+       meck:unload(wok_message)
+   end,
+   [
+     fun() ->
+         WokMessage = #wok_message{
+                         request = #msg{uuid = <<"UUID">>,
+                                        from = <<"from">>,
+                                        to = <<"dest/1">>,
+                                        body = <<"message body">>,
+                                        offset = 1,
+                                        key = <<>>,
+                                        message = <<1, 2, 3, 4, 5>>,
+                                        topic = <<"topic">>,
+                                        partition = 0}},
+         ServicesDef = #{<<"dest/1">> => {?MODULE, test_action},
+                         <<"dest/2">> => {?MODULE, test_action_undef}},
+         ?assertMatch(
+            {stop, test_middleware, incoming},
+            consume({<<"dest/1">>, #{}}, WokMessage, ServicesDef))
+     end
+   ]}.
+
+wok_kafe_subscriber_no_route_test_() ->
+  {setup,
+   fun() ->
+       ok
+   end,
+   fun(_) ->
+       ok
+   end,
+   [
+     fun() ->
+         WokMessage = #wok_message{
+                         request = #msg{uuid = <<"UUID">>,
+                                        from = <<"from">>,
+                                        to = <<"dest/3">>,
+                                        body = <<"message body">>,
+                                        offset = 1,
+                                        key = <<>>,
+                                        message = <<1, 2, 3, 4, 5>>,
+                                        topic = <<"topic">>,
+                                        partition = 0}},
+         ServicesDef = #{<<"dest/1">> => {?MODULE, test_action},
+                         <<"dest/2">> => {?MODULE, test_action_undef}},
+         ?assertMatch(
+            no_route,
+            consume({<<"dest/3">>, #{}}, WokMessage, ServicesDef))
+     end
+   ]}.
+-endif.

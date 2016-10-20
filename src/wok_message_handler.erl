@@ -1,5 +1,5 @@
 -module(wok_message_handler).
--include_lib("../include/wok_message_handler.hrl").
+-include("../include/wok_message_handler.hrl").
 
 -export([
          get_uuid/1

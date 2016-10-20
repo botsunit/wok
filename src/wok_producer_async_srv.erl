@@ -3,7 +3,7 @@
 -compile([{parse_transform, lager_transform}]).
 -behaviour(gen_server).
 -include("../include/wok.hrl").
--include_lib("../include/wok_message_handler.hrl").
+-include("../include/wok_message_handler.hrl").
 
 %% API
 -export([start_link/1]).
