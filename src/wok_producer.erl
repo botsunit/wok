@@ -1,4 +1,3 @@
-% @hidden
 -module(wok_producer).
 -include("../include/wok.hrl").
 
@@ -30,12 +29,15 @@
 
 % API
 
+% @hidden
 start() ->
   wok_producer_srv:start().
 
+% @hidden
 start(Topic) ->
   wok_producer_srv:start(Topic).
 
+% @hidden
 start(Topic, Partition) ->
   wok_producer_srv:start(Topic, Partition).
 

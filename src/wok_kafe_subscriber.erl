@@ -152,7 +152,7 @@ wok_kafe_subscriber_test_() ->
                                     params = #{},
                                     offset = 1,
                                     key = <<>>,
-                                    message = <<1,2,3,4,5>>,
+                                    message = <<1, 2, 3, 4, 5>>,
                                     topic = <<"topic">>,
                                     partition = 0},
                        response = #msg{

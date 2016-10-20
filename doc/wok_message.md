@@ -39,7 +39,9 @@ Set an async response.</td></tr><tr><td valign="top"><a href="#body-1">body/1</a
 Return the incoming message body.</td></tr><tr><td valign="top"><a href="#body-2">body/2</a></td><td>
 Update the incoming message body.</td></tr><tr><td valign="top"><a href="#content-1">content/1</a></td><td>
 Return the incoming message as map.</td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td>
-Return the custon datas for the given message.</td></tr><tr><td valign="top"><a href="#encode_message-4">encode_message/4</a></td><td>
+Return the custom datas as map for the given message.</td></tr><tr><td valign="top"><a href="#custom_data-2">custom_data/2</a></td><td>
+Return the custom data value for the given message and key.</td></tr><tr><td valign="top"><a href="#custom_data-3">custom_data/3</a></td><td>
+Add (or replace) a custom data for the given message.</td></tr><tr><td valign="top"><a href="#encode_message-4">encode_message/4</a></td><td>
 Encode a reponse for an async producer.</td></tr><tr><td valign="top"><a href="#encode_reply-4">encode_reply/4</a></td><td> 
 Encore a message for an async producer.</td></tr><tr><td valign="top"><a href="#encode_reply-5">encode_reply/5</a></td><td>
 Encore a message for an async producer.</td></tr><tr><td valign="top"><a href="#from-1">from/1</a></td><td>
@@ -124,7 +126,29 @@ custom_data(Wok_message::<a href="#type-message">message()</a>) -&gt; #{}
 </code></pre>
 <br />
 
-Return the custon datas for the given message
+Return the custom datas as map for the given message
+
+<a name="custom_data-2"></a>
+
+### custom_data/2 ###
+
+<pre><code>
+custom_data(Wok_message::<a href="#type-message">message()</a>, Key::atom()) -&gt; any() | undefined
+</code></pre>
+<br />
+
+Return the custom data value for the given message and key
+
+<a name="custom_data-3"></a>
+
+### custom_data/3 ###
+
+<pre><code>
+custom_data(Wok_message::<a href="#type-message">message()</a>, Key::atom(), Value::any()) -&gt; {ok, any(), <a href="#type-message">message()</a>} | {ok, <a href="#type-message">message()</a>}
+</code></pre>
+<br />
+
+Add (or replace) a custom data for the given message
 
 <a name="encode_message-4"></a>
 
