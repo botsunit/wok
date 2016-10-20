@@ -20,6 +20,8 @@
          , headers/1
          , body/1
          , body/2
+         , topic/1
+         , partition/1
          , params/1
          , global_state/1
          , local_state/1
@@ -45,6 +47,8 @@
          , provide/4
          , provide/5
         ]).
+
+-export_type([message/0]).
 
 -type message() :: term().
 -type opaque() :: binary().
@@ -170,6 +174,20 @@ body(#wok_message{request = Message}) ->
 -spec body(message(), term()) -> message().
 body(#wok_message{request = Request} = Message, Body) ->
   Message#wok_message{request = Request#msg{body = Body}}.
+
+% @doc
+% Return the incoming message topic
+% @end
+-spec topic(message()) -> binary().
+topic(#wok_message{request = Request}) ->
+  wok_message_handler:get_topic(Request).
+
+% @doc
+% Return the incoming message partition
+% @end
+-spec partition(message()) -> binary().
+partition(#wok_message{request = Request}) ->
+  wok_message_handler:get_partition(Request).
 
 % @doc
 % Return the incoming message params

@@ -8,6 +8,8 @@
          , get_headers/1
          , get_body/1
          , get_params/1
+         , get_topic/1
+         , get_partition/1
         ]).
 
 -export_type([
@@ -41,4 +43,8 @@ get_headers(#msg{headers = Headers}) -> Headers.
 get_body(#msg{body = Body}) -> Body.
 % @hidden
 get_params(#msg{params = Params}) -> Params.
+% @hidden
+get_topic(#msg{topic = Topic}) -> Topic.
+% @hidden
+get_partition(#msg{partition = Partition}) -> Partition.
 
