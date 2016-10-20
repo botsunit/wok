@@ -64,7 +64,14 @@ consume({Route, Params}, WokMessage, ServicesDef) ->
       % TODO metrics
       case wok_middlewares:incoming_message(WokMessage4) of
         {ok, WokMessage5} ->
-          Response = erlang:apply(Module, Function, [WokMessage5]),
+          Response = try
+                       erlang:apply(Module, Function, [WokMessage5])
+                     catch
+                       Class:Reason ->
+                         lager:error("Wok stop: ~p:~p/1 internal error!~n  => Stacktrace:~s",
+                                     [Module, Function, lager:pr_stacktrace(erlang:get_stacktrace(), {Class, Reason})]),
+                         erlang:halt(1)
+                     end,
           send_response(Response);
         {stop, Middleware, Reason} = Stop ->
           lager:info("Middleware ~s stop message ~s from ~s reason: ~p",
@@ -87,8 +94,14 @@ send_response(Response) ->
             noreply ->
               {noreply, middlewares};
             {reply, Topic, From, To, Body} ->
-              wok_message:provide(Topic, From, To, Body), % TODO ERROR !!!
-              {reply, Response1}
+              case wok_message:provide(Topic, From, To, Body) of
+                {ok, _} ->
+                  lager:debug("Message ~p (from ~p, to ~s) provided to ~p", [Body, From, To, Topic]),
+                  {reply, Response1};
+                Error ->
+                  lager:error("Error when providing essage ~p (from ~p, to ~s) to ~p: ~p", [Body, From, To, Topic, Error]),
+                  erlang:halt(1)
+              end
           end;
         {stop, Middleware, Reason} = Stop ->
           lager:info("Middleware ~s stop response for message ~s from ~s reason: ~p",
@@ -115,7 +128,7 @@ wok_kafe_subscriber_test_() ->
        meck:expect(wok_message, set_global_state, fun(Message) ->
                                                       Message
                                                   end),
-       meck:expect(wok_message, provide, 4, ok),
+       meck:expect(wok_message, provide, 4, {ok, all_good}),
        meck:new(wok_middlewares),
        meck:expect(wok_middlewares, incoming_message, fun(Message) ->
                                                           {ok, Message}
@@ -174,7 +187,7 @@ wok_kafe_subscriber_noreply_by_outgoing_middleware_test_() ->
        meck:expect(wok_message, set_global_state, fun(Message) ->
                                                       Message
                                                   end),
-       meck:expect(wok_message, provide, 4, ok),
+       meck:expect(wok_message, provide, 4, {ok, all_good}),
        meck:new(wok_middlewares),
        meck:expect(wok_middlewares, incoming_message, fun(Message) ->
                                                           {ok, Message}
@@ -215,12 +228,12 @@ wok_kafe_subscriber_stop_by_outgoing_middleware_test_() ->
        meck:expect(wok_message, set_global_state, fun(Message) ->
                                                       Message
                                                   end),
-       meck:expect(wok_message, provide, 4, ok),
+       meck:expect(wok_message, provide, 4, {ok, all_good}),
        meck:new(wok_middlewares),
        meck:expect(wok_middlewares, incoming_message, fun(Message) ->
                                                           {ok, Message}
                                                       end),
-       meck:expect(wok_middlewares, outgoing_message, fun(Message) ->
+       meck:expect(wok_middlewares, outgoing_message, fun(_Message) ->
                                                           {stop, test_middleware, outgoing}
                                                       end)
    end,
@@ -255,9 +268,9 @@ wok_kafe_subscriber_stop_by_incoming_middleware_test_() ->
        meck:expect(wok_message, set_global_state, fun(Message) ->
                                                       Message
                                                   end),
-       meck:expect(wok_message, provide, 4, ok),
+       meck:expect(wok_message, provide, 4, {ok, all_good}),
        meck:new(wok_middlewares),
-       meck:expect(wok_middlewares, incoming_message, fun(Message) ->
+       meck:expect(wok_middlewares, incoming_message, fun(_Message) ->
                                                           {stop, test_middleware, incoming}
                                                       end)
    end,

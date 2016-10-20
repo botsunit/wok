@@ -167,7 +167,7 @@ tests: ## Run tests
 	$(verbose) $(REBAR) eunit
 
 doc:: ## Generate doc
-	$(verbose) $(REBAR) as doc edoc
+	$(verbose) $(REBAR) edoc
 
 dist: $(DIST) ## Create a distribution
 
