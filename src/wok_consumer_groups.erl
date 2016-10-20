@@ -2,6 +2,9 @@
 -module(wok_consumer_groups).
 -compile([{parse_transform, lager_transform}]).
 -behaviour(gen_server).
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
 
 %% API
 -export([start_link/0]).
@@ -105,3 +108,124 @@ assignment_change(_GroupID, UnAssigned, ReAssigned) ->
   [wok_producer_srv:start(Topic, Partition) || {Topic, Partition} <- ReAssigned],
   ok.
 
+-ifdef(TEST).
+wok_consumer_groups_start_groups_test_() ->
+  {setup,
+   fun() ->
+     meck:new(kafe),
+     meck:expect(kafe, start_consumer, 3, {ok, c:pid(0, 0, 0)})
+   end,
+   fun(_) ->
+     meck:unload(kafe)
+   end,
+   [
+     fun() ->
+         ?assertMatch(
+            [{<<"topic3">>, _PID3, _MRef3, [{test, 3}]},
+             {<<"topic2">>, _PID2, _MRef2, [{test, 2}]},
+             {<<"topic1">>, _PID1, _MRef1, [{test, 1}]}],
+            start_groups([{<<"topic1">>, [{test, 1}]},
+                          {<<"topic2">>, [{test, 2}]},
+                          {<<"topic3">>, [{test, 3}]}], <<"prefix">>, []))
+     end
+   ]}.
+
+wok_consumer_groups_start_groups_error_test_() ->
+  {setup,
+   fun() ->
+     meck:new(kafe),
+     meck:expect(kafe, start_consumer, 3, {error, test_error})
+   end,
+   fun(_) ->
+     meck:unload(kafe)
+   end,
+   [
+     fun() ->
+         ?assertMatch(
+            [{<<"topic3">>, [{test, 3}]},
+             {<<"topic2">>, [{test, 2}]},
+             {<<"topic1">>, [{test, 1}]}],
+            start_groups([{<<"topic1">>, [{test, 1}]},
+                          {<<"topic2">>, [{test, 2}]},
+                          {<<"topic3">>, [{test, 3}]}], <<"prefix">>, []))
+     end
+   ]}.
+
+wok_consumer_groups_start_groups_half_test_() ->
+  {setup,
+   fun() ->
+     meck:new(kafe),
+     meck:expect(kafe, start_consumer, 3, meck:seq([{ok, c:pid(0, 0, 0)},
+                                                    {error, test_error},
+                                                    {ok, c:pid(0, 0, 0)},
+                                                    {error, test_error}]))
+   end,
+   fun(_) ->
+     meck:unload(kafe)
+   end,
+   [
+     fun() ->
+         ?assertMatch(
+            [{<<"topic4">>, [{test, 4}]},
+             {<<"topic3">>, _PID3, _MRef3, [{test, 3}]},
+             {<<"topic2">>, [{test, 2}]},
+             {<<"topic1">>, _PID1, _MRef1, [{test, 1}]}],
+            start_groups([{<<"topic1">>, [{test, 1}]},
+                          {<<"topic2">>, [{test, 2}]},
+                          {<<"topic3">>, [{test, 3}]},
+                          {<<"topic4">>, [{test, 4}]}], <<"prefix">>, []))
+     end
+   ]}.
+
+wok_consumer_groups_restart_test_() ->
+  {setup,
+   fun() ->
+     meck:new(kafe),
+     meck:expect(kafe, start_consumer, 3, {ok, c:pid(0, 0, 0)})
+   end,
+   fun(_) ->
+     meck:unload(kafe)
+   end,
+   [
+     fun() ->
+         PID = c:pid(0, 0, 0),
+         MRef = erlang:make_ref(),
+         ?assertMatch(
+            [{<<"topic3">>, PID, _MRef3, [{test, 3}]},
+             {<<"topic2">>, PID, _MRef2, [{test, 2}]},
+             {<<"topic1">>, PID, MRef, [{test, 1}]}],
+            start_groups([{<<"topic1">>, PID, MRef, [{test, 1}]},
+                          {<<"topic2">>, c:pid(0, 1000, 0), MRef, [{test, 2}]},
+                          {<<"topic3">>, [{test, 3}]}], <<"pwrefix">>, []))
+     end
+   ]}.
+
+wok_consumer_groups_options_test_() ->
+  {setup,
+   fun() ->
+     ok
+   end,
+   fun(_) ->
+     ok
+   end,
+   [
+     fun() ->
+       ?assertMatch(
+          #{option1 := 1,
+            option2 := 2,
+            option3 := 3},
+          group_options([{option1, 1},
+                         {option2, 2},
+                         {option3, 3}]))
+     end,
+     fun() ->
+       ?assertMatch(
+          #{option1 := 1,
+            fetch_interval := 2,
+            option3 := 3},
+          group_options([{option1, 1},
+                         {fetch_frequency, 2},
+                         {option3, 3}]))
+     end
+   ]}.
+-endif.
