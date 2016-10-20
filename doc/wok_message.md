@@ -48,7 +48,8 @@ Return the global state for the given message.</td></tr><tr><td valign="top"><a 
 Return the incoming message headers.</td></tr><tr><td valign="top"><a href="#local_state-1">local_state/1</a></td><td>
 Return the local state for the given message.</td></tr><tr><td valign="top"><a href="#noreply-1">noreply/1</a></td><td>
 Set a no reply response.</td></tr><tr><td valign="top"><a href="#params-1">params/1</a></td><td>
-Return the incoming message params.</td></tr><tr><td valign="top"><a href="#provide-2">provide/2</a></td><td>
+Return the incoming message params.</td></tr><tr><td valign="top"><a href="#partition-1">partition/1</a></td><td>
+Return the incoming message partition.</td></tr><tr><td valign="top"><a href="#provide-2">provide/2</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-4">provide/4</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#provide-5">provide/5</a></td><td>
 Send a message.</td></tr><tr><td valign="top"><a href="#reply-4">reply/4</a></td><td> 
@@ -61,7 +62,8 @@ Return the outgoing message from.</td></tr><tr><td valign="top"><a href="#respon
 Update the outgoing message from.</td></tr><tr><td valign="top"><a href="#response_to-1">response_to/1</a></td><td>
 Return the outgoing message to.</td></tr><tr><td valign="top"><a href="#response_to-2">response_to/2</a></td><td>
 Update the outgoing message to.</td></tr><tr><td valign="top"><a href="#to-1">to/1</a></td><td>
-Return the incoming message to.</td></tr><tr><td valign="top"><a href="#uuid-1">uuid/1</a></td><td>
+Return the incoming message to.</td></tr><tr><td valign="top"><a href="#topic-1">topic/1</a></td><td>
+Return the incoming message topic.</td></tr><tr><td valign="top"><a href="#uuid-1">uuid/1</a></td><td>
 Return the incoming message UUID.</td></tr></table>
 
 
@@ -226,6 +228,17 @@ params(Wok_message::<a href="#type-message">message()</a>) -&gt; binary() | unde
 
 Return the incoming message params
 
+<a name="partition-1"></a>
+
+### partition/1 ###
+
+<pre><code>
+partition(Wok_message::<a href="#type-message">message()</a>) -&gt; binary()
+</code></pre>
+<br />
+
+Return the incoming message partition
+
 <a name="provide-2"></a>
 
 ### provide/2 ###
@@ -371,6 +384,17 @@ to(Wok_message::<a href="#type-message">message()</a>) -&gt; binary() | undefine
 <br />
 
 Return the incoming message to
+
+<a name="topic-1"></a>
+
+### topic/1 ###
+
+<pre><code>
+topic(Wok_message::<a href="#type-message">message()</a>) -&gt; binary()
+</code></pre>
+<br />
+
+Return the incoming message topic
 
 <a name="uuid-1"></a>
 
