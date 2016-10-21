@@ -18,9 +18,15 @@ wok_message_tests_test_() ->
                                              <<>>}
                                         end),
        meck:new(wok_state),
-       meck:expect(wok_state, state, 0, global_state)
+       meck:expect(wok_state, state, 0, global_state),
+       meck:new(kafe_rr),
+       meck:expect(kafe_rr, next, 1, 123),
+       meck:new(kafe),
+       meck:expect(kafe, default_key_to_partition, 2, 123)
    end,
    fun(_) ->
+       meck:unload(kafe),
+       meck:unload(kafe_rr),
        meck:unload(wok_state),
        meck:unload(test_handler),
        meck:unload(doteki)
@@ -271,10 +277,22 @@ wok_message_tests_test_() ->
                                                                 from = <<"from">>}}))
     end,
     fun() ->
+        ?assertMatch(#wok_message{
+                        response = #msg{
+                                      from = <<"newfrom">>}},
+                     wok_message:response_from(#wok_message{}, <<"newfrom">>))
+    end,
+    fun() ->
         ?assertMatch(<<"to">>,
                      wok_message:response_to(#wok_message{
                                                 response = #msg{
                                                               to = <<"to">>}}))
+    end,
+    fun() ->
+        ?assertMatch(#wok_message{
+                        response = #msg{
+                                      to = <<"newto">>}},
+                     wok_message:response_to(#wok_message{}, <<"newto">>))
     end,
     fun() ->
         ?assertMatch(<<"body">>,
@@ -356,5 +374,84 @@ wok_message_tests_test_() ->
                                        <<"topic">>,
                                        <<"to">>,
                                        <<"body">>))
+    end,
+    fun() ->
+        ?assertMatch({ok, <<"topic">>, 123,
+                      <<"g2gIZAALd29rX21lc3NhZ2VoDGQAA21zZ2QACXVuZGVmaW5lZGQAC",
+                        "XVuZGVmaW5lZG0AAAAEZnJvbWQACXVuZGVmaW5lZGQACXVuZGVmaW",
+                        "5lZHQAAAAAZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZ",
+                        "pbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkaAxkAANtc2dkAAl1",
+                        "bmRlZmluZWRtAAAABGZyb21tAAAAAnRvZAAJdW5kZWZpbmVkbQAAA",
+                        "ARib2R5dAAAAABkAAl1bmRlZmluZWRkAAl1bmRlZmluZWRkAAl1bm",
+                        "RlZmluZWRtAAAABXRvcGljZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmV",
+                        "kZAAJdW5kZWZpbmVkdAAAAABkAAR0cnVlZAAJdW5kZWZpbmVk">>},
+                     wok_message:encode_reply(
+                       #wok_message{request = #msg{to = <<"from">>}},
+                       {<<"topic">>, <<"key">>}, <<"from">>, <<"to">>, <<"body">>)),
+
+        ?assertMatch({ok, <<"topic">>, 123,
+                      <<"g2gIZAALd29rX21lc3NhZ2VoDGQAA21zZ2QACXVuZGVmaW5lZGQAC",
+                        "XVuZGVmaW5lZG0AAAAEZnJvbWQACXVuZGVmaW5lZGQACXVuZGVmaW",
+                        "5lZHQAAAAAZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZ",
+                        "pbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkaAxkAANtc2dkAAl1",
+                        "bmRlZmluZWRtAAAABGZyb21tAAAAAnRvZAAJdW5kZWZpbmVkbQAAA",
+                        "ARib2R5dAAAAABkAAl1bmRlZmluZWRkAAl1bmRlZmluZWRkAAl1bm",
+                        "RlZmluZWRtAAAABXRvcGljZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmV",
+                        "kZAAJdW5kZWZpbmVkdAAAAABkAAR0cnVlZAAJdW5kZWZpbmVk">>},
+                     wok_message:encode_reply(
+                       #wok_message{request = #msg{to = <<"from">>}},
+                       <<"topic">>, <<"from">>, <<"to">>, <<"body">>)),
+
+        ?assertMatch({ok, <<"topic">>, 123,
+                      <<"g2gIZAALd29rX21lc3NhZ2VoDGQAA21zZ2QACXVuZGVmaW5lZGQAC",
+                        "XVuZGVmaW5lZG0AAAAEZnJvbWQACXVuZGVmaW5lZGQACXVuZGVmaW",
+                        "5lZHQAAAAAZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZ",
+                        "pbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkaAxkAANtc2dkAAl1",
+                        "bmRlZmluZWRtAAAABGZyb21tAAAAAnRvZAAJdW5kZWZpbmVkbQAAA",
+                        "ARib2R5dAAAAABkAAl1bmRlZmluZWRkAAl1bmRlZmluZWRkAAl1bm",
+                        "RlZmluZWRtAAAABXRvcGljZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmV",
+                        "kZAAJdW5kZWZpbmVkdAAAAABkAAR0cnVlZAAJdW5kZWZpbmVk">>},
+                     wok_message:encode_reply(
+                       #wok_message{request = #msg{to = <<"from">>}},
+                       {<<"topic">>, 123}, <<"from">>, <<"to">>, <<"body">>)),
+
+        ?assertMatch({ok, <<"topic">>, 123,
+                      <<"g2gIZAALd29rX21lc3NhZ2VoDGQAA21zZ2QACXVuZGVmaW5lZGQAC",
+                        "XVuZGVmaW5lZG0AAAAEZnJvbWQACXVuZGVmaW5lZGQACXVuZGVmaW",
+                        "5lZHQAAAAAZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZ",
+                        "pbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkaAxkAANtc2dkAAl1",
+                        "bmRlZmluZWRtAAAABGZyb21tAAAAAnRvZAAJdW5kZWZpbmVkbQAAA",
+                        "ARib2R5dAAAAABkAAl1bmRlZmluZWRkAAl1bmRlZmluZWRkAAl1bm",
+                        "RlZmluZWRtAAAABXRvcGljZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmV",
+                        "kZAAJdW5kZWZpbmVkdAAAAABkAAR0cnVlZAAJdW5kZWZpbmVk">>},
+                     wok_message:encode_reply(
+                       #wok_message{request = #msg{to = <<"from">>}},
+                       {<<"topic">>, <<"key">>}, <<"to">>, <<"body">>)),
+
+        ?assertMatch({ok, <<"topic">>, 123,
+                      <<"g2gIZAALd29rX21lc3NhZ2VoDGQAA21zZ2QACXVuZGVmaW5lZGQAC",
+                        "XVuZGVmaW5lZG0AAAAEZnJvbWQACXVuZGVmaW5lZGQACXVuZGVmaW",
+                        "5lZHQAAAAAZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZ",
+                        "pbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkaAxkAANtc2dkAAl1",
+                        "bmRlZmluZWRtAAAABGZyb21tAAAAAnRvZAAJdW5kZWZpbmVkbQAAA",
+                        "ARib2R5dAAAAABkAAl1bmRlZmluZWRkAAl1bmRlZmluZWRkAAl1bm",
+                        "RlZmluZWRtAAAABXRvcGljZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmV",
+                        "kZAAJdW5kZWZpbmVkdAAAAABkAAR0cnVlZAAJdW5kZWZpbmVk">>},
+                     wok_message:encode_reply(
+                       #wok_message{request = #msg{to = <<"from">>}},
+                       <<"topic">>, <<"to">>, <<"body">>)),
+
+        ?assertMatch({ok, <<"topic">>, 123,
+                      <<"g2gIZAALd29rX21lc3NhZ2VoDGQAA21zZ2QACXVuZGVmaW5lZGQAC",
+                        "XVuZGVmaW5lZG0AAAAEZnJvbWQACXVuZGVmaW5lZGQACXVuZGVmaW",
+                        "5lZHQAAAAAZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZ",
+                        "pbmVkZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmVkaAxkAANtc2dkAAl1",
+                        "bmRlZmluZWRtAAAABGZyb21tAAAAAnRvZAAJdW5kZWZpbmVkbQAAA",
+                        "ARib2R5dAAAAABkAAl1bmRlZmluZWRkAAl1bmRlZmluZWRkAAl1bm",
+                        "RlZmluZWRtAAAABXRvcGljZAAJdW5kZWZpbmVkZAAJdW5kZWZpbmV",
+                        "kZAAJdW5kZWZpbmVkdAAAAABkAAR0cnVlZAAJdW5kZWZpbmVk">>},
+                     wok_message:encode_reply(
+                       #wok_message{request = #msg{to = <<"from">>}},
+                       {<<"topic">>, 123}, <<"to">>, <<"body">>))
     end
    ]}.
