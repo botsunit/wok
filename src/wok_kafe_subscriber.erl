@@ -70,7 +70,7 @@ consume({Route, Params}, WokMessage, ServicesDef) ->
                        Class:Reason ->
                          lager:error("Wok stop: ~p:~p/1 internal error!~n  => Stacktrace:~s",
                                      [Module, Function, lager:pr_stacktrace(erlang:get_stacktrace(), {Class, Reason})]),
-                         erlang:halt(1)
+                         init:stop(1)
                      end,
           send_response(Response);
         {stop, Middleware, Reason} = Stop ->
@@ -100,7 +100,7 @@ send_response(Response) ->
                   {reply, Response1};
                 Error ->
                   lager:error("Error when providing essage ~p (from ~p, to ~s) to ~p: ~p", [Body, From, To, Topic, Error]),
-                  erlang:halt(1)
+                  init:stop(1)
               end
           end;
         {stop, Middleware, Reason} = Stop ->
