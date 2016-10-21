@@ -4,141 +4,139 @@ digraph wok_deps {
     remincross=true;
     splines=ortho;
     rankdir=LR;
-  ]
+  ];
 
-  wok_http_adapter[label="wok_http_adapter\n(0.1.2)", fontcolor="white", style="filled", fillcolor="black"];
-  bucs[label="bucs\n(~> 0.1.9)", style="filled", fillcolor="red"];
-  bristow[label="bristow\n(~> 0.1.1)", style="filled", fillcolor="red"];
-  uuid[label="erlang-uuid\n(0.6.0)", style="filled", fillcolor="red"];
-  doteki[label="doteki\n(~> 0.1.13)", style="filled", fillcolor="red"];
-  wok_tmpl_engine[label="wok_tmpl_engine\n(0.1.4)", fontcolor="white", style="filled", fillcolor="black"];
-  whisk[label="whisk\n(0.1.4)", style="filled", fillcolor="red"];
-  tempfile[label="tempfile\n(1.1.4)", style="filled", fillcolor="red"];
-  wok_mail[label="wok_mail\n(0.1.4)", fontcolor="white", style="filled", fillcolor="black"];
-  poolgirl[label="poolgirl\n(~> 0.1.4)", style="filled", fillcolor="red"];
-  wok_message_handler[label="wok_message_handler\n(0.5.1)", fontcolor="white", style="filled", fillcolor="black"];
-  lager_json_formatter[label="lager_json_formatter\n(0.1.1)", style="filled", fillcolor="red"];
-  pipette[label="pipette\n(0.1.4)", style="filled", fillcolor="red"];
-  kafe[label="kafe\n(~> 1.6.2)", style="filled", fillcolor="red"];
-  wok_tests[label="wok_tests\n(0.2.4)", fontcolor="white", style="filled", fillcolor="black"];
-  cowboy_default_static_file[label="cowboy_default_static_file\n(1.2.4)", style="filled", fillcolor="red"];
-
-  wok[label="wok\n(0.5.1)", fontcolor="white", style="filled", fillcolor="black"];
-
-  middleware_session[label="middleware_session\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  heartbeat_middleware[label="heartbeat_middleware\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  basic_auth_middleware[label="basic_auth_middleware\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  wok_cowboy[label="wok_cowboy\n(0.1.1)", fontcolor="white", style="filled", fillcolor="black"];
-  wok_i18n[label="wok_i18n\n(0.1.5)", fontcolor="white", style="filled", fillcolor="black"];
-
-  lager[label="lager\n(~> 3.2.0)"];
-  cowboy[label="cowboy\n(2.0.0-pre.3)"];
-  rebar3_elixir[label="rebar3_elixir\n(> 0)", style="filled", fillcolor="red"];
-  meck[label="meck\n(master)"];
-  edown[label="edown\n(master)"];
-  goldrush[label="goldrush\n(0.1.8)"];
-  jsx[label="jsx\n(~> 2.8.0)"];
-  cowlib[label="cowlib\n(master)"];
-  ranch[label="ranch\n(1.1.0)"];
-  hackney[label="hackney\n(~> 1.6.0)"];
-  idna[label="idna\n(1.2.0)"];
-  mimerl[label="mimerl\n(1.0.2)"];
-  certifi[label="certifi\n(0.4.0)"];
-  metrics[label="metrics\n(1.0.1)"];
-  ssl_verify_fun[label="ssl_verify_fun\n(1.1.0)"];
-  gen_smtp[label="gen_smtp\n(~> 0.11.0)"];
-  erlydtl[label="erlydtl\n(~> 0.11.0)"];
-  qdate[label="qdate\n(master)"];
-  erlware_commons[label="erlware_commons\n(v0.15.0)"];
-  erlang_localtime[label="erlang_localtime\n(master)"];
+  wok[label="wok\n(gl-b: move_rest)",
+      fontcolor="white",
+      style="filled",
+      fillcolor="black"];
+  lager[label="lager\n(hex: ~> 3.2.0)"];
+  lager_json_formatter[label="lager_json_formatter\n(hex: ~> 0.1.1",
+                       fontcolor="white",
+                       style="filled"
+                       fillcolor="black"];
+  kafe[label="kafe\n(gh-b: 2.0.0)",
+       fontcolor="white",
+       style="filled",
+       fillcolor="black"];
+  bucs[label="bucs\n(hex: ~> 0.1.9)",
+       fontcolor="white",
+       style="filled",
+       fillcolor="black"];
+  doteki[label="doteki\n(hex: ~> 0.1.13)",
+         fontcolor="white",
+         style="filled",
+         fillcolor="black"];
+  uuid[label="uuid\n(gh-t: 0.6.0)"
+       fontcolor="white",
+       style="filled",
+       fillcolor="red"];
+  metrics[label="metrics\n(gh-b: add_delete)",
+          fontcolor="white",
+          style="filled",
+          fillcolor="red"];
+  goldrush[label="goldrush\n(hex: ~> 0.1.8)"];
+  jsx[label="jsx\n(hex: ~> 2.8.0)"];
+  poolgirl[label="poolgirl\n(gh-b: master)",
+           fontcolor="white",
+           style="filled",
+           fillcolor="black"];
+  bristow[label="bristow\n(hex: ~> 0.1.1)",
+          fontcolor="white",
+          style="filled",
+          fillcolor="black"];
+  wok_rest[label="wok_rest\n(gl-b: master)",
+           fontcolor="white",
+           style="filled",
+           fillcolor="black"];
+  cowboy_default_static_file[label="cowboy_default_static_file\n(gh-b: master)",
+                             fontcolor="white",
+                             style="filled",
+                             fillcolor="black"];
+  cowboy[label="cowboy\n(gh-t: 2.0.0-pre.3)"];
+  tempfile[label="tempfile\n(gh-t: 1.1.4)",
+           fontcolor="white",
+           style="filled",
+           fillcolor="black"];
+  erlydtl[label="erlydtl\n(hex: ~> 0.11.0)"];
+  cowlib[label="cowlib\n(gh-b: master"];
+  ranch[label="ranch\n(gh-t: 1.1.0)"];
+  wok_tests[label="wok_tests\n(gl-b: move_rest)",
+            fontcolor="white",
+            style="filled",
+            fillcolor="black"];
+  hackney[label="hackney\n(gh-b: master)",
+          fontcolor="white",
+          style="filled",
+          fillcolor="red"];
+  idna[label="idna\n(hex: 1.2.0)"];
+  mimerl[label="mimerl\n(hex: 1.0.2)"];
+  certifi[label="certifi\n(hex: 0.7.0)"];
+  ssl_verify_fun[label="ssl_verify_fun\n(hex: 1.1.1)"];
+  wok_mail[label="wok_mail\n(gl-t: 0.1.4)",
+            fontcolor="white",
+            style="filled",
+            fillcolor="black"];
+  gen_smtp[label="gen_smtp\n(hex: ~> 0.11.0)"];
+  middleware_session[label="middleware_session\n(gl-b: move_rest)",
+                     fontcolor="white",
+                     style="filled",
+                     fillcolor="black"];
+  basic_auth_middleware[label="basic_auth_middleware\n(gl-b: move_rest)",
+                        fontcolor="white",
+                        style="filled",
+                        fillcolor="black"];
+  wok_async_message_handler[label="wok_async_message_handler\n(gl-b: move_rest)",
+                            fontcolor="white",
+                            style="filled",
+                            fillcolor="black"];
+  postgrex[label="postgrex\n(hex: >= 0.0.0)"];
+  ecto[label="ecto\n(hex: ~> 2.0.0)"];
+  poison[label="poison\n(hex: ~> 2.2)"];
 
   wok -> lager;
-  wok -> lager_json_formatter
-  wok -> wok_message_handler;
-  wok -> pipette;
+  wok -> lager_json_formatter;
   wok -> kafe;
   wok -> bucs;
   wok -> doteki;
   wok -> uuid;
-  wok-> rebar3_elixir[style=dotted];
-  wok -> meck[style=dotted];
-  wok -> wok_tests[style=dotted];
-  wok -> edown[style=dotted];
+  wok -> metrics;
 
-  wok_cowboy -> lager;
-  wok_cowboy -> wok_http_adapter;
-  wok_cowboy -> cowboy;
-  wok_cowboy -> cowboy_default_static_file;
-  wok_cowboy -> bucs;
-  wok_cowboy -> doteki;
-  wok_cowboy -> tempfile;
-  wok_cowboy -> meck[style=dotted];
-  wok_cowboy -> wok_tests[style=dotted];
-  wok_cowboy -> wok[style=dotted];
+  wok_rest -> lager;
+  wok_rest -> cowboy_default_static_file;
+  wok_rest -> cowboy;
+  wok_rest -> bucs;
+  wok_rest -> doteki;
+  wok_rest -> tempfile;
+  wok_rest -> erlydtl;
 
   lager -> goldrush;
 
   lager_json_formatter -> lager;
   lager_json_formatter -> jsx;
 
-  wok_http_adapter -> edown[style=dotted];
-  wok_http_adapter -> rebar3_elixir[style=dotted];
-
-  wok_message_handler -> bucs;
-  wok_message_handler -> uuid;
-  wok_message_handler -> meck[style=dotted];
-  wok_message_handler -> doteki[style=dotted];
-  wok_message_handler -> edown[style=dotted];
-  wok_message_handler -> rebar3_elixir[style=dotted];
-
-  pipette -> lager;
-  pipette -> bucs;
-  pipette -> doteki;
-  pipette -> uuid;
-  pipette -> meck[style=dotted];
-  pipette -> edown[style=dotted];
-  pipette -> rebar3_elixir[style=dotted];
-
   kafe -> lager;
   kafe -> bucs;
   kafe -> doteki;
   kafe -> poolgirl;
   kafe -> bristow;
-  kafe -> meck[style=dotted];
-  kafe -> edown[style=dotted];
-  kafe -> rebar3_elixir[style=dotted];
+  kafe -> metrics;
 
-  bristow -> rebar3_elixir[style=dotted];
+  doteki -> bucs;
+
+  poolgirl -> doteki;
+
+  cowboy_default_static_file -> cowboy;
+  cowboy_default_static_file -> bucs;
 
   cowboy -> cowlib;
   cowboy -> ranch;
 
-  cowboy_default_static_file -> bucs;
-  cowboy_default_static_file -> cowboy;
-
-  bucs -> edown[style=dotted];
-  bucs -> rebar3_elixir[style=dotted];
-
-  doteki -> bucs;
-  doteki -> edown[style=dotted];
-  doteki -> rebar3_elixir[style=dotted];
-
   tempfile -> bucs;
-  tempfile -> meck[style=dotted];
-  tempfile -> edown[style=dotted];
-  tempfile -> rebar3_elixir[style=dotted];
 
   wok_tests -> bucs;
-  wok_tests -> wok_http_adapter;
-  wok_tests -> wok_message_handler;
   wok_tests -> doteki;
   wok_tests -> hackney;
-  wok_tests -> edown[style=dotted];
-  wok_tests -> rebar3_elixir[style=dotted];
-
-  poolgirl -> doteki;
-  poolgirl -> edown[style=dotted];
-  poolgirl -> rebar3_elixir[style=dotted];
 
   hackney -> idna;
   hackney -> mimerl;
@@ -149,46 +147,12 @@ digraph wok_deps {
   wok_mail -> bucs;
   wok_mail -> doteki;
   wok_mail -> gen_smtp;
-  wok_mail -> meck[style=dotted];
-  wok_mail -> edown[style=dotted];
-  wok_mail -> rebar3_elixir[style=dotted];
-
-  wok_i18n -> jsx;
-  wok_i18n -> lager;
-  wok_i18n -> wok_tmpl_engine;
-  wok_i18n -> whisk;
-  wok_i18n -> wok;
-  wok_i18n -> bucs;
-  wok_i18n -> doteki;
-  wok_i18n -> wok_cowboy;
-  wok_i18n -> edown[style=dotted];
-  wok_i18n -> rebar3_elixir[style=dotted];
-
-  wok_tmpl_engine -> bucs;
-  wok_tmpl_engine -> erlydtl;
-  wok_tmpl_engine -> rebar3_elixir[style=dotted];
-
-  whisk -> bucs;
-  whisk -> edown[style=dotted];
-  whisk -> rebar3_elixir[style=dotted];
-
-  basic_auth_middleware -> wok[style=dotted];
-  basic_auth_middleware -> wok_tests[style=dotted];
-  basic_auth_middleware -> rebar3_elixir[style=dotted];
 
   middleware_session -> lager;
   middleware_session -> uuid;
-  middleware_session -> wok[style=dotted];
-  middleware_session -> wok_tests[style=dotted];
-  middleware_session -> rebar3_elixir[style=dotted];
 
-  heartbeat_middleware -> lager;
-  heartbeat_middleware -> uuid;
-  heartbeat_middleware -> qdate;
-  heartbeat_middleware -> wok[style=dotted];
-  heartbeat_middleware -> wok_tests[style=dotted];
-  heartbeat_middleware -> rebar3_elixir[style=dotted];
-
-  qdate -> erlware_commons;
-  qdate -> erlang_localtime;
+  wok_async_message_handler -> postgrex;
+  wok_async_message_handler -> ecto;
+  wok_async_message_handler -> poison;
+  wok_async_message_handler -> wok;
 }
