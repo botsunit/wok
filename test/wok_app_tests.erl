@@ -10,6 +10,7 @@ wok_app_run_with_rest_test_() ->
        meck:expect(wok_rest_initializer, start, 0, static_for_tests),
        meck:new(doteki),
        meck:expect(doteki, get_env, 1, undefined),
+       meck:expect(doteki, get_env, 2, []),
        meck:new(wok_sup),
        meck:expect(wok_sup, start_link, fun(X) -> X end)
    end,
@@ -32,6 +33,7 @@ wok_app_run_without_rest_test_() ->
        meck:expect(bucs, function_exists, 3, false),
        meck:new(doteki),
        meck:expect(doteki, get_env, 1, undefined),
+       meck:expect(doteki, get_env, 2, []),
        meck:new(wok_sup),
        meck:expect(wok_sup, start_link, fun(X) -> X end)
    end,

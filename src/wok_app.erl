@@ -7,12 +7,30 @@
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
+  start_apps(),
   Static = start_rest(),
   _ = start_messages(),
   wok_sup:start_link(Static).
 
 stop(_State) ->
   ok.
+
+start_apps() ->
+  start_apps(
+    doteki:get_env([wok, start], [])).
+
+start_apps([]) ->
+  ok;
+start_apps([{Application, Type, application}|Rest]) when Type == permanent;
+                                                         Type == transient;
+                                                         Type == temporary ->
+  application:ensure_all_started(Application, Type),
+  start_apps(Rest);
+start_apps([{Application, application}|Rest]) ->
+  application:ensure_all_started(Application),
+  start_apps(Rest);
+start_apps([_|Rest]) ->
+  start_apps(Rest).
 
 start_rest() ->
   case bucs:function_exists(wok_rest_initializer, start, 0) of
