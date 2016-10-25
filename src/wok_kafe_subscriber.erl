@@ -65,7 +65,13 @@ consume({Route, Params}, WokMessage, ServicesDef) ->
       case wok_middlewares:incoming_message(WokMessage4) of
         {ok, WokMessage5} ->
           Response = try
-                       erlang:apply(Module, Function, [WokMessage5])
+                       case erlang:apply(Module, Function, [WokMessage5]) of
+                         R when is_record(R, wok_message) ->
+                           R;
+                         Err ->
+                           lager:error("Wok stop: ~p:~p/1 invalid response: ~p", [Module, Function, Err]),
+                           init:stop(1)
+                       end
                      catch
                        Class:Reason ->
                          lager:error("Wok stop: ~p:~p/1 internal error!~n  => Stacktrace:~s",
@@ -83,7 +89,7 @@ consume({Route, Params}, WokMessage, ServicesDef) ->
       end
   end.
 
-send_response(Response) ->
+send_response(Response) when is_record(Response, wok_message) ->
   case wok_message:get_response(Response) of
     noreply ->
       noreply;
@@ -111,7 +117,9 @@ send_response(Response) ->
                       Reason]),
           Stop
       end
-  end.
+  end;
+send_response(_) ->
+  noreply.
 
 -ifdef(TEST).
 test_action(Message) ->
