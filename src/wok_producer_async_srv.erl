@@ -93,7 +93,7 @@ produce([{MessageID, Topic, Partition, Message, Retry} = M|Rest], Topic, Partiti
   Response = binary_to_term(base64:decode(Message)),
   Response1 = Response#wok_message{reply = true},
   Result =  case wok_middlewares:outgoing_message(Response1) of
-              {ok, Response2} ->
+              {ok, Response2} when is_record(Response2, wok_message) ->
                 case wok_message:get_response(Response2) of
                   {reply, _, From, To, Body} ->
                     case wok_message:provide({Topic, Partition}, From, To, Body,
@@ -110,7 +110,10 @@ produce([{MessageID, Topic, Partition, Message, Retry} = M|Rest], Topic, Partiti
                 end;
               {stop, Middleware, Reason} = Stop ->
                 lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Response1, Reason]),
-                erlang:apply(Handler, response, [MessageID, Stop, Reason])
+                erlang:apply(Handler, response, [MessageID, Stop, Reason]);
+              Other ->
+                lager:error("Invalid response for message ~p: ~p", [MessageID, Other]),
+                erlang:apply(Handler, response, [MessageID, {error, invalid_message}, Retry])
             end,
   provide_response(Result, M, Rest, Topic, Partition, Handler);
 produce([{MessageID, _, _, _, Retry} = M|Rest], Topic, Partition, Handler) ->
