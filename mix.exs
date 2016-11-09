@@ -25,11 +25,11 @@ defmodule Wok.Mixfile do
     [
       {:lager, "~> 3.2.0"},
       {:lager_json_formatter, "~> 0.1.1"},
-      {:kafe, git: "https://github.com/botsunit/kafe.git", branch: "2.0.0"},
-      {:bucs, "~> 0.1.9"},
-      {:doteki, "~> 0.1.13"},
+      {:kafe, git: "https://github.com/botsunit/kafe.git", branch: "master"},
+      {:bucs, "~> 1.0.0"},
+      {:doteki, "~> 1.0.0"},
       {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.6.0"},
-      {:metrics, git: "https://github.com/botsunit/erlang-metrics.git", branch: "add_delete"}    
+      {:metrics, git: "https://github.com/botsunit/erlang-metrics.git", tag: "2.2.0"}    
     ]
   end
 
