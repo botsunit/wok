@@ -31,11 +31,7 @@ digraph wok_deps {
        fontcolor="white",
        style="filled",
        fillcolor="red"];
-  // metrics[label="metrics\n(gh-t: botsunit/2.2.0)",
-  metrics[label="metrics\n(hex: ~> 2.2.0)",
-          fontcolor="white",
-          style="filled",
-          fillcolor="red"];
+  metrics[label="metrics\n(hex: ~> 2.2.0)"];
   goldrush[label="goldrush\n(hex: ~> 0.1.8)"];
   jsx[label="jsx\n(hex: ~> 2.8.0)"];
   poolgirl[label="poolgirl\n(hex: ~> 1.0.1)",
