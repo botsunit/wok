@@ -1,14 +1,17 @@
 {"1.1.0",
 [{<<"bristow">>,{pkg,<<"bristow">>,<<"0.1.1">>},1},
- {<<"bucs">>,{pkg,<<"bucs">>,<<"1.0.0">>},0},
- {<<"doteki">>,{pkg,<<"doteki">>,<<"1.0.0">>},0},
+ {<<"bucs">>,{pkg,<<"bucs">>,<<"1.0.1">>},0},
+ {<<"doteki">>,{pkg,<<"doteki">>,<<"1.0.1">>},0},
  {<<"goldrush">>,{pkg,<<"goldrush">>,<<"0.1.8">>},1},
  {<<"jsx">>,{pkg,<<"jsx">>,<<"2.8.0">>},1},
- {<<"kafe">>,{pkg,<<"kafe">>,<<"2.0.0">>},0},
+ {<<"kafe">>,
+  {git,"https://github.com/botsunit/kafe.git",
+       {ref,"3d9b72f2fa1adfef659fa124d61c8810c564a8f7"}},
+  0},
  {<<"lager">>,{pkg,<<"lager">>,<<"3.2.1">>},0},
  {<<"lager_json_formatter">>,{pkg,<<"lager_json_formatter">>,<<"0.1.1">>},0},
  {<<"metrics">>,{pkg,<<"metrics">>,<<"2.2.0">>},0},
- {<<"poolgirl">>,{pkg,<<"poolgirl">>,<<"1.0.1">>},1},
+ {<<"poolgirl">>,{pkg,<<"poolgirl">>,<<"1.0.3">>},1},
  {<<"uuid">>,
   {git,"https://github.com/botsunit/erlang-uuid.git",
        {ref,"582cab69bdff5c56ca3907226ed7dca8663b5701"}},
@@ -16,13 +19,12 @@
 [
 {pkg_hash,[
  {<<"bristow">>, <<"1F9C1D6F0368E23E34B67908F5578BEB3FAED9668DE8F86BFE4E4047D1F59A86">>},
- {<<"bucs">>, <<"851B1530F29C9A793F336D47D95967CD77388ED414D71E3C0BABD9253BA6AE3B">>},
- {<<"doteki">>, <<"52CFB4E8D92E85464C4434131215FA27D8B13C992AE3FBA572C2478ED55D68A2">>},
+ {<<"bucs">>, <<"5AE078EF6E40D688406F64D5B0DFCCAEEBFE403875A6941F50E34D287FCEC3EE">>},
+ {<<"doteki">>, <<"29C8CF04A4B600504EEABA784C289117B7E3D8D28BC03B560E0A7B9411835340">>},
  {<<"goldrush">>, <<"2024BA375CEEA47E27EA70E14D2C483B2D8610101B4E852EF7F89163CDB6E649">>},
  {<<"jsx">>, <<"749BEC6D205C694AE1786D62CEA6CC45A390437E24835FD16D12D74F07097727">>},
- {<<"kafe">>, <<"694411A73B09885C827E2E035624A92D735C0CEADEF2D62EFB5AF006F7C92F0B">>},
  {<<"lager">>, <<"EEF4E18B39E4195D37606D9088EA05BF1B745986CF8EC84F01D332456FE88D17">>},
  {<<"lager_json_formatter">>, <<"5C708F540F23774BDA3F7B3D41D6F1FF17232D9178A85304D7974C152B758BDF">>},
  {<<"metrics">>, <<"709B45A275FDE02C9F2950CEAB38B29B46D05687DE33299E02C03A71BE336545">>},
- {<<"poolgirl">>, <<"FAC9E77A4084382977728191338E2958F942560EF2DE3F158910DB6DE49486CB">>}]}
+ {<<"poolgirl">>, <<"5F7A3143964F660B3688D6DF9B5C5A9B049EBC4479E5CB5AA65DBEC1B59C468A">>}]}
 ].

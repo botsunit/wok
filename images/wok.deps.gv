@@ -15,15 +15,15 @@ digraph wok_deps {
                        fontcolor="white",
                        style="filled"
                        fillcolor="black"];
-  kafe[label="kafe\n(hex: ~> 2.0.0)",
+  kafe[label="kafe\n(gh-b: botsunit/master)",
        fontcolor="white",
        style="filled",
        fillcolor="black"];
-  bucs[label="bucs\n(hex: ~> 1.0.0)",
+  bucs[label="bucs\n(hex: ~> 1.0.1)",
        fontcolor="white",
        style="filled",
        fillcolor="black"];
-  doteki[label="doteki\n(hex: ~> 1.0.0)",
+  doteki[label="doteki\n(hex: ~> 1.0.1)",
          fontcolor="white",
          style="filled",
          fillcolor="black"];
@@ -34,7 +34,7 @@ digraph wok_deps {
   metrics[label="metrics\n(hex: ~> 2.2.0)"];
   goldrush[label="goldrush\n(hex: ~> 0.1.8)"];
   jsx[label="jsx\n(hex: ~> 2.8.0)"];
-  poolgirl[label="poolgirl\n(hex: ~> 1.0.1)",
+  poolgirl[label="poolgirl\n(hex: ~> 1.0.3)",
            fontcolor="white",
            style="filled",
            fillcolor="black"];
