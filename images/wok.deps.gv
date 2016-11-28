@@ -11,54 +11,54 @@ digraph wok_deps {
       style="filled",
       fillcolor="black"];
   lager[label="lager\n(hex: ~> 3.2.0)"];
-  lager_json_formatter[label="lager_json_formatter\n(hex: ~> 0.1.1",
+  lager_json_formatter[label="lager_json_formatter\n(hex: ~> 0.2.0",
                        fontcolor="white",
                        style="filled"
                        fillcolor="black"];
-  kafe[label="kafe\n(gh-b: botsunit/master)",
+  kafe[label="kafe\n(hex: ~> 2.1.0)",
        fontcolor="white",
        style="filled",
        fillcolor="black"];
-  bucs[label="bucs\n(hex: ~> 1.0.1)",
+  bucs[label="bucs\n(hex: ~> 1.0.2)",
        fontcolor="white",
        style="filled",
        fillcolor="black"];
-  doteki[label="doteki\n(hex: ~> 1.0.1)",
+  doteki[label="doteki\n(hex: ~> 1.0.2)",
          fontcolor="white",
          style="filled",
          fillcolor="black"];
-  uuid[label="uuid\n(gh-t: 0.6.0)"
+  uuid[label="uuid\n(gh-t: 0.7.0)"
        fontcolor="white",
        style="filled",
        fillcolor="red"];
   metrics[label="metrics\n(hex: ~> 2.2.0)"];
   goldrush[label="goldrush\n(hex: ~> 0.1.8)"];
   jsx[label="jsx\n(hex: ~> 2.8.0)"];
-  poolgirl[label="poolgirl\n(hex: ~> 1.0.3)",
+  poolgirl[label="poolgirl\n(hex: ~> 1.1.0)",
            fontcolor="white",
            style="filled",
            fillcolor="black"];
-  bristow[label="bristow\n(hex: ~> 0.1.1)",
+  bristow[label="bristow\n(hex: ~> 0.2.0)",
           fontcolor="white",
           style="filled",
           fillcolor="black"];
-  wok_rest[label="wok_rest\n(gl-b: master)",
+  wok_rest[label="wok_rest\n(gl-t: 0.1.0)",
            fontcolor="white",
            style="filled",
            fillcolor="black"];
-  cowboy_default_static_file[label="cowboy_default_static_file\n(gh-b: master)",
+  cowboy_default_static_file[label="cowboy_default_static_file\n(gh-t: 1.3.0)",
                              fontcolor="white",
                              style="filled",
                              fillcolor="black"];
   cowboy[label="cowboy\n(gh-t: 2.0.0-pre.3)"];
-  tempfile[label="tempfile\n(gh-t: botsunit/1.1.5)",
+  ephemeral[label="ephemeral\n(old tempfile)\n(hex: ~> 2.0.0)",
            fontcolor="white",
            style="filled",
            fillcolor="black"];
   erlydtl[label="erlydtl\n(hex: ~> 0.11.0)"];
   cowlib[label="cowlib\n(gh-b: master"];
   ranch[label="ranch\n(gh-t: 1.1.0)"];
-  wok_tests[label="wok_tests\n(gl-b: move_rest)",
+  wok_tests[label="wok_tests\n(gl-t: 0.3.0)",
             fontcolor="white",
             style="filled",
             fillcolor="black"];
@@ -70,26 +70,51 @@ digraph wok_deps {
   mimerl[label="mimerl\n(hex: 1.0.2)"];
   certifi[label="certifi\n(hex: 0.7.0)"];
   ssl_verify_fun[label="ssl_verify_fun\n(hex: 1.1.1)"];
-  wok_mail[label="wok_mail\n(gl-t: 0.1.4)",
+  wok_mail[label="wok_mail\n(gl-t: 0.2.0)",
             fontcolor="white",
             style="filled",
             fillcolor="black"];
   gen_smtp[label="gen_smtp\n(hex: ~> 0.11.0)"];
-  middleware_session[label="middleware_session\n(gl-b: move_rest)",
+  middleware_session[label="middleware_session\n(gl-t: 0.2.0)",
                      fontcolor="white",
                      style="filled",
                      fillcolor="black"];
-  basic_auth_middleware[label="basic_auth_middleware\n(gl-b: move_rest)",
+  basic_auth_middleware[label="basic_auth_middleware\n(gl-t: 0.2.0)",
                         fontcolor="white",
                         style="filled",
                         fillcolor="black"];
-  wok_async_message_handler[label="wok_async_message_handler\n(gl-b: move_rest)",
+  middleware_heartbeat[label="middleware_heartbeat\n(gl-t: 0.2.0)",
+                       fontcolor="white",
+                       style="filled",
+                       fillcolor="black"];
+  qdate[label="qdate\n(gh-b: master)"];
+  wok_async_message_handler[label="wok_async_message_handler\n(gl-t: 0.1.0)",
                             fontcolor="white",
                             style="filled",
                             fillcolor="black"];
   postgrex[label="postgrex\n(hex: >= 0.0.0)"];
   ecto[label="ecto\n(hex: ~> 2.0.0)"];
   poison[label="poison\n(hex: ~> 2.2)"];
+  sts[label="sts\n(gl-t: 0.1.0)",
+      fontcolor="white",
+      style="filled",
+      fillcolor="black"];
+  fixer[label="fixer\n(hex: ~> 0.2.0)",
+        fontcolor="white",
+        style="filled",
+        fillcolor="black"];
+  bank[label="bank\n(hex: ~> 0.2.0)",
+       fontcolor="white",
+       style="filled",
+       fillcolor="black"];
+  idcheckio[label="idcheckio\n(gl-t: 0.0.1)",
+            fontcolor="white",
+            style="filled",
+            fillcolor="black"];
+  postback[label="postback\n(gl-t: 0.0.1)",
+            fontcolor="white",
+            style="filled",
+            fillcolor="black"];
 
   wok -> lager;
   wok -> lager_json_formatter;
@@ -104,7 +129,7 @@ digraph wok_deps {
   wok_rest -> cowboy;
   wok_rest -> bucs;
   wok_rest -> doteki;
-  wok_rest -> tempfile;
+  wok_rest -> ephemeral;
   wok_rest -> erlydtl;
 
   lager -> goldrush;
@@ -129,7 +154,7 @@ digraph wok_deps {
   cowboy -> cowlib;
   cowboy -> ranch;
 
-  tempfile -> bucs;
+  ephemeral -> bucs;
 
   wok_tests -> bucs;
   wok_tests -> doteki;
@@ -148,8 +173,33 @@ digraph wok_deps {
   middleware_session -> lager;
   middleware_session -> uuid;
 
+  middleware_heartbeat -> lager;
+  middleware_heartbeat -> uuid;
+  middleware_heartbeat -> qdate;
+
   wok_async_message_handler -> postgrex;
   wok_async_message_handler -> ecto;
   wok_async_message_handler -> poison;
   wok_async_message_handler -> wok;
+
+  sts -> lager;
+  sts -> doteki;
+  sts -> bucs;
+  sts -> poolgirl;
+  sts -> jsx;
+  sts -> hackney;
+
+  fixer -> bucs;
+  fixer -> doteki;
+  fixer -> jsx;
+
+  bank -> bucs;
+
+  idcheckio -> bucs;
+  idcheckio -> doteki;
+  idcheckio -> jsx;
+
+  postback -> bucs;
+  postback -> doteki;
+  postback -> jsx;
 }
