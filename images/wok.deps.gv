@@ -6,7 +6,7 @@ digraph wok_deps {
     rankdir=LR;
   ];
 
-  wok[label="wok\n(gl-b: move_rest)",
+  wok[label="wok\n(gl-t: 0.6.0)",
       fontcolor="white",
       style="filled",
       fillcolor="black"];
@@ -15,7 +15,7 @@ digraph wok_deps {
                        fontcolor="white",
                        style="filled"
                        fillcolor="black"];
-  kafe[label="kafe\n(hex: ~> 2.1.0)",
+  kafe[label="kafe\n(hex: ~> 2.1.2)",
        fontcolor="white",
        style="filled",
        fillcolor="black"];
