@@ -115,6 +115,11 @@ digraph wok_deps {
             fontcolor="white",
             style="filled",
             fillcolor="black"];
+  botsunit_bots_common[label="botsunit_bots_common\n(gl-t: 0.0.1)",
+                       fontcolor="white",
+                       style="filled",
+                       fillcolor="black"];
+  plug[label="plug\n(hex: ~> 1.0)"];
 
   wok -> lager;
   wok -> lager_json_formatter;
@@ -202,4 +207,6 @@ digraph wok_deps {
   postback -> bucs;
   postback -> doteki;
   postback -> jsx;
+
+  botsunit_bots_common -> plug;
 }
