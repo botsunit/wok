@@ -24,11 +24,11 @@ defmodule Wok.Mixfile do
   defp deps do
     [
       {:lager, "~> 3.2.0"},
-      {:lager_json_formatter, "~> 0.2.0"},
-      {:kafe, "~> 2.1.2"},
-      {:bucs, "~> 1.0.2"},
-      {:doteki, "~> 1.0.2"},
-      {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.7.0"},
+      {:lager_json_formatter, "~> 0.2.1"},
+      {:kafe, "~> 2.1.3"},
+      {:bucs, "~> 1.0.3"},
+      {:doteki, "~> 1.0.3"},
+      {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.7.1"},
       {:metrics, "~> 2.2.0"}    
     ]
   end
@@ -39,8 +39,9 @@ defmodule Wok.Mixfile do
 
   defp compile_with_hooks(args) do
     pre_compile_hooks()
-    :ok = Mix.Task.run("compile", args)
+    result = Mix.Task.run("compile", args)
     post_compile_hooks()
+    result
   end
 
   defp pre_compile_hooks() do
