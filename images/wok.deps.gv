@@ -6,7 +6,7 @@ digraph wok_deps {
     rankdir=LR;
   ];
 
-  wok[label="wok\n(gl-t: 0.6.2)",
+  wok[label="wok\n(gl-t: 0.6.3)",
       fontcolor="white",
       style="filled",
       fillcolor="black"];
@@ -15,7 +15,7 @@ digraph wok_deps {
                        fontcolor="white",
                        style="filled"
                        fillcolor="black"];
-  kafe[label="kafe\n(hex: ~> 2.1.5)",
+  kafe[label="kafe\n(hex: ~> 2.1.6)",
        fontcolor="white",
        style="filled",
        fillcolor="black"];
@@ -88,7 +88,7 @@ digraph wok_deps {
                        style="filled",
                        fillcolor="black"];
   qdate[label="qdate\n(gh-b: master)"];
-  wok_async_message_handler[label="wok_async_message_handler\n(gl-t: 0.1.2)",
+  wok_async_message_handler[label="wok_async_message_handler\n(gl-t: 0.1.3)",
                             fontcolor="white",
                             style="filled",
                             fillcolor="black"];
