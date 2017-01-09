@@ -53,7 +53,7 @@ handle_info({'DOWN', MRef, _, _, _}, #{topics := Topics} = State) ->
   _ = erlang:demonitor(MRef),
   {noreply, State#{topics => case lists:keyfind(MRef, 3, Topics) of
                                {Topic, _, MRef, Options} ->
-                                 lists:keyreplace(MRef, 3, Topic, {Topic, Options});
+                                 lists:keyreplace(MRef, 3, Topics, {Topic, Options});
                                false ->
                                  Topics
                              end}};
