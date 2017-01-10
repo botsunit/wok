@@ -55,11 +55,11 @@ provide(Topic, From, To, Body, Options) ->
   provide(Topic, Message).
 
 provide({Topic, Partition}, Message) when is_integer(Partition), is_binary(Message) ->
-  kafe:produce(bucs:to_binary(Topic), Message, #{partition => Partition});
+  kafe:produce([{Topic, [{Message, Partition}]}]);
 provide({Topic, Key}, Message) when is_binary(Key), is_binary(Message) ->
-  kafe:produce(bucs:to_binary(Topic), {Key, Message});
+  kafe:produce([{Topic, [{Key, Message}]}]);
 provide(Topic, Message) when is_binary(Message) ->
-  kafe:produce(bucs:to_binary(Topic), Message);
+  kafe:produce([{Topic, [Message]}]);
 provide(Topic, {From, To, Body}) ->
   provide(Topic, From, To, Body);
 provide(Topic, {From, To, Body, Options}) ->

@@ -104,8 +104,15 @@ group_options([{Key, Value}|Rest], Acc) ->
   group_options(Rest, maps:put(Key, Value, Acc)).
 
 assignment_change(_GroupID, UnAssigned, ReAssigned) ->
-  [wok_producer_srv:stop(Topic, Partition) || {Topic, Partition} <- UnAssigned],
-  [wok_producer_srv:start(Topic, Partition) || {Topic, Partition} <- ReAssigned],
+  [begin
+     wok_async_producer:stop(Topic, Partition),
+     wok_producer_srv:stop(Topic, Partition) % TODO remove
+   end
+   || {Topic, Partition} <- UnAssigned],
+  [begin
+     wok_async_producer:start(Topic, Partition),
+     wok_producer_srv:start(Topic, Partition) % TODO remove
+   end || {Topic, Partition} <- ReAssigned],
   ok.
 
 -ifdef(TEST).
