@@ -14,8 +14,6 @@
 
 % Behavior
 
-% @doc
-% @end
 -callback messages([{Topic :: binary(), [Partition :: integer]}],
                    NumMessage :: integer()) ->
   [{MessageID :: integer(),
@@ -23,8 +21,6 @@
     Partition :: integer(),
     Message :: term()}].
 
-% @doc
-% @end
 -callback response([OK :: integer()], [KO :: integer()]) ->
   stop | ok.
 
@@ -32,15 +28,15 @@
 
 % @hidden
 start() ->
-  wok_producer_srv:start().
+  wok_async_producer:start().
 
 % @hidden
 start(Topic) ->
-  wok_producer_srv:start(Topic).
+  wok_async_producer:start(Topic).
 
 % @hidden
 start(Topic, Partition) ->
-  wok_producer_srv:start(Topic, Partition).
+  wok_async_producer:start(Topic, Partition).
 
 handle(From, To, Body) ->
   handle(From, To, Body, []).

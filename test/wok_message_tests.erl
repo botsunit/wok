@@ -22,9 +22,12 @@ wok_message_tests_test_() ->
        meck:new(kafe_rr),
        meck:expect(kafe_rr, next, 1, 123),
        meck:new(kafe),
-       meck:expect(kafe, default_key_to_partition, 2, 123)
+       meck:expect(kafe, default_key_to_partition, 2, 123),
+       meck:new(wok_middlewares),
+       meck:expect(wok_middlewares, outgoing_message, fun(R) -> {ok, R} end)
    end,
    fun(_) ->
+       meck:unload(wok_middlewares),
        meck:unload(kafe),
        meck:unload(kafe_rr),
        meck:unload(wok_state),

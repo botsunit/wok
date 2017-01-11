@@ -34,8 +34,7 @@ opaque() = binary()
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#async_reply-1">async_reply/1</a></td><td>
-Set an async response.</td></tr><tr><td valign="top"><a href="#body-1">body/1</a></td><td>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#async_reply-1">async_reply/1</a></td><td>Equivalent to <a href="#async_reply-2"><tt>async_reply(Msg, false)</tt></a>.</td></tr><tr><td valign="top"><a href="#body-1">body/1</a></td><td>
 Return the incoming message body.</td></tr><tr><td valign="top"><a href="#body-2">body/2</a></td><td>
 Update the incoming message body.</td></tr><tr><td valign="top"><a href="#content-1">content/1</a></td><td>
 Return the incoming message as map.</td></tr><tr><td valign="top"><a href="#custom_data-1">custom_data/1</a></td><td>
@@ -77,12 +76,9 @@ Return the incoming message UUID.</td></tr></table>
 
 ### async_reply/1 ###
 
-<pre><code>
-async_reply(Msg::<a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>) -&gt; <a href="wok_msg.md#type-wok_msg">wok_msg:wok_msg()</a>
-</code></pre>
-<br />
+`async_reply(Msg) -> any()`
 
-Set an async response
+Equivalent to [`async_reply(Msg, false)`](#async_reply-2).
 
 <a name="body-1"></a>
 
@@ -180,7 +176,7 @@ Since the sender is not specified, we will use the recipient of the incoming mes
 ### encode_reply/5 ###
 
 <pre><code>
-encode_reply(Message::<a href="#type-message">message()</a>, Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, From::binary(), To::binary(), Body::term()) -&gt; {ok, Topic::binary(), Partition::integer(), EncodedMessage::<a href="#type-opaque">opaque()</a>} | {error, term()}
+encode_reply(Message::<a href="#type-message">message()</a>, Topic::binary() | {Topic::binary(), Partition::integer()} | {Topic::binary(), Key::binary()}, From::binary(), To::binary(), Body::term()) -&gt; {ok, Topic::binary(), Partition::integer(), EncodedMessage::<a href="#type-opaque">opaque()</a>} | {stop, Middleware::atom(), Reason::term()} | {error, term()}
 </code></pre>
 <br />
 

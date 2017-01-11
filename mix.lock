@@ -3,7 +3,7 @@
   "doteki": {:hex, :doteki, "1.0.3", "03dad2fc118aa672853f850bfb13f9ba31c9feb4330e36a4c3c2cd19ca4cce67", [:make, :mix, :rebar3], [{:bucs, "~> 1.0.3", [hex: :bucs, optional: false]}]},
   "goldrush": {:hex, :goldrush, "0.1.9", "f06e5d5f1277da5c413e84d5a2924174182fb108dabb39d5ec548b27424cd106", [:rebar3], []},
   "jsx": {:hex, :jsx, "2.8.1", "1453b4eb3615acb3e2cd0a105d27e6761e2ed2e501ac0b390f5bbec497669846", [:mix, :rebar3], []},
-  "kafe": {:git, "https://github.com/botsunit/kafe.git", "930e028bb968156b1498719c131781c42a619208", [branch: "batch_producing"]},
+  "kafe": {:git, "https://github.com/botsunit/kafe.git", "19bea7e5fe87789e7c4f560edf47dfe9efa2e057", [branch: "batch_producing"]},
   "lager": {:hex, :lager, "3.2.4", "a6deb74dae7927f46bd13255268308ef03eb206ec784a94eaf7c1c0f3b811615", [:rebar3], [{:goldrush, "0.1.9", [hex: :goldrush, optional: false]}]},
   "lager_json_formatter": {:hex, :lager_json_formatter, "0.2.1", "e9b032fa3ea62ab44858a6b9d86b460952d23c93d5b18a78b8ef7e4046658499", [:make, :mix, :rebar3], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}]},
   "metrics": {:hex, :metrics, "2.2.0", "709b45a275fde02c9f2950ceab38b29b46d05687de33299e02c03a71be336545", [:rebar3], []},
