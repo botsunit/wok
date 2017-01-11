@@ -5,6 +5,8 @@
          start/0
          , start/1
          , start/2
+         , handle/3
+         , handle/4
          , provide/5
          , provide/4
          , provide/2
@@ -12,20 +14,19 @@
 
 % Behavior
 
--callback messages(Topic :: binary(),
-                   Partition :: integer(),
+% @doc
+% @end
+-callback messages([{Topic :: binary(), [Partition :: integer]}],
                    NumMessage :: integer()) ->
   [{MessageID :: integer(),
     Topic :: binary(),
     Partition :: integer(),
     Message :: term()}].
 
--callback response(MessageID :: integer(),
-                   Response :: ok
-                   | {error, term()}
-                   | {stop, Middleware :: atom(), Reason :: term()},
-                   Retry :: true | false) ->
-  stop | exit | next | retry.
+% @doc
+% @end
+-callback response([OK :: integer()], [KO :: integer()]) ->
+  stop | ok.
 
 % API
 
@@ -41,17 +42,23 @@ start(Topic) ->
 start(Topic, Partition) ->
   wok_producer_srv:start(Topic, Partition).
 
-provide(Topic, From, To, Body) ->
-  provide(Topic, From, To, Body, []).
+handle(From, To, Body) ->
+  handle(From, To, Body, []).
 
-provide(Topic, From, To, Body, Options) ->
+handle(From, To, Body, Options) ->
   {Handler, Options1} = case doteki:get_env([wok, messages, handler], ?DEFAULT_MESSAGE_HANDLER) of
                           {Module, Options0} ->
                             {Module, buclists:merge_keylists(1, Options, Options0)};
                           Module ->
                             {Module, Options}
                         end,
-  Message = erlang:apply(Handler, create, [From, To, Body, Options1]),
+  erlang:apply(Handler, create, [From, To, Body, Options1]).
+
+provide(Topic, From, To, Body) ->
+  provide(Topic, From, To, Body, []).
+
+provide(Topic, From, To, Body, Options) ->
+  Message = handle(From, To, Body, Options),
   provide(Topic, Message).
 
 provide({Topic, Partition}, Message) when is_integer(Partition), is_binary(Message) ->

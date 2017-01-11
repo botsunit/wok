@@ -30,7 +30,7 @@ init([Static]) ->
       [];
     _ ->
       [
-       ?CHILD(wok_producer_sup, [], supervisor, infinity), % TODO remove
+       % ?CHILD(wok_producer_sup, [], supervisor, infinity), % TODO remove
        ?CHILD(wok_async_producer, [], worker, 5000)
       ]
   end ++ custom_servers() ++ middlewares_servers(),

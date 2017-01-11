@@ -105,13 +105,13 @@ group_options([{Key, Value}|Rest], Acc) ->
 
 assignment_change(_GroupID, UnAssigned, ReAssigned) ->
   [begin
-     wok_async_producer:stop(Topic, Partition),
-     wok_producer_srv:stop(Topic, Partition) % TODO remove
+%     wok_producer_srv:stop(Topic, Partition), % TODO remove
+     wok_async_producer:stop(Topic, Partition)
    end
    || {Topic, Partition} <- UnAssigned],
   [begin
-     wok_async_producer:start(Topic, Partition),
-     wok_producer_srv:start(Topic, Partition) % TODO remove
+%     wok_producer_srv:start(Topic, Partition), % TODO remove
+     wok_async_producer:start(Topic, Partition)
    end || {Topic, Partition} <- ReAssigned],
   ok.
 
