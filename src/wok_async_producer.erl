@@ -129,7 +129,6 @@ handle_info(produce, #state{frequency = Frequency,
                             handler = Handler,
                             size = Size} = State) ->
   Messages = erlang:apply(Handler, messages, [Topics, Size]),
-  lager:info("========> ~p", [Messages]),
   case produce(Messages, Handler) of
     ok ->
       {noreply, State#state{timer = erlang:send_after(Frequency, self(), produce)}};
