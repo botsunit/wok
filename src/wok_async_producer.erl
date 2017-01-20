@@ -235,7 +235,7 @@ handle([{MessageID, Topic, Partition, Message}|Rest], Acc) ->
   end.
 
 dispatch(MessageID, Message, Topic, Partition, Acc) ->
-  Broker = kafe:broker_id_by_topic_and_partition(Topic, Partition),
+  Broker = kafe_brokers:broker_id_by_topic_and_partition(Topic, Partition),
   {Topics, IDs} = maps:get(Broker, Acc, {[], []}),
   Messages = buclists:keyfind(Topic, 1, Topics, []),
   maps:put(
