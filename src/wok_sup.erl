@@ -30,7 +30,7 @@ init([Static]) ->
       [];
     _ ->
       [
-       ?CHILD(wok_producer_sup, [], supervisor, infinity)
+       ?CHILD(wok_async_producer, [], worker, 5000)
       ]
   end ++ custom_servers() ++ middlewares_servers(),
   {ok, {
@@ -107,7 +107,7 @@ wok_sup_init_test_() ->
                   ?CHILD(wok_middlewares, [], worker, 5000),
                   ?CHILD(wok_plugins, [], worker, 5000),
                   ?CHILD(wok_consumer_groups, [], worker, 5000),
-                  ?CHILD(wok_producer_sup, [], supervisor, infinity),
+                  ?CHILD(wok_async_producer, [], worker, 5000),
                   ?CHILD(worker1, [], worker, 5000),
                   ?CHILD(worker2, [arg1, arg2], worker, 5000),
                   ?CHILD(worker3, [], worker, 5000),
@@ -159,7 +159,7 @@ wok_sup_init_no_messages_test_() ->
                   ?CHILD(wok_state, [static], worker, 5000),
                   ?CHILD(wok_middlewares, [], worker, 5000),
                   ?CHILD(wok_plugins, [], worker, 5000),
-                  ?CHILD(wok_producer_sup, [], supervisor, infinity),
+                  ?CHILD(wok_async_producer, [], worker, 5000),
                   ?CHILD(worker1, [], worker, 5000),
                   ?CHILD(worker2, [arg1, arg2], worker, 5000),
                   ?CHILD(worker3, [], worker, 5000),
@@ -257,7 +257,7 @@ wok_sup_init_no_start_test_() ->
                   ?CHILD(wok_middlewares, [], worker, 5000),
                   ?CHILD(wok_plugins, [], worker, 5000),
                   ?CHILD(wok_consumer_groups, [], worker, 5000),
-                  ?CHILD(wok_producer_sup, [], supervisor, infinity),
+                  ?CHILD(wok_async_producer, [], worker, 5000),
                   ?CHILD(middleware1_server1, [], worker, 5000),
                   ?CHILD(middleware1_server2, [arg1, arg2], worker, 5000)
                  ]}},
@@ -299,7 +299,7 @@ wok_sup_init_no_middlewares_test_() ->
                   ?CHILD(wok_middlewares, [], worker, 5000),
                   ?CHILD(wok_plugins, [], worker, 5000),
                   ?CHILD(wok_consumer_groups, [], worker, 5000),
-                  ?CHILD(wok_producer_sup, [], supervisor, infinity),
+                  ?CHILD(wok_async_producer, [], worker, 5000),
                   ?CHILD(worker1, [], worker, 5000),
                   ?CHILD(worker2, [arg1, arg2], worker, 5000),
                   ?CHILD(worker3, [], worker, 5000),

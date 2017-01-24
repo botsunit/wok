@@ -14,6 +14,11 @@
                 end
               end).
 
+t() ->
+  List = [<<"test">>, <<"repl">>, <<"public">>, <<"service">>],
+  Index = erlang:apply(?RAND, uniform, [length(List)]),
+  lists:nth(Index, List).
+
 % controler
 
 my_action(Message) ->
@@ -30,9 +35,9 @@ my_action(Message) ->
 my_async_action(Message) ->
   lager:info("BEGIN dummy_service_handler:my_action =>>>>>>>>>< ~p :: ~p",
              [wok_message:content(Message), wok_message:global_state(Message)]),
-  timer:sleep(2000 + erlang:apply(?RAND, uniform, [4000])),
+  % timer:sleep(2000 + erlang:apply(?RAND, uniform, [4000])),
   case wok_message:encode_reply(Message,
-                                {<<"test">>, <<"mYk3Y">>},
+                                t(),
                                 <<"my_service/my_controler/my_answer">>,
                                 <<"Message response from my_async_action">>) of
     {ok, Topic, Partition, MessageTransfert} ->
@@ -49,7 +54,7 @@ my_async_action(Message) ->
 my_answer(Message) ->
   lager:info("BEGIN dummy_service_handler:my_answer =>>>>>>>>>< ~p :: ~p",
              [wok_message:content(Message), wok_message:global_state(Message)]),
-  timer:sleep(2000 + erlang:apply(?RAND, uniform, [4000])),
+  % timer:sleep(2000 + erlang:apply(?RAND, uniform, [4000])),
   lager:info("END dummy_service_handler:my_answer =>>>>>>>>>< ~p",
              [wok_message:content(Message)]),
   wok_message:noreply(Message).

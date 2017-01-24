@@ -7,6 +7,10 @@ meck_kafe() ->
   meck:expect(kafe, produce,
               fun(Topic, Message) ->
                   <<Topic/binary, "::", Message/binary>>
+              end),
+  meck:expect(kafe, produce,
+              fun([{Topic, [Message]}]) ->
+                  <<Topic/binary, "::", Message/binary>>
               end).
 
 unmeck_kafe() ->

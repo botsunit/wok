@@ -391,13 +391,24 @@ provide(Topic, Message) ->
                    To :: binary(),
                    Body :: term()) ->
   {ok, Topic :: binary(), Partition :: integer(), EncodedMessage :: opaque()}
+  | {stop, Middleware :: atom(), Reason :: term()}
   | {error, term()}.
 encode_reply(Message, {Topic, Key}, From, To, Body) when is_binary(Key) ->
   encode_reply(Message, {Topic, kafe:default_key_to_partition(Topic, Key)}, From, To, Body);
 encode_reply(Message, Topic, From, To, Body) when is_binary(Topic) ->
   encode_reply(Message, {Topic, kafe_rr:next(Topic)}, From, To, Body);
 encode_reply(Message, {Topic, Partition}, From, To, Body) when is_integer(Partition) ->
-  {ok, Topic, Partition, base64:encode(term_to_binary(reply(Message, Topic, From, To, Body)))}.
+  Reply = reply(Message, Topic, From, To, Body),
+  case wok_middlewares:outgoing_message(Reply) of
+    {ok, Reply0} when is_record(Reply0, wok_message) ->
+      {ok, Topic, Partition, base64:encode(term_to_binary(Reply0))};
+    {stop, Middleware, Reason} = Stop ->
+      lager:debug("Middleware ~p stop message ~p reason: ~p", [Middleware, Reply, Reason]),
+      Stop;
+    Other ->
+      lager:error("Invalid response for message ~p: ~p", [Reply, Other]),
+      {error, invalid_response}
+  end.
 
 % @doc
 % Encore a message for an async producer
@@ -415,11 +426,20 @@ encode_reply(Message, {Topic, Partition}, From, To, Body) when is_integer(Partit
 encode_reply(Message = #wok_message{request = #msg{to = From}}, Topic, To, Body) ->
   encode_reply(Message, Topic, From, To, Body).
 
+% @equiv async_reply(Msg, false)
+async_reply(Msg) ->
+  async_reply(Msg, false).
+
 % @doc
 % Set an async response
+%
+% If the second parameter is set to true, the async producer will send queued messages.
 % @end
--spec async_reply(wok_msg:wok_msg()) -> wok_msg:wok_msg().
-async_reply(Msg) ->
+-spec async_reply(wok_msg:wok_msg(), true | false) -> wok_msg:wok_msg().
+async_reply(Msg, false) ->
+  noreply(Msg);
+async_reply(Msg, true) ->
+  wok_async_producer:send(),
   noreply(Msg).
 
 % @doc
@@ -434,5 +454,12 @@ async_reply(Msg) ->
   {ok, Topic :: binary(), Partition :: integer(), EncodedMessage :: opaque()}
   | {error, term()}.
 encode_message(Topic, From, To, Body) ->
-  encode_reply(#wok_message{}, Topic, From, To, Body).
+  encode_message(#wok_message{}, Topic, From, To, Body).
 
+% @hidden
+encode_message(Message, {Topic, Key}, From, To, Body) when is_binary(Key) ->
+  encode_message(Message, {Topic, kafe:default_key_to_partition(Topic, Key)}, From, To, Body);
+encode_message(Message, Topic, From, To, Body) when is_binary(Topic) ->
+  encode_message(Message, {Topic, kafe_rr:next(Topic)}, From, To, Body);
+encode_message(Message, {Topic, Partition}, From, To, Body) when is_integer(Partition) ->
+  {ok, Topic, Partition, base64:encode(term_to_binary(reply(Message, Topic, From, To, Body)))}.
