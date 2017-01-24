@@ -88,7 +88,7 @@ digraph wok_deps {
                        style="filled",
                        fillcolor="black"];
   qdate[label="qdate\n(gh-b: master)"];
-  wok_async_message_handler[label="wok_async_message_handler\n(gl-t: 0.2.0)",
+  wok_async_message_handler[label="wok_async_message_handler\n(gl-t: 0.2.1)",
                             fontcolor="white",
                             style="filled",
                             fillcolor="black"];
