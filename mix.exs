@@ -8,8 +8,8 @@ defmodule Wok.Mixfile do
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps,
-      aliases: aliases
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -24,11 +24,11 @@ defmodule Wok.Mixfile do
   defp deps do
     [
       {:lager, "~> 3.2.0"},
-      {:lager_json_formatter, "~> 0.2.1"},
-      {:kafe, "~> 2.2.0"},
-      {:bucs, "~> 1.0.4"},
-      {:doteki, "~> 1.0.3"},
-      {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.7.1"},
+      {:lager_json_formatter, "~> 0.2.2"},
+      {:kafe, "~> 2.2.1"},
+      {:bucs, "~> 1.0.6"},
+      {:doteki, "~> 1.0.5"},
+      {:uuid, git: "https://github.com/botsunit/erlang-uuid.git", tag: "0.7.2"},
       {:metrics, "~> 2.2.0"}    
     ]
   end

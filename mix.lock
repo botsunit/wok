@@ -1,11 +1,11 @@
-%{"bristow": {:hex, :bristow, "0.2.1", "412432129231b37321b7d6d718fb0d048ea2f3470380bf98a856453893a4e307", [:make, :mix, :rebar3], []},
-  "bucs": {:hex, :bucs, "1.0.4", "d618fcb7d75a78d8cfbcc0525993e05ed466b265186fb8af3b33f43c63491b7b", [:make, :mix, :rebar3], []},
-  "doteki": {:hex, :doteki, "1.0.3", "03dad2fc118aa672853f850bfb13f9ba31c9feb4330e36a4c3c2cd19ca4cce67", [:make, :mix, :rebar3], [{:bucs, "~> 1.0.3", [hex: :bucs, optional: false]}]},
+%{"bristow": {:hex, :bristow, "0.2.2", "034423223b1b27ec5e39928a04476f7aeaae9edf9e3448c572049db8fc595c8a", [:make, :mix, :rebar3], []},
+  "bucs": {:hex, :bucs, "1.0.6", "b0467388b5adaabb4d8726595b7b754a961bfe80f0ccac88f58e1afea32be6d0", [:make, :mix, :rebar3], []},
+  "doteki": {:hex, :doteki, "1.0.5", "1e719dbe540f84ea87c6dc92be4b6f706a42b08067af519de13b6efc27243a49", [:make, :mix, :rebar3], [{:bucs, "~> 1.0.6", [hex: :bucs, optional: false]}]},
   "goldrush": {:hex, :goldrush, "0.1.9", "f06e5d5f1277da5c413e84d5a2924174182fb108dabb39d5ec548b27424cd106", [:rebar3], []},
   "jsx": {:hex, :jsx, "2.8.1", "1453b4eb3615acb3e2cd0a105d27e6761e2ed2e501ac0b390f5bbec497669846", [:mix, :rebar3], []},
-  "kafe": {:hex, :kafe, "2.2.0", "51a5df846450a592fcc34158c9740d454e0cb3cdb7c5bd3dad6f088d455a86f8", [:make, :mix, :rebar3], [{:bristow, "~> 0.2.1", [hex: :bristow, optional: false]}, {:bucs, "~> 1.0.4", [hex: :bucs, optional: false]}, {:doteki, "~> 1.0.3", [hex: :doteki, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}, {:metrics, "~> 2.2.0", [hex: :metrics, optional: false]}, {:poolgirl, "~> 1.1.1", [hex: :poolgirl, optional: false]}]},
+  "kafe": {:hex, :kafe, "2.2.1", "c1722f4b77d2c8569e40b9a9c74c95b1ee543b2220aab031e87a8a5c41273885", [:make, :mix, :rebar3], [{:bristow, "~> 0.2.2", [hex: :bristow, optional: false]}, {:bucs, "~> 1.0.6", [hex: :bucs, optional: false]}, {:doteki, "~> 1.0.5", [hex: :doteki, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}, {:metrics, "~> 2.2.0", [hex: :metrics, optional: false]}, {:poolgirl, "~> 1.1.2", [hex: :poolgirl, optional: false]}]},
   "lager": {:hex, :lager, "3.2.4", "a6deb74dae7927f46bd13255268308ef03eb206ec784a94eaf7c1c0f3b811615", [:rebar3], [{:goldrush, "0.1.9", [hex: :goldrush, optional: false]}]},
-  "lager_json_formatter": {:hex, :lager_json_formatter, "0.2.1", "e9b032fa3ea62ab44858a6b9d86b460952d23c93d5b18a78b8ef7e4046658499", [:make, :mix, :rebar3], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}]},
+  "lager_json_formatter": {:hex, :lager_json_formatter, "0.2.2", "7e58fc2001a5c7720d9abba69c0b05e52db0890cb8c543f2980ed75fc0f00311", [:make, :mix, :rebar3], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}, {:lager, "~> 3.2.0", [hex: :lager, optional: false]}]},
   "metrics": {:hex, :metrics, "2.2.0", "709b45a275fde02c9f2950ceab38b29b46d05687de33299e02c03a71be336545", [:rebar3], []},
-  "poolgirl": {:hex, :poolgirl, "1.1.1", "860c653a9a3e228133b372efdb4a5963c8b7a0a0a317aa1224e6434f1daa2aa5", [:make, :mix, :rebar3], [{:doteki, "~> 1.0.3", [hex: :doteki, optional: false]}]},
-  "uuid": {:git, "https://github.com/botsunit/erlang-uuid.git", "df9028133d545846622b0cac0f708ef9d2ad6f7a", [tag: "0.7.1"]}}
+  "poolgirl": {:hex, :poolgirl, "1.1.2", "c36f0dbd37ff6815c9ccde9a144ad889dbbc8640861aa1513b6bfbc2d2b2c120", [:make, :mix, :rebar3], [{:doteki, "~> 1.0.5", [hex: :doteki, optional: false]}]},
+  "uuid": {:git, "https://github.com/botsunit/erlang-uuid.git", "f350d2baad17b80d1c7bde7397c381701a14e6a5", [tag: "0.7.2"]}}
