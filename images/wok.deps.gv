@@ -115,7 +115,7 @@ digraph wok_deps {
             fontcolor="white",
             style="filled",
             fillcolor="black"];
-  botsunit_bots_common[label="botsunit_bots_common\n(gl-t: 0.0.3)",
+  botsunit_bots_common[label="botsunit_bots_common\n(gl-t: 0.0.4)",
                        fontcolor="white",
                        style="filled",
                        fillcolor="black"];
