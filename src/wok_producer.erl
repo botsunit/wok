@@ -5,6 +5,7 @@
          start/0
          , start/1
          , start/2
+         , stop/2
          , handle/3
          , handle/4
          , provide/5
@@ -37,6 +38,10 @@ start(Topic) ->
 % @hidden
 start(Topic, Partition) ->
   wok_async_producer:start(Topic, Partition).
+
+% @hidden
+stop(Topic, Partition) ->
+  wok_async_producer:stop(Topic, Partition).
 
 handle(From, To, Body) ->
   handle(From, To, Body, []).
