@@ -30,6 +30,7 @@ init([Static]) ->
       [];
     _ ->
       [
+       ?CHILD(wok_async_producer_state, [], worker, 5000),
        ?CHILD(wok_async_producer, [], worker, 5000)
       ]
   end ++ custom_servers() ++ middlewares_servers(),
