@@ -88,11 +88,9 @@ init([]) ->
   Handler = doteki:get_env([wok, producer, handler]),
   Frequency = doteki:get_env([wok, producer, frequency], ?DEFAULT_PRODUCER_FREQUENCY),
   Size = doteki:get_env([wok, producer, number_of_messages], ?DEFAULT_PRODUCER_SIZE),
+  Topics = wok_async_producer_state:get(),
   {ok, #state{
-          topics = #{
-            started => [],
-            paused => []
-           },
+          topics = Topics,
           handler = Handler,
           timer = erlang:send_after(Frequency, self(), produce),
           frequency = Frequency,
@@ -104,14 +102,17 @@ init([]) ->
 handle_call({start, Topic, Partition}, _From, #state{topics = Topics} = State) ->
   Topics0 = topics_add(Topics, started, Topic, Partition),
   Topics1 = topics_remove(Topics0, paused, Topic, Partition),
+  wok_async_producer_state:put(Topics1),
   {reply, ok, State#state{topics = Topics1}};
 handle_call({stop, Topic, Partition}, _From, #state{topics = Topics} = State) ->
   Topics0 = topics_remove(Topics, paused, Topic, Partition),
   Topics1 = topics_remove(Topics0, started, Topic, Partition),
+  wok_async_producer_state:put(Topics1),
   {reply, ok, State#state{topics = Topics1}};
 handle_call({pause, Topic, Partition}, _From, #state{topics = Topics} = State) ->
   Topics0 = topics_add(Topics, paused, Topic, Partition),
   Topics1 = topics_remove(Topics0, started, Topic, Partition),
+  wok_async_producer_state:put(Topics1),
   {reply, ok, State#state{topics = Topics1}};
 handle_call(_Request, _From, State) ->
   {reply, ignore, State}.
